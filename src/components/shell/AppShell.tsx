@@ -9,6 +9,8 @@ import { ensureUserChats, unreadTotal } from "@/lib/chat/data";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { ensureDeadlineReminders, unreadNotificationCount } from "@/lib/notifications";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { getThemeMode } from "@/lib/theme-server";
 import { Logo } from "@/components/Logo";
 import { getDictionary } from "@/i18n/server";
 import type { CurrentUser } from "@/lib/auth";
@@ -22,7 +24,7 @@ type AppShellProps = {
 };
 
 export async function AppShell({ user, nav: items, children }: AppShellProps) {
-  const { locale, t } = await getDictionary();
+  const [{ locale, t }, theme] = await Promise.all([getDictionary(), getThemeMode()]);
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   const home = items[0]?.href ?? "/";
 
@@ -39,7 +41,10 @@ export async function AppShell({ user, nav: items, children }: AppShellProps) {
 
   const account = (
     <div className="space-y-3">
-      <LanguageSwitcher current={locale} label={t.common.language} />
+      <div className="flex flex-wrap items-center gap-2">
+        <LanguageSwitcher current={locale} label={t.common.language} />
+        <ThemeSwitcher initial={theme} labels={t.common.theme} />
+      </div>
       <div className="flex items-center gap-3">
         <Avatar name={fullName} />
         <div className="min-w-0 flex-1">

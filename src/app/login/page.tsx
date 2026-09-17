@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { getThemeMode } from "@/lib/theme-server";
 import { Logo } from "@/components/Logo";
 import { getDictionary } from "@/i18n/server";
 import { LoginForm } from "./LoginForm";
@@ -10,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LoginPage() {
-  const { locale, t } = await getDictionary();
+  const [{ locale, t }, theme] = await Promise.all([getDictionary(), getThemeMode()]);
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -50,7 +52,10 @@ export default async function LoginPage() {
       <main className="flex flex-col px-5 py-5 sm:px-10">
         <div className="flex items-center justify-between">
           <Logo className="lg:invisible" />
-          <LanguageSwitcher current={locale} label={t.common.language} />
+          <div className="flex items-center gap-2">
+            <ThemeSwitcher initial={theme} labels={t.common.theme} />
+            <LanguageSwitcher current={locale} label={t.common.language} />
+          </div>
         </div>
 
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">

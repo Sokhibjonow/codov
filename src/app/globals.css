@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the chosen theme, not only the device */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   /* codov brand: navy #141B2D, coral #D9502A, light coral #F07A57, cream #F6F3EC.
      Buttons and links use a slightly deeper coral so white and body text stay readable. */
@@ -27,30 +30,28 @@
   color-scheme: light;
 }
 
-/* Dark theme follows the device setting */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0e1320;
-    --surface: #161d2f;
-    --foreground: #eceae3;
-    --muted: #9aa1b2;
-    --border: #273048;
-    --brand: #f07a57;
-    --brand-light: #f5957a;
-    --primary: #f07a57;
-    --primary-hover: #f5957a;
-    --primary-soft: #33231f;
-    --on-color: #141b2d;
-    --accent: #fbbf24;
-    --warning: #fbbf24;
-    --warning-strong: #fcd34d;
-    --success: #4ade80;
-    --danger: #f87171;
-    --danger-soft: #3b1c22;
-    --logo-ink: #f6f3ec;
-    --logo-accent: #f07a57;
-    color-scheme: dark;
-  }
+/* Dark theme: data-theme on <html> comes from the user's choice or the device setting (lib/theme.ts) */
+:root[data-theme="dark"] {
+  --background: #0e1320;
+  --surface: #161d2f;
+  --foreground: #eceae3;
+  --muted: #9aa1b2;
+  --border: #273048;
+  --brand: #f07a57;
+  --brand-light: #f5957a;
+  --primary: #f07a57;
+  --primary-hover: #f5957a;
+  --primary-soft: #33231f;
+  --on-color: #141b2d;
+  --accent: #fbbf24;
+  --warning: #fbbf24;
+  --warning-strong: #fcd34d;
+  --success: #4ade80;
+  --danger: #f87171;
+  --danger-soft: #3b1c22;
+  --logo-ink: #f6f3ec;
+  --logo-accent: #f07a57;
+  color-scheme: dark;
 }
 
 @theme inline {

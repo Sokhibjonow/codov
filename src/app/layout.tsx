@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Nunito } from "next/font/google";
 import { getLocale } from "@/i18n/server";
+import { themeScript } from "@/lib/theme";
+import { getThemeMode } from "@/lib/theme-server";
 // Code highlighting theme for lesson Markdown (see components/markdown)
 import "highlight.js/styles/github-dark.min.css";
 import "./globals.css";
@@ -33,10 +35,19 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
+  const [locale, theme] = await Promise.all([getLocale(), getThemeMode()]);
 
   return (
-    <html lang={locale} className={`${nunito.variable} ${jetbrains.variable} h-full antialiased`}>
+    <html
+      lang={locale}
+      data-theme={theme === "system" ? undefined : theme}
+      // The inline script sets data-theme before React loads
+      suppressHydrationWarning
+      className={`${nunito.variable} ${jetbrains.variable} h-full antialiased`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">{children}</body>
     </html>
   );
