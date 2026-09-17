@@ -125,7 +125,7 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
           </div>
         ) : (
           <form action={setLessonCompleted.bind(null, lesson.id, true)}>
-            <SubmitButton className="btn bg-success px-6 py-3 text-white hover:bg-success/90">
+            <SubmitButton className="btn bg-success px-6 py-3 text-on-color hover:bg-success/90">
               <CheckCircle2 size={20} />
               {t.learn.markDone}
             </SubmitButton>

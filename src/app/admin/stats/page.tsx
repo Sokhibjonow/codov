@@ -102,7 +102,7 @@ export default async function AdminStatsPage({ searchParams }: Props) {
             key={g.id}
             href={`/admin/stats?group=${g.id}`}
             className={`rounded-full border px-3 py-1.5 text-sm font-bold transition ${
-              g.id === group.id ? "border-primary bg-primary text-white" : "border-border bg-surface hover:border-primary"
+              g.id === group.id ? "border-primary bg-primary text-on-color" : "border-border bg-surface hover:border-primary"
             }`}
           >
             {g.name}

@@ -209,7 +209,7 @@ export function ChatThread({ t, locale, me, thread, basePath, onRead }: ChatThre
           <p className="truncate font-extrabold">{title}</p>
           <p className="truncate text-xs text-muted">{subtitle}</p>
         </div>
-        {!connected && <span className="text-xs font-semibold text-[#b45309]">{t.chat.reconnecting}</span>}
+        {!connected && <span className="text-xs font-semibold text-warning">{t.chat.reconnecting}</span>}
       </header>
 
       <div
@@ -260,7 +260,7 @@ export function ChatThread({ t, locale, me, thread, basePath, onRead }: ChatThre
                 )}
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug shadow-sm sm:max-w-[70%] ${
-                    mine ? "rounded-br-md bg-primary text-white" : "rounded-bl-md bg-surface"
+                    mine ? "rounded-br-md bg-primary text-on-color" : "rounded-bl-md bg-surface"
                   } ${message.status === "failed" ? "cursor-pointer ring-2 ring-danger" : ""}`}
                   onClick={message.status === "failed" ? () => void send(message.text, message.id) : undefined}
                 >
@@ -272,19 +272,19 @@ export function ChatThread({ t, locale, me, thread, basePath, onRead }: ChatThre
                   )}
                   {message.deleted && message.text ? (
                     <>
-                      <p className={`mb-0.5 text-[11px] font-bold italic ${mine ? "text-white/70" : "text-danger"}`}>{t.chat.deletedTeacherOnly}</p>
-                      <p className={`whitespace-pre-wrap break-words line-through decoration-1 ${mine ? "text-white/60" : "text-muted"}`}>
+                      <p className={`mb-0.5 text-[11px] font-bold italic ${mine ? "text-on-color/70" : "text-danger"}`}>{t.chat.deletedTeacherOnly}</p>
+                      <p className={`whitespace-pre-wrap break-words line-through decoration-1 ${mine ? "text-on-color/60" : "text-muted"}`}>
                         {message.text}
                       </p>
                     </>
                   ) : message.deleted ? (
-                    <p className={`italic ${mine ? "text-white/70" : "text-muted"}`}>{t.chat.deleted}</p>
+                    <p className={`italic ${mine ? "text-on-color/70" : "text-muted"}`}>{t.chat.deleted}</p>
                   ) : (
                     <p className="whitespace-pre-wrap break-words">
                       <Linkified text={message.text} />
                     </p>
                   )}
-                  <p className={`mt-0.5 flex items-center justify-end gap-1 text-[11px] ${mine ? "text-white/70" : "text-muted"}`}>
+                  <p className={`mt-0.5 flex items-center justify-end gap-1 text-[11px] ${mine ? "text-on-color/70" : "text-muted"}`}>
                     {message.status === "sending" && <Clock size={11} />}
                     {message.status === "failed" && <AlertCircle size={11} />}
                     {message.status === "failed" ? message.error : formatTime(message.createdAt)}

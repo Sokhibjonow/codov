@@ -29,7 +29,7 @@ export function Dialog({ open, onClose, title, closeLabel, wide, children }: Dia
       onClick={(event) => {
         if (event.target === ref.current) onClose();
       }}
-      className={`m-auto w-[calc(100%-1.5rem)] rounded-2xl bg-surface p-0 text-foreground shadow-2xl backdrop:bg-foreground/40 ${
+      className={`m-auto w-[calc(100%-1.5rem)] rounded-2xl bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/50 ${
         wide ? "max-w-2xl" : "max-w-lg"
       }`}
     >

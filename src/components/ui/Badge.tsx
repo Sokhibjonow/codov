@@ -5,7 +5,7 @@ const tones = {
   primary: "bg-primary-soft text-primary",
   success: "bg-success/10 text-success",
   danger: "bg-danger-soft text-danger",
-  accent: "bg-accent/15 text-[#b45309]",
+  accent: "bg-accent/15 text-warning",
 };
 
 export function Badge({ tone = "neutral", children }: { tone?: keyof typeof tones; children: ReactNode }) {

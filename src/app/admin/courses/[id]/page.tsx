@@ -290,7 +290,7 @@ export default async function CourseEditorPage({ params }: { params: Promise<{ i
             <h2 className="text-sm font-extrabold text-danger">{t.common.dangerZone}</h2>
             <p className="mb-3 mt-1 text-xs text-muted">{t.courses.deleteHint}</p>
             <form action={deleteCourse.bind(null, course.id)}>
-              <SubmitButton className="btn bg-danger text-white hover:bg-danger/90" confirmText={t.common.confirmDelete}>
+              <SubmitButton className="btn bg-danger text-on-color hover:bg-danger/90" confirmText={t.common.confirmDelete}>
                 <Trash2 size={18} />
                 {t.common.delete}
               </SubmitButton>

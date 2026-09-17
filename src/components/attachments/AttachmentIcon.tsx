@@ -15,20 +15,20 @@ export function AttachmentIcon({ item, size = 20 }: { item: AttachmentItem; size
       return <FileImage size={size} className="text-primary" />;
     case "psd":
     case "fig":
-      return <PenTool size={size} className="text-[#7c3aed]" />;
+      return <PenTool size={size} className="text-[#7c3aed] dark:text-violet-400" />;
     case "pdf":
       return <FileText size={size} className="text-danger" />;
     case "zip":
     case "rar":
     case "7z":
-      return <FileArchive size={size} className="text-[#b45309]" />;
+      return <FileArchive size={size} className="text-warning" />;
     case "xlsx":
       return <FileSpreadsheet size={size} className="text-success" />;
     case "pptx":
-      return <Presentation size={size} className="text-[#ea580c]" />;
+      return <Presentation size={size} className="text-[#ea580c] dark:text-orange-400" />;
     case "docx":
     case "txt":
-      return <FileText size={size} className="text-[#2563eb]" />;
+      return <FileText size={size} className="text-[#2563eb] dark:text-blue-400" />;
     default:
       return <File size={size} className="text-muted" />;
   }

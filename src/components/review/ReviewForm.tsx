@@ -71,7 +71,7 @@ export function ReviewForm({ t, maxScore, defaults, action, aiFeedback }: Review
       {state && !state.ok && <FormAlert ok={false} message={state.message} />}
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <SubmitButton name="decision" value="ACCEPTED" className="btn bg-success text-white hover:bg-success/90">
+        <SubmitButton name="decision" value="ACCEPTED" className="btn bg-success text-on-color hover:bg-success/90">
           <Check size={18} />
           {t.submissions.accept}
         </SubmitButton>

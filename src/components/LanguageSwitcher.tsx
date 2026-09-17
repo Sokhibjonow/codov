@@ -13,7 +13,7 @@ export function LanguageSwitcher({ current, label }: { current: Locale; label: s
           aria-pressed={locale === current}
           className={`rounded-md px-2.5 py-1 text-xs font-bold uppercase transition-colors ${
             locale === current
-              ? "bg-primary text-white"
+              ? "bg-primary text-on-color"
               : "text-muted hover:bg-primary-soft hover:text-primary"
           }`}
         >

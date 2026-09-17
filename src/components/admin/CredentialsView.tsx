@@ -79,7 +79,7 @@ export function CredentialsView({ credentials, t }: { credentials: Credential[];
 
   return (
     <div className="space-y-4">
-      <p className="flex items-start gap-2 rounded-xl bg-accent/15 px-3.5 py-2.5 text-sm font-semibold text-[#92400e]">
+      <p className="flex items-start gap-2 rounded-xl bg-accent/15 px-3.5 py-2.5 text-sm font-semibold text-warning-strong">
         <TriangleAlert size={18} className="mt-0.5 shrink-0" />
         {t.credentials.warning}
       </p>

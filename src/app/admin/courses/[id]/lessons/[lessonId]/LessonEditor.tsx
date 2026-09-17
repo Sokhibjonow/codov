@@ -86,7 +86,7 @@ export function SaveBar({ t, dirty, result }: { t: Dictionary; dirty: boolean; r
         {t.common.save}
       </SubmitButton>
       {dirty ? (
-        <span className="text-sm font-semibold text-[#b45309]">{t.lessons.unsaved}</span>
+        <span className="text-sm font-semibold text-warning">{t.lessons.unsaved}</span>
       ) : (
         result && <FormAlert ok={result.ok} message={result.message} />
       )}

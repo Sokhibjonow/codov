@@ -58,7 +58,7 @@ export default async function GroupsPage({ searchParams }: { searchParams: Searc
             href={tab.href}
             aria-current={tab.active ? "page" : undefined}
             className={`rounded-lg px-4 py-1.5 text-sm font-bold ${
-              tab.active ? "bg-primary text-white" : "text-muted hover:text-foreground"
+              tab.active ? "bg-primary text-on-color" : "text-muted hover:text-foreground"
             }`}
           >
             {tab.label}

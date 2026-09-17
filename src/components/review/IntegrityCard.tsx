@@ -49,7 +49,7 @@ export function IntegrityCard({ summary, t }: { summary: IntegritySummary | null
             <li
               key={flag}
               className={`rounded-lg px-3 py-2 text-sm font-bold ${
-                severe.has(flag) ? "bg-danger-soft text-danger" : "bg-accent/15 text-[#92400e]"
+                severe.has(flag) ? "bg-danger-soft text-danger" : "bg-accent/15 text-warning-strong"
               }`}
             >
               {ti.flags[flag]}

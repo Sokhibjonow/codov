@@ -10,10 +10,10 @@ type Entry = { status: Status | ""; note: string };
 const STATUSES: Status[] = ["PRESENT", "LATE", "ABSENT", "EXCUSED"];
 
 const activeClass: Record<Status, string> = {
-  PRESENT: "border-success bg-success text-white",
-  LATE: "border-accent bg-accent text-white",
-  ABSENT: "border-danger bg-danger text-white",
-  EXCUSED: "border-primary bg-primary text-white",
+  PRESENT: "border-success bg-success text-on-color",
+  LATE: "border-accent bg-accent text-on-color",
+  ABSENT: "border-danger bg-danger text-on-color",
+  EXCUSED: "border-primary bg-primary text-on-color",
 };
 
 type AttendanceRowsProps = {

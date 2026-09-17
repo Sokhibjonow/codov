@@ -260,8 +260,8 @@ export function Workspace({
 
 function SubmissionBanner({ submission, maxScore, t }: { submission: WorkspaceSubmission; maxScore: number; t: Dictionary }) {
   const view = {
-    SUBMITTED: { icon: Hourglass, className: "bg-accent/15 text-[#92400e]", text: t.submissions.banner.review },
-    NEEDS_REVIEW: { icon: Hourglass, className: "bg-accent/15 text-[#92400e]", text: t.submissions.banner.review },
+    SUBMITTED: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: t.submissions.banner.review },
+    NEEDS_REVIEW: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: t.submissions.banner.review },
     ACCEPTED: {
       icon: CheckCircle2,
       className: "bg-success/10 text-success",

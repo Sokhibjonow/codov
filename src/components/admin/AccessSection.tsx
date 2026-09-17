@@ -60,7 +60,7 @@ export function AccessSection({ t, locale, user, deactivateHint, deleteHint }: A
         <h3 className="text-sm font-extrabold text-danger">{t.common.dangerZone}</h3>
         <p className="mb-3 mt-1 text-xs text-muted">{deleteHint}</p>
         <form action={deleteUser.bind(null, user.id)}>
-          <SubmitButton className="btn bg-danger text-white hover:bg-danger/90" confirmText={t.common.confirmDelete}>
+          <SubmitButton className="btn bg-danger text-on-color hover:bg-danger/90" confirmText={t.common.confirmDelete}>
             <Trash2 size={18} />
             {t.common.delete}
           </SubmitButton>

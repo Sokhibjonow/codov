@@ -18,7 +18,7 @@ export function ChatUnreadBadge({ initial, userId }: { initial: number; userId: 
 
   if (count <= 0) return null;
   return (
-    <span className="ml-auto min-w-5 rounded-full bg-danger px-1.5 text-center text-xs font-bold leading-5 text-white">
+    <span className="ml-auto min-w-5 rounded-full bg-danger px-1.5 text-center text-xs font-bold leading-5 text-on-color">
       {count > 99 ? "99+" : count}
     </span>
   );

@@ -131,7 +131,7 @@ export function ChatApp({ t, locale, me, chats: initialChats, thread, contacts, 
                     <span className="flex items-center gap-2">
                       <span className="min-w-0 flex-1 truncate text-sm text-muted">{preview(chat)}</span>
                       {chat.unread > 0 && (
-                        <span className="min-w-5 shrink-0 rounded-full bg-primary px-1.5 text-center text-xs font-bold leading-5 text-white">
+                        <span className="min-w-5 shrink-0 rounded-full bg-primary px-1.5 text-center text-xs font-bold leading-5 text-on-color">
                           {chat.unread > 99 ? "99+" : chat.unread}
                         </span>
                       )}

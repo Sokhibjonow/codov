@@ -38,7 +38,7 @@ export function MobileNav({ home, menuLabel, children, footer, actions }: Mobile
 
       {open && (
         <div className="fixed inset-x-0 bottom-0 top-14 z-20 md:hidden">
-          <div className="absolute inset-0 bg-foreground/30" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
           <div
             className="relative max-h-full overflow-y-auto border-b border-border bg-surface p-3 shadow-xl"
             onClick={(event) => {

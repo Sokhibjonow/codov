@@ -19,7 +19,7 @@ export function AutotestResults({ t, rules, results }: AutotestResultsProps) {
   return (
     <div className="space-y-2">
       {results && (
-        <p className={`text-sm font-extrabold ${score === 100 ? "text-success" : score !== null && score >= 50 ? "text-[#b45309]" : "text-danger"}`}>
+        <p className={`text-sm font-extrabold ${score === 100 ? "text-success" : score !== null && score >= 50 ? "text-warning" : "text-danger"}`}>
           {format(t.autotests.summary, { passed, total: rules.length, percent: score ?? 0 })}
         </p>
       )}

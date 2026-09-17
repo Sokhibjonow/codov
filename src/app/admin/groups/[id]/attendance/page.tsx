@@ -19,7 +19,7 @@ type Props = {
 
 const cellClass = {
   success: "bg-success/15 text-success",
-  accent: "bg-accent/20 text-[#b45309]",
+  accent: "bg-accent/20 text-warning",
   danger: "bg-danger-soft text-danger",
   neutral: "bg-primary-soft text-primary",
 } as const;

@@ -13,7 +13,8 @@ const O2 = "M1874 -279Q1874 -365 1912.0 -430.5Q1950 -496 2016.0 -531.0Q2082 -566
 const V = "M2771 -160 2892 -558H3074L2876 0H2665L2467 -558H2650Z";
 
 const COLORS = {
-  dark: { ink: "#141B2D", accent: "#D9502A" },
+  // Follows the light/dark theme through CSS variables
+  dark: { ink: "var(--logo-ink)", accent: "var(--logo-accent)" },
   light: { ink: "#F6F3EC", accent: "#F07A57" },
 };
 

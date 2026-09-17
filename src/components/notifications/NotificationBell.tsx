@@ -53,7 +53,7 @@ function describe(t: Pick<Dictionary, "notifications">, locale: Locale, role: Ro
         text: format(tn.deadlineSoon, { title: title(item.data), date: formatDateTime(new Date(item.data.dueAt), locale) }),
         href: `/student/assignments/${item.data.assignmentId}`,
         icon: Clock,
-        tone: "text-[#b45309]",
+        tone: "text-warning",
       };
     case "attendance.absent":
       return {
@@ -160,7 +160,7 @@ export function NotificationBell({ t, locale, role, initialUnread, placement }: 
       >
         <Bell size={20} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 min-w-5 rounded-full bg-danger px-1 text-center text-[11px] font-bold leading-5 text-white">
+          <span className="absolute -right-0.5 -top-0.5 min-w-5 rounded-full bg-danger px-1 text-center text-[11px] font-bold leading-5 text-on-color">
             {unread > 99 ? "99+" : unread}
           </span>
         )}
