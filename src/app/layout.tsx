@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={locale}
-      data-theme={theme === "system" ? undefined : theme}
+      data-theme={theme ?? undefined}
       // The inline script sets data-theme before React loads
       suppressHydrationWarning
       className={`${nunito.variable} ${jetbrains.variable} h-full antialiased`}

@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { isThemeMode, THEME_COOKIE, type ThemeMode } from "./theme";
 
-export async function getThemeMode(): Promise<ThemeMode> {
+/** The theme the user picked, or null when the site follows the device setting. */
+export async function getThemeMode(): Promise<ThemeMode | null> {
   const value = (await cookies()).get(THEME_COOKIE)?.value;
-  return isThemeMode(value) ? value : "system";
+  return isThemeMode(value) ? value : null;
 }

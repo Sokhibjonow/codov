@@ -4,7 +4,7 @@ export const ru = {
     tagline: "Учимся HTML, CSS и JavaScript",
     logout: "Выйти",
     language: "Язык",
-    theme: { label: "Тема", light: "Светлая", dark: "Тёмная", system: "Как на устройстве" },
+    theme: { label: "Тема", light: "Светлая", dark: "Тёмная" },
     save: "Сохранить",
     cancel: "Отмена",
     create: "Создать",

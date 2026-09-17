@@ -6,7 +6,7 @@ export const uz: Dictionary = {
     tagline: "HTML, CSS va JavaScriptni o‘rganamiz",
     logout: "Chiqish",
     language: "Til",
-    theme: { label: "Ko‘rinish", light: "Yorug‘", dark: "Qorong‘i", system: "Qurilmadagidek" },
+    theme: { label: "Ko‘rinish", light: "Yorug‘", dark: "Qorong‘i" },
     save: "Saqlash",
     cancel: "Bekor qilish",
     create: "Yaratish",

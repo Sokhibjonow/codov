@@ -1,7 +1,8 @@
-// Light / dark / "as on the device" theme. The choice lives in a cookie so the server can render it,
-// and a tiny inline script applies it before the first paint (no white flash in dark mode).
+// Light / dark theme. The choice lives in a cookie so the server can render it, and a tiny inline
+// script applies it before the first paint (no white flash in dark mode). Without a choice the
+// device setting is used.
 
-export const themeModes = ["light", "system", "dark"] as const;
+export const themeModes = ["light", "dark"] as const;
 export type ThemeMode = (typeof themeModes)[number];
 export const THEME_COOKIE = "cubick_theme";
 
