@@ -1,4 +1,4 @@
-# CubickEdu
+# codov
 
 Учебная платформа по HTML, CSS и JavaScript: уроки, задания с редактором кода, проверка работ, чат, кабинеты ученика и родителя. Интерфейс на узбекском и русском.
 
@@ -95,7 +95,7 @@ src/proxy.ts              защита разделов по ролям
    ```
 
    ```bash
-   mkdir -p /opt/cubickedu && tar xzf /root/to-server/cubickedu.tar.gz -C /opt/cubickedu && cd /opt/cubickedu
+   mkdir -p /opt/codov && tar xzf /root/to-server/codov.tar.gz -C /opt/codov && cd /opt/codov
    ```
 
 3. Установите и запустите (спросит домен и ключ Gemini):
@@ -107,13 +107,13 @@ src/proxy.ts              защита разделов по ролям
 4. Перенесите данные (курсы, ученики, работы, файлы):
 
    ```bash
-   sudo bash deploy/restore.sh /root/to-server/cubickedu.dump /root/to-server/uploads.tar.gz
+   sudo bash deploy/restore.sh /root/to-server/codov.dump /root/to-server/uploads.tar.gz
    ```
 
-**Обновление сайта:** скопируйте новый `cubickedu.tar.gz`, распакуйте поверх и выполните `sudo bash deploy/update.sh`
+**Обновление сайта:** скопируйте новый `codov.tar.gz`, распакуйте поверх и выполните `sudo bash deploy/update.sh`
 (перед обновлением делается резервная копия).
 
-**Полезные команды** (в папке `/opt/cubickedu`):
+**Полезные команды** (в папке `/opt/codov`):
 
 | Что | Команда |
 |---|---|
@@ -131,7 +131,7 @@ src/proxy.ts              защита разделов по ролям
 
 **Один раз:**
 1. Зарегистрироваться на vercel.com, в терминале проекта: `npx vercel login`.
-2. `npx vercel link` — создать проект `cubickedu`.
+2. `npx vercel link` — создать проект `codov`.
 3. В проекте на vercel.com → **Storage**: создать **Neon** (регион Frankfurt) и **Blob** (Public), подключить к проекту.
 4. **Settings → Environment Variables:** `SESSION_SECRET` (длинная случайная строка) и `GEMINI_API_KEY`.
 5. `npx vercel env pull .env.vercel`, затем перенос данных с компьютера: `npm run move-to-vercel -- --yes`.

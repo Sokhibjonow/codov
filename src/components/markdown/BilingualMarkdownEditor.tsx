@@ -37,7 +37,7 @@ const LIVE_SNIPPET = `\`\`\`html-live
 <h1>Salom, dunyo!</h1>
 
 <style>
-  h1 { color: #5046e5; }
+  h1 { color: #141B2D; }
 </style>
 \`\`\``;
 

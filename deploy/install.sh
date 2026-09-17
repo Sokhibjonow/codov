@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# First installation of CubickEdu on a clean Ubuntu 22.04/24.04 server.
+# First installation of codov on a clean Ubuntu 22.04/24.04 server.
 # Run from the project folder:  sudo bash deploy/install.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -33,7 +33,7 @@ fi
 
 echo "== 3/5 Settings (.env)"
 if [ ! -f .env ]; then
-  read -rp "Домен сайта (например edu.cubick.uz): " domain
+  read -rp "Домен сайта (например codov.uz): " domain
   read -rsp "Ключ Google Gemini (можно оставить пустым): " gemini
   echo
   cat > .env <<ENV

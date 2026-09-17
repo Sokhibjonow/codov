@@ -1,4 +1,4 @@
-// CubickEdu database schema
+// codov database schema
 
 generator client {
   provider = "prisma-client"

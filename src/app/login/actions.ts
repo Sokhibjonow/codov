@@ -20,7 +20,7 @@ const credentialsSchema = z.object({
 });
 
 // Compared against when the login does not exist, so response time doesn't reveal valid logins
-const DUMMY_HASH = bcrypt.hashSync("cubickedu-dummy-password", 10);
+const DUMMY_HASH = bcrypt.hashSync("codov-dummy-password", 10);
 
 export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const rawLogin = String(formData.get("login") ?? "");

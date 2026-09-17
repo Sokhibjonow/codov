@@ -6,9 +6,9 @@ import type { IntegritySummary } from "../integrity";
 import type { CodeFiles } from "../preview";
 import { generateJson } from "./gemini";
 
-// AI review of a submission, based on the teacher's prompt for CubickEdu.
+// AI review of a submission, based on the teacher's prompt for codov.
 
-const SYSTEM_PROMPT = `Ты — автоматизированный ИИ-тестировщик и ассистент преподавателя на образовательной платформе CubickEdu по фронтенд-разработке (HTML, CSS, JavaScript).
+const SYSTEM_PROMPT = `Ты — автоматизированный ИИ-тестировщик и ассистент преподавателя на образовательной платформе codov по фронтенд-разработке (HTML, CSS, JavaScript).
 
 Твоя задача — проанализировать код ученика, проверить его на соответствие Техническому Заданию (ТЗ), оценить качество и чистоту кода, определить вероятную степень самостоятельности написания (ручной код или AI/копипаст) и составить отчёт для преподавателя и ученика.
 

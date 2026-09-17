@@ -48,7 +48,7 @@ export async function GET() {
   return new Response(buffer, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": 'attachment; filename="cubickedu-students.xlsx"',
+      "Content-Disposition": 'attachment; filename="codov-students.xlsx"',
     },
   });
 }

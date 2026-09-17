@@ -17,8 +17,8 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "CubickEdu",
-    template: "%s · CubickEdu",
+    default: "codov",
+    template: "%s · codov",
   },
   description: "HTML, CSS, JavaScript",
 };
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#5046e5",
+  themeColor: "#141B2D",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

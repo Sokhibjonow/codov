@@ -2,7 +2,7 @@ import type { Dictionary } from "./ru";
 
 export const uz: Dictionary = {
   common: {
-    appName: "CubickEdu",
+    appName: "codov",
     tagline: "HTML, CSS va JavaScriptni o‘rganamiz",
     logout: "Chiqish",
     language: "Til",
@@ -53,7 +53,7 @@ export const uz: Dictionary = {
     lastLogin: "Oxirgi kirish",
   },
   auth: {
-    title: "CubickEdu tizimiga kirish",
+    title: "codov tizimiga kirish",
     subtitle: "O‘qituvchi bergan login va parolni kiriting",
     login: "Login",
     password: "Parol",

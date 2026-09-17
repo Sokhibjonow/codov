@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Loads a database dump and uploaded files into the server (replaces what is there now).
-#   sudo bash deploy/restore.sh cubickedu.dump uploads.tar.gz
+#   sudo bash deploy/restore.sh codov.dump uploads.tar.gz
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

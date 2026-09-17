@@ -1,4 +1,4 @@
-# CubickEdu — production image
+# codov — production image
 FROM node:22-bookworm-slim
 
 WORKDIR /app

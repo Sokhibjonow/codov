@@ -1,4 +1,4 @@
-# CubickEdu on a server: site + PostgreSQL + Caddy (HTTPS) + daily backups.
+# codov on a server: site + PostgreSQL + Caddy (HTTPS) + daily backups.
 # Settings come from the .env file next to this one (created by deploy/install.sh).
 services:
   db:
@@ -18,7 +18,7 @@ services:
 
   app:
     build: .
-    image: cubickedu-app
+    image: codov-app
     restart: unless-stopped
     depends_on:
       db:

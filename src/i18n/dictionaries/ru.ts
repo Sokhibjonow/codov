@@ -1,6 +1,6 @@
 export const ru = {
   common: {
-    appName: "CubickEdu",
+    appName: "codov",
     tagline: "Учимся HTML, CSS и JavaScript",
     logout: "Выйти",
     language: "Язык",
@@ -51,7 +51,7 @@ export const ru = {
     lastLogin: "Последний вход",
   },
   auth: {
-    title: "Вход в CubickEdu",
+    title: "Вход в codov",
     subtitle: "Введите логин и пароль, которые выдал преподаватель",
     login: "Логин",
     password: "Пароль",

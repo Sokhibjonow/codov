@@ -14,14 +14,14 @@ export default async function LoginPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-white lg:flex">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-navy p-12 text-white lg:flex">
         <div
           aria-hidden="true"
-          className="absolute -right-24 -top-24 size-96 rotate-12 rounded-[4rem] bg-white/10"
+          className="absolute -right-24 -top-24 size-96 rotate-12 rounded-[4rem] bg-brand/25"
         />
         <div
           aria-hidden="true"
-          className="absolute -bottom-32 -left-16 size-80 -rotate-12 rounded-[3rem] bg-white/5"
+          className="absolute -bottom-32 -left-16 size-80 -rotate-12 rounded-[3rem] bg-brand-light/10"
         />
 
         <Logo tone="light" size={36} className="relative" />
@@ -30,16 +30,16 @@ export default async function LoginPage() {
           <h2 className="text-4xl font-extrabold leading-tight">{t.auth.brandTitle}</h2>
           <p className="mt-4 text-lg text-white/80">{t.auth.brandText}</p>
 
-          <pre className="mt-8 overflow-x-auto rounded-2xl bg-[#1b1c2e]/80 p-5 font-mono text-sm leading-relaxed shadow-2xl">
+          <pre className="mt-8 overflow-x-auto rounded-2xl bg-black/30 p-5 ring-1 ring-white/10 font-mono text-sm leading-relaxed shadow-2xl">
             <code>
-              <span className="text-[#8f89ff]">&lt;div</span> <span className="text-accent">class</span>=
+              <span className="text-brand-light">&lt;div</span> <span className="text-accent">class</span>=
               <span className="text-[#7ee0a1]">&quot;card&quot;</span>
-              <span className="text-[#8f89ff]">&gt;</span>
+              <span className="text-brand-light">&gt;</span>
               {"\n  "}
-              <span className="text-[#8f89ff]">&lt;h1&gt;</span>Salom, dunyo!
-              <span className="text-[#8f89ff]">&lt;/h1&gt;</span>
+              <span className="text-brand-light">&lt;h1&gt;</span>Salom, dunyo!
+              <span className="text-brand-light">&lt;/h1&gt;</span>
               {"\n"}
-              <span className="text-[#8f89ff]">&lt;/div&gt;</span>
+              <span className="text-brand-light">&lt;/div&gt;</span>
             </code>
           </pre>
         </div>

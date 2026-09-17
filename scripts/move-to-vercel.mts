@@ -59,8 +59,8 @@ async function counts(url: string) {
 
 // ── 1. Database ──
 console.log("1/2 Database");
-const dir = mkdtempSync(path.join(tmpdir(), "cubickedu-"));
-const dump = path.join(dir, "cubickedu.dump");
+const dir = mkdtempSync(path.join(tmpdir(), "codov-"));
+const dump = path.join(dir, "codov.dump");
 try {
   const dumped = spawnSync(postgresTool("pg_dump"), ["-Fc", "--no-owner", "-f", dump, "-d", libpqUrl(localDb)], { stdio: ["ignore", "inherit", "inherit"] });
   if (dumped.status !== 0) throw new Error("pg_dump failed");

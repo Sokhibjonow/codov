@@ -1,14 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f6fb;
+  /* codov brand: navy #141B2D, coral #D9502A, light coral #F07A57, cream #F6F3EC.
+     Buttons and links use a slightly deeper coral so white and body text stay readable. */
+  --background: #f6f3ec;
   --surface: #ffffff;
-  --foreground: #1b1c2e;
-  --muted: #6a6e86;
-  --border: #e2e4ef;
-  --primary: #5046e5;
-  --primary-hover: #4038c9;
-  --primary-soft: #ecebfd;
+  --foreground: #141b2d;
+  --muted: #5f6576;
+  --border: #e8e3d8;
+  --brand: #d9502a;
+  --brand-light: #f07a57;
+  --navy: #141b2d;
+  --primary: #bd4220;
+  --primary-hover: #a3381b;
+  --primary-soft: #fcede6;
   --accent: #f59e0b;
   --success: #16a34a;
   --danger: #dc2626;
@@ -21,6 +26,9 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
+  --color-navy: var(--navy);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);

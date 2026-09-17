@@ -41,7 +41,7 @@ export function CredentialsView({ credentials, t }: { credentials: Credential[];
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `cubickedu-logins-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `codov-logins-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -52,7 +52,7 @@ export function CredentialsView({ credentials, t }: { credentials: Credential[];
     const cards = credentials
       .map(
         (c) => `<div class="card">
-          <div class="brand">Cubick<b>Edu</b></div>
+          <div class="brand">c<b>o</b>d<b>o</b>v</div>
           <div class="name">${escapeHtml(c.name)}</div>
           <div class="role">${escapeHtml(t.roles[c.role])}</div>
           <table>
@@ -63,11 +63,11 @@ export function CredentialsView({ credentials, t }: { credentials: Credential[];
         </div>`,
       )
       .join("");
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>CubickEdu</title><style>
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>codov</title><style>
       body{font-family:Arial,sans-serif;margin:16px;color:#1b1c2e}
       .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
       .card{border:1.5px dashed #9a9cb0;border-radius:12px;padding:14px;break-inside:avoid}
-      .brand{font-weight:800;font-size:14px}.brand b{color:#5046e5}
+      .brand{font-weight:800;font-size:14px}.brand b{color:#D9502A}
       .name{font-size:18px;font-weight:700;margin-top:8px}.role{color:#6a6e86;font-size:12px;margin-bottom:8px}
       td{padding:3px 10px 3px 0;font-size:14px}td:first-child{color:#6a6e86}
       .mono{font-family:Consolas,monospace;font-size:16px;font-weight:700;letter-spacing:.5px}

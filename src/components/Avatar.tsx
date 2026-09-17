@@ -1,4 +1,4 @@
-const COLORS = ["#5046e5", "#0d9488", "#db2777", "#d97706", "#2563eb", "#7c3aed", "#059669"];
+const COLORS = ["#D9502A", "#0d9488", "#db2777", "#b45309", "#2563eb", "#141B2D", "#059669"];
 
 export function Avatar({ name, size = 36 }: { name: string; size?: number }) {
   const initials = name
