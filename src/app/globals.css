@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f6fb;
+  --surface: #ffffff;
+  --foreground: #1b1c2e;
+  --muted: #6a6e86;
+  --border: #e2e4ef;
+  --primary: #5046e5;
+  --primary-hover: #4038c9;
+  --primary-soft: #ecebfd;
+  --accent: #f59e0b;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  /* text-base keeps iOS from zooming into focused inputs */
+  .input {
+    @apply w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover;
+  }
+  .btn-ghost {
+    @apply text-muted hover:bg-primary-soft hover:text-primary;
+  }
+  .card {
+    @apply rounded-2xl border border-border bg-surface p-5;
+  }
+
+  /* 16:9 YouTube player */
+  .video-embed {
+    @apply aspect-video w-full overflow-hidden rounded-xl bg-black;
+  }
+  .video-embed iframe {
+    @apply block h-full w-full border-0;
+  }
+
+  /* Code editor: 16px on phones so iOS doesn't zoom in while typing */
+  .code-editor .cm-editor {
+    @apply text-base md:text-sm;
+  }
+
+  /* Lesson content */
+  .markdown {
+    @apply text-base leading-relaxed break-words;
+  }
+  .markdown > * > :first-child {
+    @apply mt-0;
+  }
+  .markdown h1 {
+    @apply mt-8 mb-3 text-3xl font-extrabold tracking-tight;
+  }
+  .markdown h2 {
+    @apply mt-8 mb-3 text-2xl font-extrabold tracking-tight;
+  }
+  .markdown h3 {
+    @apply mt-6 mb-2 text-xl font-bold;
+  }
+  .markdown p,
+  .markdown ul,
+  .markdown ol,
+  .markdown blockquote,
+  .markdown pre {
+    @apply my-3;
+  }
+  .markdown ul {
+    @apply list-disc pl-6;
+  }
+  .markdown ol {
+    @apply list-decimal pl-6;
+  }
+  .markdown li {
+    @apply my-1;
+  }
+  .markdown a {
+    @apply font-semibold text-primary underline underline-offset-2;
+  }
+  .markdown img {
+    @apply my-4 rounded-xl border border-border;
+  }
+  .markdown blockquote {
+    @apply rounded-xl border-l-4 border-accent bg-accent/10 px-4 py-2;
+  }
+  .markdown :not(pre) > code {
+    @apply rounded-md bg-primary-soft px-1.5 py-0.5 font-mono text-[0.9em] text-primary;
+  }
+  .markdown pre {
+    @apply overflow-x-auto rounded-xl bg-[#0d1117] p-4 font-mono text-sm leading-relaxed text-[#e6edf3];
+  }
+  .markdown pre code.hljs {
+    @apply bg-transparent p-0;
+  }
+  .markdown hr {
+    @apply my-6 border-border;
+  }
+  .markdown .table-wrap {
+    @apply my-4 overflow-x-auto rounded-xl border border-border;
+  }
+  .markdown table {
+    @apply w-full text-left text-sm;
+  }
+  .markdown th {
+    @apply bg-background px-3 py-2 font-bold;
+  }
+  .markdown td {
+    @apply border-t border-border px-3 py-2;
+  }
+  .markdown .live-example {
+    @apply my-4 overflow-hidden rounded-xl border border-border;
+  }
+  .markdown .live-example pre {
+    @apply my-0 rounded-none;
+  }
+  .markdown .live-example-label {
+    @apply border-y border-border bg-background px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-muted;
+  }
+  .markdown .live-example-frame {
+    @apply h-80 resize-y overflow-auto bg-white;
+  }
+  /* Assignment page: the result to build is shown almost full screen */
+  .task-view .markdown .live-example-frame {
+    @apply h-[75vh] min-h-[420px];
+  }
+  .markdown .live-example-frame iframe {
+    @apply block h-full w-full border-0;
+  }
+}

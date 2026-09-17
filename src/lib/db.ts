@@ -1,0 +1,16 @@
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@/generated/prisma/client";
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+function createClient() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) throw new Error("DATABASE_URL is not set");
+  // Serverless functions run many copies at once, each keeps only a few connections
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString, max: process.env.VERCEL ? 3 : 10 }) });
+}
+
+// Reuse one client across hot reloads in development
+export const prisma = globalForPrisma.prisma ?? createClient();
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

@@ -1,0 +1,416 @@
+// CubickEdu database schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────── Users ─────────────
+
+enum Role {
+  ADMIN
+  STUDENT
+  PARENT
+}
+
+enum Locale {
+  uz
+  ru
+}
+
+model User {
+  id             String    @id @default(cuid())
+  login          String    @unique
+  passwordHash   String
+  role           Role
+  firstName      String
+  lastName       String    @default("")
+  phone          String?
+  locale         Locale?
+  isActive       Boolean   @default(true)
+  // Bumped on password reset: invalidates every session issued before
+  sessionVersion Int       @default(0)
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  groupMemberships    GroupMember[]
+  children            ParentChild[]      @relation("ParentLinks")
+  parents             ParentChild[]      @relation("ChildLinks")
+  submissions         Submission[]       @relation("StudentSubmissions")
+  reviewedSubmissions Submission[]       @relation("ReviewerSubmissions")
+  drafts              CodeDraft[]
+  lessonProgress      LessonProgress[]
+  attendance          AttendanceRecord[]
+  chatMemberships     ChatMember[]
+  messages            Message[]
+  notifications       Notification[]
+
+  @@index([role])
+}
+
+model ParentChild {
+  parentId  String
+  childId   String
+  createdAt DateTime @default(now())
+
+  parent User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
+  child  User @relation("ChildLinks", fields: [childId], references: [id], onDelete: Cascade)
+
+  @@id([parentId, childId])
+  @@index([childId])
+}
+
+// ───────────── Groups ─────────────
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members    GroupMember[]
+  courses    GroupCourse[]
+  deadlines  AssignmentDeadline[]
+  attendance AttendanceRecord[]
+  chat       Chat?
+}
+
+model GroupMember {
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+  @@index([userId])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model AttendanceRecord {
+  id        String           @id @default(cuid())
+  groupId   String
+  studentId String
+  date      DateTime         @db.Date
+  status    AttendanceStatus
+  note      String?
+  createdAt DateTime         @default(now())
+
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, studentId, date])
+  @@index([studentId, date])
+}
+
+// ───────────── Learning content ─────────────
+// Texts are stored in both languages; an empty translation falls back to the other one.
+
+model Course {
+  id            String   @id @default(cuid())
+  titleUz       String
+  titleRu       String
+  descriptionUz String   @default("")
+  descriptionRu String   @default("")
+  order         Int      @default(0)
+  isPublished   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  modules     Module[]
+  groups      GroupCourse[]
+  attachments Attachment[]
+}
+
+model GroupCourse {
+  groupId  String
+  courseId String
+  openedAt DateTime @default(now())
+
+  group  Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, courseId])
+  @@index([courseId])
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  titleUz   String
+  titleRu   String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId, order])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  moduleId    String
+  titleUz     String
+  titleRu     String
+  // Markdown
+  contentUz   String   @default("") @db.Text
+  contentRu   String   @default("") @db.Text
+  order       Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  assignments Assignment[]
+  progress    LessonProgress[]
+  attachments Attachment[]
+
+  @@index([moduleId, order])
+}
+
+model LessonProgress {
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+  @@index([lessonId])
+}
+
+model Assignment {
+  id              String   @id @default(cuid())
+  lessonId        String
+  titleUz         String
+  titleRu         String
+  // Markdown task description (ТЗ)
+  descriptionUz   String   @default("") @db.Text
+  descriptionRu   String   @default("") @db.Text
+  // Lesson topic passed to the AI reviewer to judge what is "age-appropriate" code
+  topic           String   @default("")
+  starterHtml     String   @default("") @db.Text
+  starterCss      String   @default("") @db.Text
+  starterJs       String   @default("") @db.Text
+  // Autotest rules, see src/lib/autotests
+  tests           Json     @default("[]")
+  maxScore        Int      @default(100)
+  aiReviewEnabled Boolean  @default(true)
+  order           Int      @default(0)
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  lesson      Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  drafts      CodeDraft[]
+  deadlines   AssignmentDeadline[]
+  attachments Attachment[]
+
+  @@index([lessonId, order])
+}
+
+model AssignmentDeadline {
+  assignmentId String
+  groupId      String
+  dueAt        DateTime
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  group      Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([assignmentId, groupId])
+  @@index([groupId, dueAt])
+}
+
+// Materials attached to a course, lesson or assignment: mockups, PDFs, archives, links, YouTube videos.
+// Exactly one of courseId / lessonId / assignmentId is set.
+
+enum AttachmentKind {
+  FILE
+  LINK
+}
+
+model Attachment {
+  id           String         @id @default(cuid())
+  courseId     String?
+  lessonId     String?
+  assignmentId String?
+  kind         AttachmentKind
+  title        String
+  // /files/... for uploads, the external address for links
+  url          String
+  fileName     String?
+  size         Int?
+  order        Int            @default(0)
+  createdAt    DateTime       @default(now())
+
+  course     Course?     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson     Lesson?     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  assignment Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([assignmentId])
+}
+
+// ───────────── Code & submissions ─────────────
+
+// Autosaved work in progress, one per student per assignment
+model CodeDraft {
+  userId       String
+  assignmentId String
+  html         String   @default("") @db.Text
+  css          String   @default("") @db.Text
+  js           String   @default("") @db.Text
+  // Integrity counters accumulated while editing (paste count, typed chars, active time…)
+  integrity    Json?
+  // Editing sessions since the last submission (see src/lib/integrity.ts)
+  replay       Json?
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, assignmentId])
+}
+
+enum SubmissionStatus {
+  SUBMITTED // waiting for automatic checks
+  NEEDS_REVIEW // checks done, waiting for the teacher
+  ACCEPTED
+  RETURNED // sent back for rework
+}
+
+enum AiReviewStatus {
+  NONE
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  studentId    String
+  attempt      Int
+  html         String           @db.Text
+  css          String           @db.Text
+  js           String           @db.Text
+  status       SubmissionStatus @default(SUBMITTED)
+  // Sent after the student's group deadline (snapshot at submit time)
+  isLate       Boolean          @default(false)
+
+  autotestResults Json?
+  autotestScore   Int?
+
+  aiStatus    AiReviewStatus @default(NONE)
+  aiReport    Json?
+  aiError     String?
+  aiAttempts  Int            @default(0)
+  aiStartedAt DateTime?
+
+  // Paste/typing/time statistics and the compressed edit recording for replay
+  integrity Json?
+  replay    Json?
+
+  score          Int?
+  teacherComment String?   @db.Text
+  reviewerId     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  reviewer   User?      @relation("ReviewerSubmissions", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@unique([assignmentId, studentId, attempt])
+  @@index([studentId, createdAt])
+  @@index([status, createdAt])
+  @@index([aiStatus])
+}
+
+// ───────────── Chat ─────────────
+
+enum ChatType {
+  DIRECT
+  GROUP
+}
+
+model Chat {
+  id            String   @id @default(cuid())
+  type          ChatType
+  // Set only for GROUP chats
+  groupId       String?  @unique
+  // Set only for DIRECT chats: both user ids sorted and joined with ":", so a pair has one chat
+  directKey     String?  @unique
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  group    Group?       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  members  ChatMember[]
+  messages Message[]
+
+  @@index([lastMessageAt])
+}
+
+model ChatMember {
+  chatId     String
+  userId     String
+  lastReadAt DateTime?
+  joinedAt   DateTime  @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([chatId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  chatId    String
+  senderId  String
+  text      String    @db.Text
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+  deletedAt DateTime?
+
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt])
+}
+
+// ───────────── Notifications ─────────────
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  // e.g. "submission.reviewed", "assignment.new", "chat.message"
+  type      String
+  data      Json      @default("{}")
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+}

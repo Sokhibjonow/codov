@@ -1,0 +1,80 @@
+# CubickEdu on a server: site + PostgreSQL + Caddy (HTTPS) + daily backups.
+# Settings come from the .env file next to this one (created by deploy/install.sh).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cubickedu
+      POSTGRES_USER: cubick
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cubick -d cubickedu"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: cubickedu-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://cubick:${POSTGRES_PASSWORD}@db:5432/cubickedu?schema=public
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      UPLOAD_DIR: /app/storage/uploads
+      TZ: Asia/Tashkent
+    volumes:
+      - ./data/uploads:/app/storage/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGUSER: cubick
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: cubickedu
+      KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      TZ: Asia/Tashkent
+    volumes:
+      - ./deploy/backup.sh:/backup.sh:ro
+      - ./data/uploads:/data/uploads:ro
+      - ./data/backups:/backups
+    entrypoint: ["sh", "/backup.sh", "loop"]
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

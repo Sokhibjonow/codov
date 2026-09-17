@@ -1,0 +1,13 @@
+node_modules
+.next
+storage
+data
+backups
+.env
+.env.*
+!.env.example
+public/monaco
+tsconfig.tsbuildinfo
+*.log
+.claude
+src/generated
