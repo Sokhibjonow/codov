@@ -9,6 +9,7 @@ import {
   verifySession,
   type Role,
 } from "@/lib/session-token";
+import { LOCALE_HEADER } from "@/i18n/config";
 
 const areas: [prefix: string, role: Role][] = [
   ["/admin", "ADMIN"],
@@ -20,6 +21,14 @@ const areas: [prefix: string, role: Role][] = [
 // (so deactivated accounts and reset passwords lock the user out immediately).
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // The public page has its own address per language (/ and /ru) so search engines index both
+  if (pathname === "/" || pathname === "/ru") {
+    const headers = new Headers(request.headers);
+    headers.set(LOCALE_HEADER, pathname === "/ru" ? "ru" : "uz");
+    return NextResponse.next({ request: { headers } });
+  }
+
   const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value);
 
   if (pathname === "/login") {
@@ -54,5 +63,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/admin/:path*", "/student/:path*", "/parent/:path*"],
+  matcher: ["/", "/ru", "/login", "/admin/:path*", "/student/:path*", "/parent/:path*"],
 };

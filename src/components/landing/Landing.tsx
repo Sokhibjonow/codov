@@ -42,20 +42,51 @@ const FORMAT_ICONS: LucideIcon[] = [School, MonitorPlay, Laptop];
 /** Web Basics, Frontend, Backend, Database, Tools, AI & Web */
 const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles];
 
-// Tells search engines what codov is (structured data, not shown on the page)
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  name: "codov",
-  url: SITE_URL,
-  logo: `${SITE_URL}/icons/icon-512.png`,
-  description: SITE_DESCRIPTION,
-  areaServed: "UZ",
-  knowsAbout: ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Tailwind CSS", "Node.js", "Express", "REST API", "MySQL", "SQL", "Git", "AI"],
-  inLanguage: ["uz", "ru"],
-  telephone: CONTACTS.phone || undefined,
-  sameAs: [CONTACTS.instagram, CONTACTS.channel, CONTACTS.telegram && `https://t.me/${CONTACTS.telegram}`].filter(Boolean),
-};
+/**
+ * Structured data for search engines (not shown on the page): the school, its six courses and the FAQ,
+ * in the page's language. Lets Google show courses and answers right in the results.
+ */
+function structuredData(t: Dictionary, locale: Locale) {
+  const l = t.landing;
+  const organization = {
+    "@type": "EducationalOrganization",
+    "@id": `${SITE_URL}/#organization`,
+    name: "codov",
+    url: SITE_URL,
+    logo: `${SITE_URL}/icons/icon-512.png`,
+    image: `${SITE_URL}/og.png`,
+    description: SITE_DESCRIPTION,
+    areaServed: "UZ",
+    inLanguage: ["uz", "ru"],
+    knowsAbout: l.learn.items.flatMap((item) => item.topics),
+    ...(CONTACTS.phone && { telephone: CONTACTS.phone }),
+    sameAs: [CONTACTS.instagram, CONTACTS.channel, CONTACTS.telegram && `https://t.me/${CONTACTS.telegram}`].filter(Boolean),
+  };
+  const courses = {
+    "@type": "ItemList",
+    name: l.learn.title,
+    itemListElement: l.learn.items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Course",
+        name: `${item.name}: ${item.topics.join(", ")}`,
+        description: item.text,
+        inLanguage: locale,
+        provider: { "@id": `${SITE_URL}/#organization` },
+      },
+    })),
+  };
+  const faq = {
+    "@type": "FAQPage",
+    mainEntity: l.faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+  return { "@context": "https://schema.org", "@graph": [organization, courses, faq] };
+}
 
 function InstagramIcon({ size = 18 }: { size?: number }) {
   return (
@@ -103,7 +134,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(t, locale)) }} />
       <RevealOnScroll />
 
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
@@ -122,7 +153,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
             <div className="hidden sm:block">
               <ThemeSwitcher initial={theme} labels={t.common.theme} />
             </div>
-            <LanguageSwitcher current={locale} label={t.common.language} />
+            <LanguageSwitcher current={locale} label={t.common.language} publicPage />
             <Link href="/login" className="btn btn-primary px-3 py-2 text-sm">
               <LogIn size={16} />
               <span className="hidden sm:inline">{l.nav.login}</span>

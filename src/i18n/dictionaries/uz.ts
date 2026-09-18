@@ -712,7 +712,7 @@ export const uz: Dictionary = {
       note: "Codov o‘qituvchiga o‘rgatishda, o‘quvchiga esa o‘rganishda yordam beradi. Testlar va sun’iy intellekt tezkor fikr beradi, yakuniy baho va maslahatni esa jonli o‘qituvchi beradi.",
     },
     learn: {
-      title: "Yo‘nalishlar",
+      title: "Dasturlash kurslari yo‘nalishlari",
       subtitle: "Oltita yo‘nalish — veb asoslaridan sun’iy intellektli ilovalargacha.",
       items: [
         { name: "Web Basics", text: "Har qanday saytning poydevori: sahifa tuzilishi, dizayn va interaktivlik.", topics: ["HTML", "CSS", "JavaScript"] },
