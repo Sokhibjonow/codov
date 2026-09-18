@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Nunito } from "next/font/google";
 import { getLocale } from "@/i18n/server";
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
 import { getThemeMode } from "@/lib/theme-server";
 // Code highlighting theme for lesson Markdown (see components/markdown)
@@ -18,11 +19,50 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "codov",
+    default: SITE_TITLE,
     template: "%s · codov",
   },
-  description: "HTML, CSS, JavaScript",
+  description: SITE_DESCRIPTION,
+  applicationName: "codov",
+  // Google ignores keywords, but some other search engines and catalogs still read them
+  keywords: [
+    "codov",
+    "HTML o‘rganish",
+    "CSS darslari",
+    "JavaScript kurslari",
+    "dasturlash kurslari",
+    "veb-dasturlash",
+    "frontend kurs",
+    "dasturlash Toshkent",
+    "IT kurslar O‘zbekiston",
+    "курсы HTML",
+    "курсы CSS",
+    "курсы JavaScript",
+    "обучение программированию Ташкент",
+    "веб-разработка для начинающих",
+    "frontend курсы Узбекистан",
+  ],
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "codov",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    locale: "uz_UZ",
+    alternateLocale: ["ru_RU"],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "codov — HTML, CSS, JavaScript" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/og.png"],
+  },
+  robots: { index: true, follow: true },
+  // Google Search Console ownership check (the code from the "HTML tag" method)
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export const viewport: Viewport = {
