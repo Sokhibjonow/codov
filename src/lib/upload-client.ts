@@ -38,13 +38,21 @@ async function uploadToBlob(
 ): Promise<UploadResult> {
   try {
     const { upload, uploadPresigned } = await import("@vercel/blob/client");
+    // The presigned upload can send every byte and then never settle, so once the file is fully
+    // sent we move on after a short pause; the server then checks the stored file itself
+    let markSent: () => void = () => {};
+    const sent = new Promise<void>((resolve) => (markSent = resolve));
     // Newer stores (no read-write token) use presigned URLs; large files go in parts on classic stores
-    await (presigned ? uploadPresigned : upload)(pathname, file, {
+    const uploading = (presigned ? uploadPresigned : upload)(pathname, file, {
       access: "public",
       handleUploadUrl: "/api/uploads/blob",
       multipart: !presigned && file.size > 8 * 1024 * 1024,
-      onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage)),
+      onUploadProgress: ({ percentage }) => {
+        onProgress?.(Math.round(percentage));
+        if (percentage >= 100) markSent();
+      },
     });
+    await Promise.race([uploading, sent.then(() => new Promise((resolve) => setTimeout(resolve, 2000)))]);
   } catch (error) {
     // The file may still have been stored (e.g. the storage response couldn't be read);
     // the server checks the real file below, so only log here
