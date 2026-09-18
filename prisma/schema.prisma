@@ -414,3 +414,21 @@ model Notification {
 
   @@index([userId, readAt, createdAt])
 }
+
+// ───────────── Leads: sign-up requests from the public page ─────────────
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  name        String
+  phone       String
+  status      LeadStatus @default(NEW)
+  createdAt   DateTime   @default(now())
+  contactedAt DateTime?
+
+  @@index([status, createdAt])
+}

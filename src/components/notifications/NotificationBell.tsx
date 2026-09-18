@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, CalendarX, CheckCheck, CheckCircle2, ClipboardCheck, ClipboardList, Clock, Loader2, Undo2, type LucideIcon } from "lucide-react";
+import { Bell, CalendarX, CheckCheck, CheckCircle2, ClipboardCheck, ClipboardList, Clock, Inbox, Loader2, Undo2, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useRealtime } from "@/components/realtime/RealtimeProvider";
@@ -8,6 +8,7 @@ import { format, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
 import { formatDateTime, formatDay, formatRelative } from "@/lib/format";
 import { pick } from "@/lib/learning-text";
+import { formatPhone } from "@/lib/phone";
 import { getNotifications, markNotificationsRead } from "@/lib/notification-actions";
 import type { NotificationItem } from "@/lib/notifications";
 import type { Role } from "@/lib/session-token";
@@ -65,6 +66,13 @@ function describe(t: Pick<Dictionary, "notifications">, locale: Locale, role: Ro
         href: `/parent/children/${item.data.childId}`,
         icon: CalendarX,
         tone: "text-danger",
+      };
+    case "lead.new":
+      return {
+        text: format(tn.leadNew, { name: item.data.name, phone: formatPhone(item.data.phone) }),
+        href: "/admin/leads",
+        icon: Inbox,
+        tone: "text-primary",
       };
     default:
       return null;

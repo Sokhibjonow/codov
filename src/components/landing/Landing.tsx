@@ -25,8 +25,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Logo, LogoMark } from "@/components/Logo";
+import { Logo } from "@/components/Logo";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { LeadForm } from "./LeadForm";
+import { RevealOnScroll } from "./RevealOnScroll";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
 import { CONTACTS, SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
@@ -88,7 +90,7 @@ function SocialLinks({ labels, compact = false }: { labels: Dictionary["landing"
 
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="mx-auto mb-10 max-w-2xl text-center">
+    <div data-reveal className="mx-auto mb-10 max-w-2xl text-center">
       <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">{title}</h2>
       {subtitle && <p className="mt-3 text-lg text-muted">{subtitle}</p>}
     </div>
@@ -98,11 +100,11 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle?: string })
 /** Public home page: what codov is, for students and parents; the platform itself is behind the login. */
 export function Landing({ t, locale, theme }: LandingProps) {
   const l = t.landing;
-  const contactHref = CONTACTS.telegram ? `https://t.me/${CONTACTS.telegram}` : CONTACTS.phone ? `tel:${CONTACTS.phone}` : "#contact";
 
   return (
     <div className="flex min-h-screen flex-col">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <RevealOnScroll />
 
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
@@ -132,15 +134,15 @@ export function Landing({ t, locale, theme }: LandingProps) {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden bg-navy text-white">
-          <div aria-hidden="true" className="absolute -right-32 -top-32 size-[28rem] rotate-12 rounded-[5rem] bg-brand/25" />
+          <div aria-hidden="true" className="landing-drift absolute -right-32 -top-32 size-[28rem] rotate-12 rounded-[5rem] bg-brand/25" />
           <div aria-hidden="true" className="absolute -bottom-40 -left-24 size-96 -rotate-12 rounded-[4rem] bg-brand-light/10" />
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:px-6 md:py-24 lg:grid-cols-2">
             <div>
-              <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-brand-light">{l.hero.badge}</p>
-              <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">{l.hero.title}</h1>
-              <p className="mt-5 max-w-xl text-lg text-white/80">{l.hero.text}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a href={contactHref} className="btn bg-brand-light px-6 py-3 text-navy hover:bg-white">
+              <p data-reveal className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-brand-light">{l.hero.badge}</p>
+              <h1 data-reveal style={{ "--reveal-delay": `${100}ms` } as React.CSSProperties} className="mt-5 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">{l.hero.title}</h1>
+              <p data-reveal style={{ "--reveal-delay": `${200}ms` } as React.CSSProperties} className="mt-5 max-w-xl text-lg text-white/80">{l.hero.text}</p>
+              <div data-reveal style={{ "--reveal-delay": `${300}ms` } as React.CSSProperties} className="mt-8 flex flex-wrap gap-3">
+                <a href="#contact" className="btn bg-brand-light px-6 py-3 text-navy hover:bg-white">
                   {l.hero.cta}
                   <ArrowRight size={18} />
                 </a>
@@ -148,7 +150,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
                   {l.hero.login}
                 </Link>
               </div>
-              <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/80">
+              <ul data-reveal style={{ "--reveal-delay": `${400}ms` } as React.CSSProperties} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/80">
                 {l.hero.chips.map((chip) => (
                   <li key={chip} className="flex items-center gap-1.5">
                     <CheckCircle2 size={16} className="text-brand-light" />
@@ -159,7 +161,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
             </div>
 
             {/* Editor + preview mock */}
-            <div className="relative mx-auto w-full max-w-lg" aria-hidden="true">
+            <div data-reveal style={{ "--reveal-delay": `${250}ms` } as React.CSSProperties} className="relative mx-auto w-full max-w-lg" aria-hidden="true">
               <div className="overflow-hidden rounded-2xl bg-[#1e1e1e] shadow-2xl ring-1 ring-white/10">
                 <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-3">
                   <span className="size-3 rounded-full bg-[#ff5f57]" />
@@ -178,10 +180,11 @@ export function Landing({ t, locale, theme }: LandingProps) {
                     <span className="text-brand-light">&gt;</span>
                     Salom!
                     <span className="text-brand-light">&lt;/button&gt;</span>
+                    <span className="landing-caret ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-brand-light" />
                   </code>
                 </pre>
               </div>
-              <div className="absolute -bottom-12 -right-2 w-64 rounded-2xl bg-white p-4 text-[#141B2D] shadow-2xl sm:-right-8">
+              <div className="landing-float absolute -bottom-12 -right-2 w-64 rounded-2xl bg-white p-4 text-[#141B2D] shadow-2xl sm:-right-8">
                 <p className="text-lg font-extrabold">{l.hero.previewTitle}</p>
                 <span className="mt-2 inline-block rounded-lg bg-[#D9502A] px-3 py-1.5 text-sm font-bold text-white">Salom!</span>
                 <p className="mt-3 flex items-center gap-1.5 text-xs font-bold text-[#16a34a]">
@@ -215,6 +218,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
                 return (
                   <article
                     key={item.title}
+                    data-reveal style={{ "--reveal-delay": `${index * 100}ms` } as React.CSSProperties}
                     className={`card flex flex-col ${selfPaced ? "border-primary ring-4 ring-primary/10" : ""}`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -243,7 +247,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
                 );
               })}
             </div>
-            <p className="mx-auto mt-8 flex max-w-3xl items-start gap-3 rounded-2xl bg-primary-soft p-5 font-semibold text-primary">
+            <p data-reveal className="mx-auto mt-8 flex max-w-3xl items-start gap-3 rounded-2xl bg-primary-soft p-5 font-semibold text-primary">
               <HeartHandshake size={22} className="mt-0.5 shrink-0" />
               {l.formats.note}
             </p>
@@ -258,7 +262,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
               {l.learn.items.map((item, index) => {
                 const Icon = TRACK_ICONS[index] ?? Code2;
                 return (
-                  <li key={item.name} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
+                  <li key={item.name} data-reveal style={{ "--reveal-delay": `${(index % 3) * 100}ms` } as React.CSSProperties} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
                         <Icon size={24} />
@@ -289,7 +293,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
               {l.features.items.map((item, index) => {
                 const Icon = FEATURE_ICONS[index] ?? BookOpen;
                 return (
-                  <article key={item.title} className="rounded-2xl border border-border bg-background p-6">
+                  <article key={item.title} data-reveal style={{ "--reveal-delay": `${(index % 3) * 100}ms` } as React.CSSProperties} className="rounded-2xl border border-border bg-background p-6">
                     <span className="flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
                       <Icon size={22} />
                     </span>
@@ -308,7 +312,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
             <SectionTitle title={l.steps.title} />
             <ol className="grid gap-5 md:grid-cols-4">
               {l.steps.items.map((item, index) => (
-                <li key={item.title} className="card relative">
+                <li key={item.title} data-reveal style={{ "--reveal-delay": `${index * 100}ms` } as React.CSSProperties} className="card relative">
                   <span className="text-4xl font-extrabold text-brand">{index + 1}</span>
                   <h3 className="mt-2 text-lg font-extrabold">{item.title}</h3>
                   <p className="mt-1 text-muted">{item.text}</p>
@@ -320,7 +324,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
 
         {/* Parents */}
         <section id="parents" className="scroll-mt-20 px-4 pb-20 md:px-6">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 rounded-3xl bg-navy p-8 text-white md:p-12 lg:grid-cols-2">
+          <div data-reveal className="mx-auto grid max-w-6xl items-center gap-10 rounded-3xl bg-navy p-8 text-white md:p-12 lg:grid-cols-2">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">{l.parents.title}</h2>
               <p className="mt-4 text-lg text-white/80">{l.parents.text}</p>
@@ -342,7 +346,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
             <SectionTitle title={l.faq.title} />
             <div className="space-y-3">
               {l.faq.items.map((item) => (
-                <details key={item.q} className="group rounded-2xl border border-border bg-background px-5 py-4">
+                <details key={item.q} data-reveal className="group rounded-2xl border border-border bg-background px-5 py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold">
                     {item.q}
                     <span className="text-xl text-primary transition-transform group-open:rotate-45">+</span>
@@ -354,35 +358,51 @@ export function Landing({ t, locale, theme }: LandingProps) {
           </div>
         </section>
 
-        {/* Contact */}
+        {/* Contact: sign-up request form, then Telegram and socials */}
         <section id="contact" className="scroll-mt-20 px-4 py-20 md:px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <LogoMark size={56} />
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{l.contact.title}</h2>
-            <p className="mt-3 text-lg text-muted">{l.contact.text}</p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              {CONTACTS.telegram && (
-                <a href={`https://t.me/${CONTACTS.telegram}`} className="btn btn-primary px-6 py-3" target="_blank" rel="noopener noreferrer">
-                  <Send size={18} />
-                  {l.contact.telegram}
-                </a>
-              )}
-              {CONTACTS.phone && (
-                <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
-                  <Phone size={18} />
-                  {CONTACTS.phoneLabel}
-                </a>
-              )}
-              {!CONTACTS.telegram && !CONTACTS.phone && <p className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">{l.contact.soon}</p>}
-            </div>
-            {(CONTACTS.instagram || CONTACTS.channel) && (
-              <div className="mt-8">
-                <p className="text-sm font-bold text-muted">{l.contact.follow}</p>
-                <div className="mt-3 flex flex-wrap justify-center gap-3">
-                  <SocialLinks labels={l.contact} />
+          <div className="mx-auto max-w-6xl">
+            <div
+              data-reveal
+              className="relative overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-sm md:p-10"
+            >
+              <div className="relative z-10 max-w-3xl">
+                <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{l.lead.title}</h2>
+                <p className="mt-2 text-muted">{l.lead.text}</p>
+                <div className="mt-6">
+                  <LeadForm t={l.lead} />
                 </div>
               </div>
-            )}
+              {/* Q / A speech bubbles */}
+              <div aria-hidden="true" className="pointer-events-none absolute -right-4 top-1/2 hidden -translate-y-1/2 lg:block">
+                <div className="landing-float relative size-44">
+                  <span className="absolute left-0 top-0 flex size-24 -rotate-6 items-center justify-center rounded-3xl rounded-bl-md bg-navy text-5xl font-extrabold text-white shadow-2xl dark:ring-1 dark:ring-white/15">
+                    Q
+                  </span>
+                  <span className="absolute bottom-0 right-4 flex size-24 rotate-6 items-center justify-center rounded-3xl rounded-br-md bg-gradient-to-br from-brand-light to-brand text-5xl font-extrabold text-white shadow-2xl">
+                    A
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div data-reveal className="mt-10 text-center">
+              <p className="text-sm font-bold text-muted">{l.lead.orTelegram}</p>
+              <div className="mt-3 flex flex-wrap justify-center gap-3">
+                {CONTACTS.telegram && (
+                  <a href={`https://t.me/${CONTACTS.telegram}`} className="btn btn-primary px-6 py-3" target="_blank" rel="noopener noreferrer">
+                    <Send size={18} />
+                    {l.contact.telegram}
+                  </a>
+                )}
+                {CONTACTS.phone && (
+                  <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
+                    <Phone size={18} />
+                    {CONTACTS.phoneLabel}
+                  </a>
+                )}
+                <SocialLinks labels={l.contact} />
+              </div>
+            </div>
           </div>
         </section>
       </main>

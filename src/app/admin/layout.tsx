@@ -4,6 +4,7 @@ import {
   ClipboardCheck,
   GraduationCap,
   HeartHandshake,
+  Inbox,
   LayoutDashboard,
   MessageCircle,
   UsersRound,
@@ -25,6 +26,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     { href: "/admin/parents", label: t.nav.parents, icon: <HeartHandshake size={18} /> },
     { href: "/admin/courses", label: t.nav.courses, icon: <BookOpen size={18} /> },
     { href: "/admin/submissions", label: t.nav.submissions, icon: <ClipboardCheck size={18} /> },
+    { href: "/admin/leads", label: t.nav.leads, icon: <Inbox size={18} /> },
     { href: "/admin/stats", label: t.nav.stats, icon: <BarChart3 size={18} /> },
     { href: "/admin/chat", label: t.nav.chat, icon: <MessageCircle size={18} /> },
   ];

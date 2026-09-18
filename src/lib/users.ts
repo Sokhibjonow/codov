@@ -51,11 +51,7 @@ export function normalizePhone(input: string) {
   return input.trim().startsWith("+") ? `+${digits}` : digits;
 }
 
-export function formatPhone(phone: string | null) {
-  if (!phone) return "";
-  const m = phone.match(/^\+998(\d{2})(\d{3})(\d{2})(\d{2})$/);
-  return m ? `+998 ${m[1]} ${m[2]} ${m[3]} ${m[4]}` : phone;
-}
+export { formatPhone } from "./phone";
 
 /** Every word of the query must match the name, login or phone ("Valiyev Ali" works). */
 export function userSearchWhere(query: string): Prisma.UserWhereInput {
