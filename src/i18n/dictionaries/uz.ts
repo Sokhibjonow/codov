@@ -662,9 +662,9 @@ export const uz: Dictionary = {
   landing: {
     nav: { learn: "Dastur", how: "Qanday o‘qiymiz", parents: "Ota-onalarga", faq: "Savollar", login: "Kirish" },
     hero: {
-      badge: "Boshlovchilar uchun veb-dasturlash kurslari",
+      badge: "Veb-dasturlash kurslari: asoslardan sun’iy intellektgacha",
       title: "Saytlar yaratishni noldan o‘rganing",
-      text: "HTML, CSS va JavaScript amalda: qisqa darslar, to‘g‘ridan-to‘g‘ri brauzerdagi kod muharririda topshiriqlar va har bir ishni o‘qituvchi hamda sun’iy intellekt tekshiradi.",
+      text: "HTML, CSS va JavaScript, keyin React, Node.js, ma’lumotlar bazalari va sun’iy intellekt — amalda: qisqa darslar, brauzerdagi kod muharririda topshiriqlar va har bir ishni o‘qituvchi hamda sun’iy intellekt tekshiradi.",
       cta: "Kursga yozilish",
       login: "Kabinetga kirish",
       chips: ["O‘zbek va rus tillarida", "Telefondan ham o‘qish mumkin", "Ota-onalar natijani ko‘radi"],
@@ -672,24 +672,15 @@ export const uz: Dictionary = {
       previewText: "Tayyor! Kodingiz shunday ko‘rinadi.",
     },
     learn: {
-      title: "Nimalarni o‘rganasiz",
-      subtitle: "Har qanday sayt quriladigan uchta til — oddiydan murakkabga, bosqichma-bosqich.",
+      title: "Yo‘nalishlar",
+      subtitle: "Oltita yo‘nalish — veb asoslaridan sun’iy intellektli ilovalargacha.",
       items: [
-        {
-          name: "HTML",
-          text: "Sahifa tuzilishi: sarlavhalar, matn, havolalar, rasmlar, ro‘yxatlar, jadvallar va formalar.",
-          topics: ["Teglar va atributlar", "Semantik tuzilma", "Formalar va jadvallar"],
-        },
-        {
-          name: "CSS",
-          text: "Tashqi ko‘rinish: ranglar, shriftlar, oraliqlar, joylashuv va telefonga moslashuv.",
-          topics: ["Selektorlar va blok modeli", "Flexbox va Grid", "Moslashuvchan dizayn"],
-        },
-        {
-          name: "JavaScript",
-          text: "Jonli sahifalar: tugmalar, menyular, tekshiruvli formalar va ma’lumotlar bilan ishlash.",
-          topics: ["O‘zgaruvchilar va funksiyalar", "Hodisalar va DOM", "Mantiq va massivlar"],
-        },
+        { name: "Web Basics", text: "Har qanday saytning poydevori: sahifa tuzilishi, dizayn va interaktivlik.", topics: ["HTML", "CSS", "JavaScript"] },
+        { name: "Frontend", text: "Zamonaviy interfeyslar: komponentlar, qat’iy tiplar va tezkor dizayn.", topics: ["React", "TypeScript", "Tailwind CSS"] },
+        { name: "Backend", text: "Server tomoni: API yaratish, so‘rovlarni qayta ishlash va biznes-mantiq.", topics: ["Node.js", "Express", "REST API"] },
+        { name: "Database", text: "Ma’lumotlarni saqlash: jadvallar, ular orasidagi bog‘lanishlar va SQL so‘rovlari.", topics: ["MySQL", "SQL"] },
+        { name: "Tools", text: "Dasturchining kundalik vositalari: versiyalar nazorati, muharrir va paketlar.", topics: ["Git", "GitHub", "VS Code", "npm"] },
+        { name: "AI & Web", text: "Saytlarga sun’iy intellektni ulaymiz: tashqi API va aqlli funksiyalar.", topics: ["APIs", "Gemini / OpenAI", "AI features"] },
       ],
     },
     features: {
@@ -740,6 +731,6 @@ export const uz: Dictionary = {
       phone: "Qo‘ng‘iroq qilish",
       soon: "Yozilish uchun kontaktlar tez orada shu yerda bo‘ladi.",
     },
-    footer: "HTML, CSS va JavaScriptni o‘rganamiz",
+    footer: "Veb-dasturlashni o‘rganamiz",
   },
 };

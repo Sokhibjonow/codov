@@ -29,12 +29,18 @@ export const metadata: Metadata = {
   // Google ignores keywords, but some other search engines and catalogs still read them
   keywords: [
     "codov",
+    "veb-dasturlash kurslari",
     "HTML o‘rganish",
     "CSS darslari",
     "JavaScript kurslari",
     "dasturlash kurslari",
     "veb-dasturlash",
     "frontend kurs",
+    "backend kurs",
+    "React kurslari",
+    "Node.js o‘rganish",
+    "SQL darslari",
+    "sun’iy intellekt dasturlash",
     "dasturlash Toshkent",
     "IT kurslar O‘zbekiston",
     "курсы HTML",
@@ -43,6 +49,9 @@ export const metadata: Metadata = {
     "обучение программированию Ташкент",
     "веб-разработка для начинающих",
     "frontend курсы Узбекистан",
+    "курсы React",
+    "курсы Node.js",
+    "курсы программирования с ИИ",
   ],
   openGraph: {
     type: "website",

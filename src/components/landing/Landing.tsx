@@ -10,6 +10,12 @@ import {
   Send,
   UserCheck,
   BookOpen,
+  Database,
+  Globe,
+  LayoutTemplate,
+  Server,
+  Sparkles,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +30,8 @@ import type { ThemeMode } from "@/lib/theme";
 type LandingProps = { t: Dictionary; locale: Locale; theme: ThemeMode | null };
 
 const FEATURE_ICONS: LucideIcon[] = [BookOpen, Code2, FlaskConical, Bot, UserCheck, MessageCircle];
-const LANGUAGE_COLORS = ["#E44D26", "#264DE4", "#D6A800"];
+/** Web Basics, Frontend, Backend, Database, Tools, AI & Web */
+const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles];
 
 // Tells search engines what codov is (structured data, not shown on the page)
 const structuredData = {
@@ -35,7 +42,7 @@ const structuredData = {
   logo: `${SITE_URL}/icons/icon-512.png`,
   description: SITE_DESCRIPTION,
   areaServed: "UZ",
-  knowsAbout: ["HTML", "CSS", "JavaScript", "Web development"],
+  knowsAbout: ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Tailwind CSS", "Node.js", "Express", "REST API", "MySQL", "SQL", "Git", "AI"],
   inLanguage: ["uz", "ru"],
 };
 
@@ -150,30 +157,30 @@ export function Landing({ t, locale, theme }: LandingProps) {
         <section id="learn" className="scroll-mt-20 px-4 py-20 md:px-6">
           <div className="mx-auto max-w-6xl">
             <SectionTitle title={l.learn.title} subtitle={l.learn.subtitle} />
-            <div className="grid gap-5 md:grid-cols-3">
-              {l.learn.items.map((item, index) => (
-                <article key={item.name} className="card flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="flex size-11 items-center justify-center rounded-xl font-mono text-sm font-extrabold text-white"
-                      style={{ background: LANGUAGE_COLORS[index] }}
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <h3 className="text-2xl font-extrabold">{item.name}</h3>
-                  </div>
-                  <p className="mt-4 text-muted">{item.text}</p>
-                  <ul className="mt-4 space-y-1.5 text-sm font-semibold">
-                    {item.topics.map((topic) => (
-                      <li key={topic} className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="shrink-0 text-primary" />
-                        {topic}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
+            <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {l.learn.items.map((item, index) => {
+                const Icon = TRACK_ICONS[index] ?? Code2;
+                return (
+                  <li key={item.name} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                        <Icon size={24} />
+                      </span>
+                      <span className="font-mono text-3xl font-extrabold text-border">{String(index + 1).padStart(2, "0")}</span>
+                    </div>
+                    <h3 className="mt-4 text-2xl font-extrabold">{item.name}</h3>
+                    <p className="mt-2 flex-1 text-muted">{item.text}</p>
+                    <ul className="mt-5 flex flex-wrap gap-2">
+                      {item.topics.map((topic) => (
+                        <li key={topic} className="rounded-full border border-border bg-background px-3 py-1 font-mono text-xs font-bold">
+                          {topic}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </section>
 
