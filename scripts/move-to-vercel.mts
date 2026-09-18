@@ -1,5 +1,6 @@
 // Copies everything from this computer to Vercel: the database (to Neon) and uploaded files (to Vercel Blob).
-// The target settings come from .env.vercel (made by `npx vercel env pull .env.vercel`).
+// The target settings come from .env.vercel (made by `npx vercel env pull .env.vercel`) and, because
+// Neon's variables are "Sensitive" and can't be pulled, from .env.neon (the snippet copied on the Neon page).
 // WARNING: replaces all data in the Neon database.
 // Usage: npm run move-to-vercel -- --yes
 import { spawnSync } from "node:child_process";
@@ -11,18 +12,26 @@ import { config } from "dotenv";
 import pg from "pg";
 
 const local = config({ path: ".env", processEnv: {} }).parsed ?? {};
-const target = config({ path: ".env.vercel", processEnv: {} }).parsed ?? {};
+const target = {
+  ...(config({ path: ".env.vercel", processEnv: {} }).parsed ?? {}),
+  ...(config({ path: ".env.neon", processEnv: {} }).parsed ?? {}),
+};
 
 const localDb = local.DATABASE_URL;
 const targetDb = target.DATABASE_URL_UNPOOLED || target.POSTGRES_URL_NON_POOLING || target.DATABASE_URL;
-const blobToken = target.BLOB_READ_WRITE_TOKEN;
+// Classic stores have a read-write token, newer ones use the pulled OIDC token with the store id
+const blobAuth = target.BLOB_READ_WRITE_TOKEN
+  ? { token: target.BLOB_READ_WRITE_TOKEN }
+  : target.VERCEL_OIDC_TOKEN && target.BLOB_STORE_ID
+    ? { oidcToken: target.VERCEL_OIDC_TOKEN, storeId: target.BLOB_STORE_ID }
+    : null;
 
 if (!process.argv.includes("--yes")) {
   console.log("This replaces all data in the Vercel database. Run again with --yes to continue.");
   process.exit(1);
 }
-if (!localDb || !targetDb || !blobToken) {
-  console.log(`Missing settings: ${[!localDb && ".env DATABASE_URL", !targetDb && ".env.vercel DATABASE_URL_UNPOOLED", !blobToken && ".env.vercel BLOB_READ_WRITE_TOKEN"].filter(Boolean).join(", ")}`);
+if (!localDb || !targetDb || !blobAuth) {
+  console.log(`Missing settings: ${[!localDb && ".env DATABASE_URL", !targetDb && ".env.neon DATABASE_URL_UNPOOLED", !blobAuth && ".env.vercel BLOB_STORE_ID + VERCEL_OIDC_TOKEN"].filter(Boolean).join(", ")}`);
   process.exit(1);
 }
 
@@ -98,7 +107,7 @@ walk(uploadRoot);
 let done = 0;
 for (const file of files) {
   const pathname = path.relative(uploadRoot, file).split(path.sep).join("/");
-  await put(pathname, readFileSync(file), { access: "public", addRandomSuffix: false, allowOverwrite: true, token: blobToken });
+  await put(pathname, readFileSync(file), { access: "public", addRandomSuffix: false, allowOverwrite: true, ...blobAuth });
   done++;
 }
 console.log(`   ${done} of ${files.length} files uploaded`);

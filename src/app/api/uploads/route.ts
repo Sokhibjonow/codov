@@ -4,7 +4,7 @@ import { targetField, type AttachmentTarget } from "@/lib/attachments";
 import { ATTACHMENT_TARGETS, attachmentTargetExists } from "@/lib/attachments-server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { blobStorageEnabled, checkUpload, newBlobPathname, saveUpload, verifyBlobUpload, type StoredFile } from "@/lib/uploads";
+import { blobStorageEnabled, blobUsesPresignedUploads, checkUpload, newBlobPathname, saveUpload, verifyBlobUpload, type StoredFile } from "@/lib/uploads";
 
 /**
  * Teacher uploads.
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       const size = Number(body.size);
       const pathname = checkUpload(body.fileName, size, purpose === "image") && newBlobPathname(body.fileName, purpose === "image");
       if (!pathname) return bad(415, "unsupported file");
-      return NextResponse.json({ mode: "blob", pathname });
+      return NextResponse.json({ mode: "blob", pathname, presigned: blobUsesPresignedUploads() });
     }
 
     if (body.step === "complete" && blobStorageEnabled() && typeof body.pathname === "string") {

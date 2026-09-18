@@ -25,17 +25,24 @@ export async function uploadFile(file: File, options: UploadOptions, onProgress?
   const meta = { ...options, fileName: file.name, size: file.size };
   const start = await postJson({ ...meta, step: "start" }).catch(() => null);
   if (!start) return { ok: false };
-  if (start.mode === "blob") return uploadToBlob(file, start.pathname, meta, onProgress);
+  if (start.mode === "blob") return uploadToBlob(file, start.pathname, Boolean(start.presigned), meta, onProgress);
   return uploadForm(file, options, onProgress);
 }
 
-async function uploadToBlob(file: File, pathname: string, meta: Record<string, unknown>, onProgress: Progress): Promise<UploadResult> {
+async function uploadToBlob(
+  file: File,
+  pathname: string,
+  presigned: boolean,
+  meta: Record<string, unknown>,
+  onProgress: Progress,
+): Promise<UploadResult> {
   try {
-    const { upload } = await import("@vercel/blob/client");
-    await upload(pathname, file, {
+    const { upload, uploadPresigned } = await import("@vercel/blob/client");
+    // Newer stores (no read-write token) use presigned URLs; large files go in parts on classic stores
+    await (presigned ? uploadPresigned : upload)(pathname, file, {
       access: "public",
       handleUploadUrl: "/api/uploads/blob",
-      multipart: file.size > 8 * 1024 * 1024,
+      multipart: !presigned && file.size > 8 * 1024 * 1024,
       onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage)),
     });
     const done = await postJson({ ...meta, step: "complete", pathname });

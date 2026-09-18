@@ -62,8 +62,23 @@ function matchesSignature(bytes: Uint8Array, type: FileType, ext: string) {
 
 export type StoredFile = { url: string; fileName: string; size: number };
 
+/**
+ * Vercel Blob is used when the project has a store: either the classic read-write token or,
+ * for newer stores, BLOB_STORE_ID with Vercel's built-in (OIDC) authentication.
+ */
 export function blobStorageEnabled() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+}
+
+/** Newer stores have no read-write token; browser uploads then go through presigned URLs. */
+export function blobUsesPresignedUploads() {
+  return !process.env.BLOB_READ_WRITE_TOKEN;
+}
+
+function blobStoreId() {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const id = token ? (token.split("_")[3] ?? "") : (process.env.BLOB_STORE_ID ?? "");
+  return id.startsWith("store_") ? id.slice("store_".length) : id;
 }
 
 /** Checks the name and size before anything is stored. */
@@ -110,8 +125,7 @@ function blobPathname(segments: string[]) {
 }
 
 export function blobPublicUrl(pathname: string) {
-  const storeId = (process.env.BLOB_READ_WRITE_TOKEN ?? "").split("_")[3] ?? "";
-  return `https://${storeId}.public.blob.vercel-storage.com/${pathname.split("/").map(encodeURIComponent).join("/")}`;
+  return `https://${blobStoreId()}.public.blob.vercel-storage.com/${pathname.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 /** Where /files/… points on Vercel Blob, or null for an invalid path. */
