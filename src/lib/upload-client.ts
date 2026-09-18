@@ -45,6 +45,12 @@ async function uploadToBlob(
       multipart: !presigned && file.size > 8 * 1024 * 1024,
       onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage)),
     });
+  } catch (error) {
+    // The file may still have been stored (e.g. the storage response couldn't be read);
+    // the server checks the real file below, so only log here
+    console.warn("[upload]", error);
+  }
+  try {
     const done = await postJson({ ...meta, step: "complete", pathname });
     return done?.url ? { ok: true, url: done.url } : { ok: false };
   } catch {

@@ -147,7 +147,12 @@ export async function verifyBlobUpload(pathname: string, fileName: string, image
 
   const url = blobPublicUrl(pathname);
   try {
-    const response = await fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store" });
+    // A fresh upload can take a moment to become readable
+    let response = await fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store" });
+    for (let attempt = 0; response.status === 404 && attempt < 3; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      response = await fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store" });
+    }
     const total = Number(response.headers.get("content-range")?.split("/")[1] ?? response.headers.get("content-length"));
     // Read only the first bytes even if the range header is ignored
     const reader = response.body?.getReader();
@@ -162,7 +167,11 @@ export async function verifyBlobUpload(pathname: string, fileName: string, image
     if (response.ok && total > 0 && total <= checked.maxBytes && matchesSignature(bytes, checked.type, checked.ext)) {
       return { url: `/files/${pathname}`, fileName: fileName.slice(0, 200), size: total };
     }
-  } catch {
+    console.warn("[upload] rejected", pathname, response.status, total);
+    // Not there (yet): leave it alone rather than deleting something we couldn't read
+    if (!response.ok) return null;
+  } catch (error) {
+    console.warn("[upload] check failed", pathname, error);
     return null;
   }
   const { del } = await import("@vercel/blob");
