@@ -3,7 +3,7 @@ import type { Dictionary } from "./ru";
 export const uz: Dictionary = {
   common: {
     appName: "codov",
-    tagline: "HTML, CSS va JavaScriptni o‘rganamiz",
+    tagline: "Veb-dasturlashni o‘rganamiz",
     logout: "Chiqish",
     language: "Til",
     theme: { label: "Ko‘rinish", light: "Yorug‘", dark: "Qorong‘i" },
@@ -714,7 +714,7 @@ export const uz: Dictionary = {
       subtitle: "Hammasi bir joyda: darslar, amaliyot, tekshiruv va o‘qituvchi bilan muloqot.",
       items: [
         { title: "Tushunarli darslar", text: "Qisqa mavzular va misollar — ularni darhol ishga tushirib, natijani ko‘rish mumkin." },
-        { title: "Brauzerdagi kod muharriri", text: "HTML, CSS va JavaScript yozasiz va sahifani darhol ko‘rasiz. Hech narsa o‘rnatish shart emas." },
+        { title: "Brauzerdagi kod muharriri", text: "Kodni to‘g‘ridan-to‘g‘ri brauzerda yozasiz va natijani darhol ko‘rasiz. Hech narsa o‘rnatish shart emas." },
         { title: "Avtomatik tekshiruv", text: "Topshiriq yuborishdan oldin testlar bilan tekshiriladi — nima tayyorligi darhol ko‘rinadi." },
         { title: "Sun’iy intellekt fikri", text: "Sun’iy intellekt xatolarni ko‘rsatadi va ularni qanday tuzatishni tushuntiradi." },
         { title: "O‘qituvchi tekshiruvi", text: "Har bir ishni o‘qituvchi ko‘radi: qabul qiladi yoki izoh bilan qaytaradi." },

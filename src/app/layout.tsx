@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     locale: "uz_UZ",
     alternateLocale: ["ru_RU"],
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "codov — HTML, CSS, JavaScript" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "codov — veb-dasturlashni o‘rganish platformasi" }],
   },
   twitter: {
     card: "summary_large_image",

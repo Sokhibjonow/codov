@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "codov",
     short_name: "codov",
-    description: "HTML, CSS, JavaScript",
+    description: "Veb-dasturlashni o‘rganish platformasi",
     start_url: "/",
     display: "standalone",
     background_color: "#F6F3EC",
