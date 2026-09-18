@@ -245,11 +245,11 @@ export function Workspace({
             <AutotestResults t={t} rules={tests} results={testResults} />
           </div>
         )}
-        <div className="grid lg:h-[calc(100dvh-6rem)] lg:grid-cols-2">
-          <div className="flex h-[70vh] min-h-0 flex-col border-b border-border lg:h-auto lg:border-b-0 lg:border-r">
+        <div className="grid grid-cols-1 lg:h-[calc(100dvh-6rem)] lg:grid-cols-2">
+          <div className="flex h-[70vh] min-h-0 min-w-0 flex-col border-b border-border lg:h-auto lg:border-b-0 lg:border-r">
             <CodeTabsEditor code={code} onChange={updateFile} readOnly={locked} onEdit={recorder.record} className="min-h-0 flex-1" />
           </div>
-          <div className="flex h-[70vh] min-h-0 flex-col lg:h-auto">
+          <div className="flex h-[70vh] min-h-0 min-w-0 flex-col lg:h-auto">
             <PreviewPane code={code} t={t} className="min-h-0 flex-1" />
           </div>
         </div>
