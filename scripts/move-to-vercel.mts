@@ -14,7 +14,7 @@ const local = config({ path: ".env", processEnv: {} }).parsed ?? {};
 const target = config({ path: ".env.vercel", processEnv: {} }).parsed ?? {};
 
 const localDb = local.DATABASE_URL;
-const targetDb = target.DATABASE_URL_UNPOOLED || target.DATABASE_URL;
+const targetDb = target.DATABASE_URL_UNPOOLED || target.POSTGRES_URL_NON_POOLING || target.DATABASE_URL;
 const blobToken = target.BLOB_READ_WRITE_TOKEN;
 
 if (!process.argv.includes("--yes")) {

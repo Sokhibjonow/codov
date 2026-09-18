@@ -10,6 +10,6 @@ export default defineConfig({
   },
   datasource: {
     // Migrations need a direct connection; on Vercel + Neon DATABASE_URL goes through the pooler
-    url: process.env["DATABASE_URL_UNPOOLED"] || process.env["DATABASE_URL"],
+    url: process.env["DATABASE_URL_UNPOOLED"] || process.env["POSTGRES_URL_NON_POOLING"] || process.env["DATABASE_URL"],
   },
 });
