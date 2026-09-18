@@ -13,6 +13,10 @@ import {
   BookOpen,
   Database,
   Globe,
+  HeartHandshake,
+  Laptop,
+  MonitorPlay,
+  School,
   LayoutTemplate,
   Server,
   Sparkles,
@@ -31,6 +35,8 @@ import type { ThemeMode } from "@/lib/theme";
 type LandingProps = { t: Dictionary; locale: Locale; theme: ThemeMode | null };
 
 const FEATURE_ICONS: LucideIcon[] = [BookOpen, Code2, FlaskConical, Bot, UserCheck, MessageCircle];
+/** Offline, online with the teacher, only Codov */
+const FORMAT_ICONS: LucideIcon[] = [School, MonitorPlay, Laptop];
 /** Web Basics, Frontend, Backend, Database, Tools, AI & Web */
 const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles];
 
@@ -104,6 +110,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
             <Logo size={30} />
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-bold text-muted lg:flex">
+            <a href="#formats" className="hover:text-foreground">{l.nav.formats}</a>
             <a href="#learn" className="hover:text-foreground">{l.nav.learn}</a>
             <a href="#how" className="hover:text-foreground">{l.nav.how}</a>
             <a href="#parents" className="hover:text-foreground">{l.nav.parents}</a>
@@ -185,6 +192,62 @@ export function Landing({ t, locale, theme }: LandingProps) {
             </div>
           </div>
           <div className="h-10" />
+        </section>
+
+        {/* Three ways to learn: courses + platform + teacher */}
+        <section id="formats" className="scroll-mt-20 px-4 pt-20 md:px-6">
+          <div className="mx-auto max-w-6xl">
+            <SectionTitle title={l.formats.title} subtitle={l.formats.subtitle} />
+            <p className="mb-10 flex flex-wrap items-center justify-center gap-2 text-lg font-extrabold">
+              <span className="text-brand">Codov</span>
+              <span className="text-muted">=</span>
+              {l.formats.formula.map((part, index) => (
+                <span key={part} className="flex items-center gap-2">
+                  {index > 0 && <span className="text-muted">+</span>}
+                  <span className="rounded-full border border-border bg-surface px-4 py-1.5">{part}</span>
+                </span>
+              ))}
+            </p>
+            <div className="grid gap-5 lg:grid-cols-3">
+              {l.formats.items.map((item, index) => {
+                const Icon = FORMAT_ICONS[index] ?? Laptop;
+                const selfPaced = index === l.formats.items.length - 1;
+                return (
+                  <article
+                    key={item.title}
+                    className={`card flex flex-col ${selfPaced ? "border-primary ring-4 ring-primary/10" : ""}`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                        <Icon size={24} />
+                      </span>
+                      <span className="rounded-full bg-background px-3 py-1 text-xs font-bold text-muted">{item.badge}</span>
+                    </div>
+                    <h3 className="mt-4 text-xl font-extrabold">{item.title}</h3>
+                    <p className="mt-2 flex-1 text-muted">{item.text}</p>
+                    <ol className="mt-5 flex flex-wrap items-center gap-1.5 text-xs font-bold">
+                      {item.flow.map((step, stepIndex) => (
+                        <li key={step} className="flex items-center gap-1.5">
+                          {stepIndex > 0 && <ArrowRight size={14} className="text-muted" />}
+                          <span
+                            className={`rounded-lg px-2.5 py-1 ${
+                              stepIndex === item.flow.length - 1 ? "bg-primary text-on-color" : "bg-background"
+                            }`}
+                          >
+                            {step}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </article>
+                );
+              })}
+            </div>
+            <p className="mx-auto mt-8 flex max-w-3xl items-start gap-3 rounded-2xl bg-primary-soft p-5 font-semibold text-primary">
+              <HeartHandshake size={22} className="mt-0.5 shrink-0" />
+              {l.formats.note}
+            </p>
+          </div>
         </section>
 
         {/* What you'll learn */}

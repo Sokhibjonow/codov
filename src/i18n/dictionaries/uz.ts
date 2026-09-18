@@ -660,16 +660,42 @@ export const uz: Dictionary = {
     },
   },
   landing: {
-    nav: { learn: "Dastur", how: "Qanday o‘qiymiz", parents: "Ota-onalarga", faq: "Savollar", login: "Kirish" },
+    nav: { formats: "Formatlar", learn: "Dastur", how: "Qanday o‘qiymiz", parents: "Ota-onalarga", faq: "Savollar", login: "Kirish" },
     hero: {
-      badge: "Veb-dasturlash kurslari: asoslardan sun’iy intellektgacha",
+      badge: "Oflayn, onlayn va mustaqil veb-dasturlash kurslari",
       title: "Saytlar yaratishni noldan o‘rganing",
-      text: "HTML, CSS va JavaScript, keyin React, Node.js, ma’lumotlar bazalari va sun’iy intellekt — amalda: qisqa darslar, brauzerdagi kod muharririda topshiriqlar va har bir ishni o‘qituvchi hamda sun’iy intellekt tekshiradi.",
+      text: "Veb-dasturlash kurslari — HTML va CSSdan React, Node.js, ma’lumotlar bazalari va sun’iy intellektgacha. Sinfda, o‘qituvchi bilan onlayn yoki platformada mustaqil o‘qing — har bir ishni o‘qituvchi tekshiradi.",
       cta: "Kursga yozilish",
       login: "Kabinetga kirish",
-      chips: ["O‘zbek va rus tillarida", "Telefondan ham o‘qish mumkin", "Ota-onalar natijani ko‘radi"],
+      chips: ["Oflayn, onlayn yoki o‘z sur’atingizda", "Har bir ishni o‘qituvchi tekshiradi", "Ota-onalar natijani ko‘radi"],
       previewTitle: "Mening birinchi sahifam",
       previewText: "Tayyor! Kodingiz shunday ko‘rinadi.",
+    },
+    formats: {
+      title: "O‘qishning uch usuli",
+      subtitle: "Codov — oddiy platforma emas, balki gibrid ta’lim. O‘zingizga qulay formatni tanlang: qaysi birida bo‘lmasin, platforma bilan yolg‘iz qolmaysiz.",
+      formula: ["Kurslar", "Platforma", "O‘qituvchi"],
+      items: [
+        {
+          title: "Oflayn",
+          badge: "Sinfda",
+          text: "O‘qituvchi bilan jonli dars, so‘ng Codovda amaliyot. O‘qituvchi har bir ishni tekshiradi va fikr bildiradi.",
+          flow: ["Dars", "Codovda amaliyot", "Fikr-mulohaza"],
+        },
+        {
+          title: "O‘qituvchi bilan onlayn",
+          badge: "Uydan",
+          text: "Onlayn dars, Codovda topshiriqlar, tekshiruv va fikr-mulohaza — keyin navbatdagi bosqich.",
+          flow: ["Onlayn dars", "Codovda topshiriqlar", "Fikr-mulohaza"],
+        },
+        {
+          title: "Faqat Codov",
+          badge: "O‘z sur’atingizda",
+          text: "Kursni o‘zingizga qulay vaqtda mustaqil o‘tasiz. Yuborgan har bir ishingizni o‘qituvchi shaxsan tekshiradi va fikr bildiradi.",
+          flow: ["Codovda darslar", "Ishni yuborish", "O‘qituvchi fikri"],
+        },
+      ],
+      note: "Codov o‘qituvchiga o‘rgatishda, o‘quvchiga esa o‘rganishda yordam beradi. Testlar va sun’iy intellekt tezkor fikr beradi, yakuniy baho va maslahatni esa jonli o‘qituvchi beradi.",
     },
     learn: {
       title: "Yo‘nalishlar",
@@ -698,7 +724,7 @@ export const uz: Dictionary = {
     steps: {
       title: "Qayerdan boshlash kerak",
       items: [
-        { title: "Yoziling", text: "O‘qituvchi bilan bog‘laning va guruhni tanlang." },
+        { title: "Formatni tanlang", text: "Oflayn, onlayn yoki mustaqil — bizga yozing, guruh yoki kursni tanlab beramiz." },
         { title: "Kirish ma’lumotlarini oling", text: "O‘qituvchi shaxsiy kabinet uchun login va parol beradi." },
         { title: "O‘qing va mashq qiling", text: "Darslarni o‘ting va kod muharririda topshiriqlarni bajaring." },
         { title: "O‘sing", text: "Fikr-mulohaza oling, xatolarni tuzating va o‘z loyihalaringizni yarating." },
@@ -718,6 +744,7 @@ export const uz: Dictionary = {
       title: "Ko‘p beriladigan savollar",
       items: [
         { q: "Dasturlash tajribasi kerakmi?", a: "Yo‘q. Kurs eng asoslardan boshlanadi, kompyuterdan foydalana olish kifoya." },
+        { q: "Faqat platformada o‘qish mumkinmi?", a: "Ha. Darslarni o‘z sur’atingizda o‘tasiz, topshiriqlarni bajarib yuborasiz, o‘qituvchi esa har bir ishni shaxsan tekshirib, fikr bildiradi." },
         { q: "Kompyuter kerakmi?", a: "Kompyuter yoki noutbukda o‘qish qulayroq, lekin darslar va topshiriqlar telefondan ham ochiladi." },
         { q: "Darslar qaysi tilda?", a: "Platforma va darslar o‘zbek va rus tillarida, tilni istalgan payt almashtirish mumkin." },
         { q: "Topshiriqlar qanday tekshiriladi?", a: "Avval avtomatik testlar va sun’iy intellekt tezkor fikr beradi, keyin ishni o‘qituvchi tekshirib, baho qo‘yadi." },

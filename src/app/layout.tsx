@@ -30,6 +30,10 @@ export const metadata: Metadata = {
   keywords: [
     "codov",
     "veb-dasturlash kurslari",
+    "oflayn dasturlash kurslari",
+    "onlayn dasturlash kurslari",
+    "онлайн курсы программирования",
+    "офлайн курсы программирования",
     "HTML o‘rganish",
     "CSS darslari",
     "JavaScript kurslari",

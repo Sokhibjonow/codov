@@ -3,8 +3,8 @@ export const SITE_URL = "https://www.codov.uz";
 export const SITE_TITLE = "codov — veb-dasturlashni o‘rganish platformasi";
 export const SITE_DESCRIPTION =
   "codov — veb-dasturlashni noldan o‘rganish platformasi: HTML, CSS, JavaScript, React, TypeScript, Node.js, " +
-  "SQL, Git va sun’iy intellekt. Darslar, kod muharriri, topshiriqlar va o‘qituvchi tekshiruvi. " +
-  "Курсы веб-разработки: от HTML и CSS до React, Node.js, баз данных и ИИ — с практикой и проверкой заданий.";
+  "SQL, Git va sun’iy intellekt. Oflayn, onlayn va mustaqil kurslar: darslar, kod muharriri, topshiriqlar va o‘qituvchi tekshiruvi. " +
+  "Офлайн, онлайн и самостоятельные курсы веб-разработки: от HTML и CSS до React, Node.js, баз данных и ИИ — с проверкой каждой работы преподавателем.";
 
 /** Contacts on the public page; empty values are hidden (fill in to show the buttons). */
 export const CONTACTS = {
