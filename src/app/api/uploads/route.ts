@@ -74,7 +74,9 @@ export async function POST(request: NextRequest) {
     if (body.step === "complete" && blobStorageEnabled() && typeof body.pathname === "string") {
       const stored = await verifyBlobUpload(body.pathname, body.fileName, purpose === "image");
       if (!stored) return bad(415, "unsupported file");
-      return finish(stored, purpose, body);
+      const response = await finish(stored, purpose, body);
+      console.log("[upload] saved", body.pathname);
+      return response;
     }
     return bad(400, "bad request");
   }

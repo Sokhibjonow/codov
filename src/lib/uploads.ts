@@ -146,24 +146,24 @@ export async function verifyBlobUpload(pathname: string, fileName: string, image
   if (!checked) return null;
 
   const url = blobPublicUrl(pathname);
+  const started = Date.now();
+  // Never let the check hang the request
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
   try {
+    const head = () => fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store", signal: controller.signal });
     // A fresh upload can take a moment to become readable
-    let response = await fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store" });
+    let response = await head();
     for (let attempt = 0; response.status === 404 && attempt < 3; attempt++) {
+      await response.arrayBuffer().catch(() => {});
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      response = await fetch(url, { headers: { Range: "bytes=0-15" }, cache: "no-store" });
+      response = await head();
     }
     const total = Number(response.headers.get("content-range")?.split("/")[1] ?? response.headers.get("content-length"));
-    // Read only the first bytes even if the range header is ignored
-    const reader = response.body?.getReader();
-    const chunks: number[] = [];
-    while (reader && chunks.length < 16) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(...value.slice(0, 16 - chunks.length));
-    }
-    await reader?.cancel().catch(() => {});
-    const bytes = Uint8Array.from(chunks);
+    // Blob storage answers the range request with just the first 16 bytes
+    const bytes = response.status === 206 ? new Uint8Array(await response.arrayBuffer()).slice(0, 16) : new Uint8Array();
+    if (response.status !== 206) controller.abort();
+    console.log("[upload] checked", pathname, response.status, total, `${Date.now() - started}ms`);
     if (response.ok && total > 0 && total <= checked.maxBytes && matchesSignature(bytes, checked.type, checked.ext)) {
       return { url: `/files/${pathname}`, fileName: fileName.slice(0, 200), size: total };
     }
@@ -173,6 +173,8 @@ export async function verifyBlobUpload(pathname: string, fileName: string, image
   } catch (error) {
     console.warn("[upload] check failed", pathname, error);
     return null;
+  } finally {
+    clearTimeout(timer);
   }
   const { del } = await import("@vercel/blob");
   await del(url).catch(() => {});
