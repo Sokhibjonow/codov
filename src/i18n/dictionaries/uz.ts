@@ -659,4 +659,87 @@ export const uz: Dictionary = {
       done: "Bajarilgan",
     },
   },
+  landing: {
+    nav: { learn: "Dastur", how: "Qanday o‘qiymiz", parents: "Ota-onalarga", faq: "Savollar", login: "Kirish" },
+    hero: {
+      badge: "Boshlovchilar uchun veb-dasturlash kurslari",
+      title: "Saytlar yaratishni noldan o‘rganing",
+      text: "HTML, CSS va JavaScript amalda: qisqa darslar, to‘g‘ridan-to‘g‘ri brauzerdagi kod muharririda topshiriqlar va har bir ishni o‘qituvchi hamda sun’iy intellekt tekshiradi.",
+      cta: "Kursga yozilish",
+      login: "Kabinetga kirish",
+      chips: ["O‘zbek va rus tillarida", "Telefondan ham o‘qish mumkin", "Ota-onalar natijani ko‘radi"],
+      previewTitle: "Mening birinchi sahifam",
+      previewText: "Tayyor! Kodingiz shunday ko‘rinadi.",
+    },
+    learn: {
+      title: "Nimalarni o‘rganasiz",
+      subtitle: "Har qanday sayt quriladigan uchta til — oddiydan murakkabga, bosqichma-bosqich.",
+      items: [
+        {
+          name: "HTML",
+          text: "Sahifa tuzilishi: sarlavhalar, matn, havolalar, rasmlar, ro‘yxatlar, jadvallar va formalar.",
+          topics: ["Teglar va atributlar", "Semantik tuzilma", "Formalar va jadvallar"],
+        },
+        {
+          name: "CSS",
+          text: "Tashqi ko‘rinish: ranglar, shriftlar, oraliqlar, joylashuv va telefonga moslashuv.",
+          topics: ["Selektorlar va blok modeli", "Flexbox va Grid", "Moslashuvchan dizayn"],
+        },
+        {
+          name: "JavaScript",
+          text: "Jonli sahifalar: tugmalar, menyular, tekshiruvli formalar va ma’lumotlar bilan ishlash.",
+          topics: ["O‘zgaruvchilar va funksiyalar", "Hodisalar va DOM", "Mantiq va massivlar"],
+        },
+      ],
+    },
+    features: {
+      title: "O‘qish qanday tashkil etilgan",
+      subtitle: "Hammasi bir joyda: darslar, amaliyot, tekshiruv va o‘qituvchi bilan muloqot.",
+      items: [
+        { title: "Tushunarli darslar", text: "Qisqa mavzular va misollar — ularni darhol ishga tushirib, natijani ko‘rish mumkin." },
+        { title: "Brauzerdagi kod muharriri", text: "HTML, CSS va JavaScript yozasiz va sahifani darhol ko‘rasiz. Hech narsa o‘rnatish shart emas." },
+        { title: "Avtomatik tekshiruv", text: "Topshiriq yuborishdan oldin testlar bilan tekshiriladi — nima tayyorligi darhol ko‘rinadi." },
+        { title: "Sun’iy intellekt fikri", text: "Sun’iy intellekt xatolarni ko‘rsatadi va ularni qanday tuzatishni tushuntiradi." },
+        { title: "O‘qituvchi tekshiruvi", text: "Har bir ishni o‘qituvchi ko‘radi: qabul qiladi yoki izoh bilan qaytaradi." },
+        { title: "O‘qituvchi bilan chat", text: "Topshiriq bo‘yicha savolni to‘g‘ridan-to‘g‘ri platformada berish mumkin." },
+      ],
+    },
+    steps: {
+      title: "Qayerdan boshlash kerak",
+      items: [
+        { title: "Yoziling", text: "O‘qituvchi bilan bog‘laning va guruhni tanlang." },
+        { title: "Kirish ma’lumotlarini oling", text: "O‘qituvchi shaxsiy kabinet uchun login va parol beradi." },
+        { title: "O‘qing va mashq qiling", text: "Darslarni o‘ting va kod muharririda topshiriqlarni bajaring." },
+        { title: "O‘sing", text: "Fikr-mulohaza oling, xatolarni tuzating va o‘z loyihalaringizni yarating." },
+      ],
+    },
+    parents: {
+      title: "Ota-onalarga",
+      text: "Har bir ota-onaning o‘z kabineti bor. Farzandingizdan «o‘qishing qalay» deb so‘rash shart emas — hammasi darhol ko‘rinadi.",
+      items: [
+        "O‘tilgan darslar va topshiriqlar bo‘yicha baholar",
+        "Darslarga qatnashish",
+        "Farzand darsni qoldirsa — bildirishnoma",
+        "O‘qituvchi bilan chat",
+      ],
+    },
+    faq: {
+      title: "Ko‘p beriladigan savollar",
+      items: [
+        { q: "Dasturlash tajribasi kerakmi?", a: "Yo‘q. Kurs eng asoslardan boshlanadi, kompyuterdan foydalana olish kifoya." },
+        { q: "Kompyuter kerakmi?", a: "Kompyuter yoki noutbukda o‘qish qulayroq, lekin darslar va topshiriqlar telefondan ham ochiladi." },
+        { q: "Darslar qaysi tilda?", a: "Platforma va darslar o‘zbek va rus tillarida, tilni istalgan payt almashtirish mumkin." },
+        { q: "Topshiriqlar qanday tekshiriladi?", a: "Avval avtomatik testlar va sun’iy intellekt tezkor fikr beradi, keyin ishni o‘qituvchi tekshirib, baho qo‘yadi." },
+        { q: "Platformaga qanday kiraman?", a: "Kursga yozilgandan so‘ng o‘qituvchi login va parol beradi. Mustaqil ro‘yxatdan o‘tish yo‘q." },
+      ],
+    },
+    contact: {
+      title: "Birinchi sahifangizni yozishga tayyormisiz?",
+      text: "Bizga yozing — kurs, guruhlar va dars jadvali haqida aytib beramiz.",
+      telegram: "Telegramda yozish",
+      phone: "Qo‘ng‘iroq qilish",
+      soon: "Yozilish uchun kontaktlar tez orada shu yerda bo‘ladi.",
+    },
+    footer: "HTML, CSS va JavaScriptni o‘rganamiz",
+  },
 };

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { getThemeMode } from "@/lib/theme-server";
 import { Logo } from "@/components/Logo";
 import { getDictionary } from "@/i18n/server";
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 import { LoginForm } from "./LoginForm";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,25 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Tells search engines what codov is (shown as structured data, not on the page)
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  name: "codov",
-  url: SITE_URL,
-  logo: `${SITE_URL}/icons/icon-512.png`,
-  description: SITE_DESCRIPTION,
-  areaServed: "UZ",
-  knowsAbout: ["HTML", "CSS", "JavaScript", "Web development"],
-  inLanguage: ["uz", "ru"],
-};
-
 export default async function LoginPage() {
   const [{ locale, t }, theme] = await Promise.all([getDictionary(), getThemeMode()]);
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="relative hidden flex-col justify-between overflow-hidden bg-navy p-12 text-white lg:flex">
         <div
           aria-hidden="true"
@@ -45,7 +32,9 @@ export default async function LoginPage() {
           className="absolute -bottom-32 -left-16 size-80 -rotate-12 rounded-[3rem] bg-brand-light/10"
         />
 
-        <Logo tone="light" size={36} className="relative" />
+        <Link href="/" className="relative w-fit" aria-label="codov">
+          <Logo tone="light" size={36} />
+        </Link>
 
         <div className="relative max-w-md">
           <h2 className="text-4xl font-extrabold leading-tight">{t.auth.brandTitle}</h2>
@@ -70,7 +59,9 @@ export default async function LoginPage() {
 
       <main className="flex flex-col px-5 py-5 sm:px-10">
         <div className="flex items-center justify-between">
-          <Logo className="lg:invisible" />
+          <Link href="/" className="lg:invisible" aria-label="codov">
+            <Logo />
+          </Link>
           <div className="flex items-center gap-2">
             <ThemeSwitcher initial={theme} labels={t.common.theme} />
             <LanguageSwitcher current={locale} label={t.common.language} />
