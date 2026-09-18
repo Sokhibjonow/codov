@@ -36,34 +36,47 @@ async function uploadToBlob(
   meta: Record<string, unknown>,
   onProgress: Progress,
 ): Promise<UploadResult> {
+  let settled = false;
+  let percent = 0;
+  let uploading: Promise<unknown>;
   try {
     const { upload, uploadPresigned } = await import("@vercel/blob/client");
-    // The presigned upload can send every byte and then never settle, so once the file is fully
-    // sent we move on after a short pause; the server then checks the stored file itself
-    let markSent: () => void = () => {};
-    const sent = new Promise<void>((resolve) => (markSent = resolve));
     // Newer stores (no read-write token) use presigned URLs; large files go in parts on classic stores
-    const uploading = (presigned ? uploadPresigned : upload)(pathname, file, {
+    uploading = (presigned ? uploadPresigned : upload)(pathname, file, {
       access: "public",
       handleUploadUrl: "/api/uploads/blob",
       multipart: !presigned && file.size > 8 * 1024 * 1024,
       onUploadProgress: ({ percentage }) => {
+        percent = percentage;
         onProgress?.(Math.round(percentage));
-        if (percentage >= 100) markSent();
       },
-    });
-    await Promise.race([uploading, sent.then(() => new Promise((resolve) => setTimeout(resolve, 2000)))]);
+    }).then(
+      () => (settled = true),
+      (error) => {
+        settled = true;
+        console.warn("[upload]", error);
+      },
+    );
   } catch (error) {
-    // The file may still have been stored (e.g. the storage response couldn't be read);
-    // the server checks the real file below, so only log here
     console.warn("[upload]", error);
-  }
-  try {
-    const done = await postJson({ ...meta, step: "complete", pathname });
-    return done?.url ? { ok: true, url: done.url } : { ok: false };
-  } catch {
     return { ok: false };
   }
+
+  // The presigned upload can store the file and still never settle in the browser, so we don't rely
+  // on it: once the file is (nearly) sent, the server is asked every few seconds whether the stored
+  // file is there and valid. Checks run one at a time so the attachment is created only once.
+  const deadline = Date.now() + 10 * 60_000;
+  while (Date.now() < deadline) {
+    await Promise.race([uploading, new Promise((resolve) => setTimeout(resolve, 3000))]);
+    if (!settled && percent < 90 && file.size > 1024 * 1024) continue;
+    const done = await postJson({ ...meta, step: "complete", pathname }).catch(() => null);
+    if (done?.url) {
+      onProgress?.(100);
+      return { ok: true, url: done.url };
+    }
+    if (settled) return { ok: false };
+  }
+  return { ok: false };
 }
 
 /** fetch can't report upload progress, so this one uses XMLHttpRequest. */
