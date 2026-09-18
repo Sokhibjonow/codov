@@ -58,3 +58,6 @@ to-server
 /.windsurf
 /.claude
 skills-lock.json
+
+# local helper scripts (demo data for videos etc.)
+/scripts/tmp/
