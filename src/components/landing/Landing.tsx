@@ -6,6 +6,7 @@ import {
   FlaskConical,
   LogIn,
   MessageCircle,
+  Megaphone,
   Phone,
   Send,
   UserCheck,
@@ -44,7 +45,40 @@ const structuredData = {
   areaServed: "UZ",
   knowsAbout: ["HTML", "CSS", "JavaScript", "React", "TypeScript", "Tailwind CSS", "Node.js", "Express", "REST API", "MySQL", "SQL", "Git", "AI"],
   inLanguage: ["uz", "ru"],
+  telephone: CONTACTS.phone || undefined,
+  sameAs: [CONTACTS.instagram, CONTACTS.channel, CONTACTS.telegram && `https://t.me/${CONTACTS.telegram}`].filter(Boolean),
 };
+
+function InstagramIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** Instagram and the Telegram channel, as buttons or (compact) as icon links */
+function SocialLinks({ labels, compact = false }: { labels: Dictionary["landing"]["contact"]; compact?: boolean }) {
+  const links = [
+    CONTACTS.instagram && { href: CONTACTS.instagram, label: labels.instagram, icon: <InstagramIcon /> },
+    CONTACTS.channel && { href: CONTACTS.channel, label: labels.channel, icon: <Megaphone size={18} /> },
+  ].filter(Boolean) as { href: string; label: string; icon: React.ReactNode }[];
+
+  return links.map((link) =>
+    compact ? (
+      <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.label} title={link.label} className="hover:text-foreground">
+        {link.icon}
+      </a>
+    ) : (
+      <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="btn border border-border bg-surface px-5 py-2.5">
+        {link.icon}
+        {link.label}
+      </a>
+    ),
+  );
+}
 
 function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
@@ -273,20 +307,43 @@ export function Landing({ t, locale, theme }: LandingProps) {
               {CONTACTS.phone && (
                 <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
                   <Phone size={18} />
-                  {l.contact.phone}
+                  {CONTACTS.phoneLabel}
                 </a>
               )}
               {!CONTACTS.telegram && !CONTACTS.phone && <p className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">{l.contact.soon}</p>}
             </div>
+            {(CONTACTS.instagram || CONTACTS.channel) && (
+              <div className="mt-8">
+                <p className="text-sm font-bold text-muted">{l.contact.follow}</p>
+                <div className="mt-3 flex flex-wrap justify-center gap-3">
+                  <SocialLinks labels={l.contact} />
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>
 
       <footer className="border-t border-border px-4 py-8 md:px-6">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 text-sm text-muted">
-          <Logo size={24} />
-          <p>{l.footer}</p>
-          <p>© {new Date().getFullYear()} codov</p>
+          <div>
+            <Logo size={24} />
+            <p className="mt-2">{l.footer}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {CONTACTS.telegram && (
+              <a href={`https://t.me/${CONTACTS.telegram}`} className="hover:text-foreground" target="_blank" rel="noopener noreferrer">
+                @{CONTACTS.telegram}
+              </a>
+            )}
+            {CONTACTS.phone && (
+              <a href={`tel:${CONTACTS.phone}`} className="hover:text-foreground">
+                {CONTACTS.phoneLabel}
+              </a>
+            )}
+            <SocialLinks labels={l.contact} compact />
+          </div>
+          <p className="w-full sm:w-auto">© {new Date().getFullYear()} codov</p>
         </div>
       </footer>
     </div>

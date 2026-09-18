@@ -8,8 +8,12 @@ export const SITE_DESCRIPTION =
 
 /** Contacts on the public page; empty values are hidden (fill in to show the buttons). */
 export const CONTACTS = {
-  /** Telegram username without @ */
-  telegram: "",
-  /** Phone in international format, e.g. +998901234567 */
+  /** Telegram username without @ (sign-up and questions) */
+  telegram: "codov_admin",
+  /** Phone in international format */
   phone: "",
+  /** How the phone is shown on the page, e.g. +998 90 123 45 67 */
+  phoneLabel: "",
+  instagram: "https://www.instagram.com/codovv",
+  channel: "https://t.me/codovvv",
 };
