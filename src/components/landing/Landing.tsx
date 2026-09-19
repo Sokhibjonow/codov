@@ -3,6 +3,7 @@ import {
   Bot,
   CheckCircle2,
   Code2,
+  FileSpreadsheet,
   FlaskConical,
   LogIn,
   MessageCircle,
@@ -40,7 +41,7 @@ const FEATURE_ICONS: LucideIcon[] = [BookOpen, Code2, FlaskConical, Bot, UserChe
 /** Offline, online with the teacher, only Codov */
 const FORMAT_ICONS: LucideIcon[] = [School, MonitorPlay, Laptop];
 /** Web Basics, Frontend, Backend, Database, Tools, AI & Web */
-const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles];
+const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles, FileSpreadsheet];
 
 /**
  * Structured data for search engines (not shown on the page): the school, its six courses and the FAQ,
@@ -292,8 +293,12 @@ export function Landing({ t, locale, theme }: LandingProps) {
             <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {l.learn.items.map((item, index) => {
                 const Icon = TRACK_ICONS[index] ?? Code2;
+                // A lone last card spans the row so the grid doesn't end with a gap
+                const count = l.learn.items.length;
+                const last = index === count - 1;
+                const span = `${last && count % 2 === 1 ? "sm:col-span-2" : ""} ${last && count % 3 === 1 ? "lg:col-span-3" : ""}`;
                 return (
-                  <li key={item.name} data-reveal style={{ "--reveal-delay": `${(index % 3) * 100}ms` } as React.CSSProperties} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
+                  <li key={item.name} data-reveal style={{ "--reveal-delay": `${(index % 3) * 100}ms` } as React.CSSProperties} className={`card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg ${span}`}>
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
                         <Icon size={24} />

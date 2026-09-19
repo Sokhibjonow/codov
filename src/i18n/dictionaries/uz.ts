@@ -713,7 +713,7 @@ export const uz: Dictionary = {
     },
     learn: {
       title: "Dasturlash kurslari yo‘nalishlari",
-      subtitle: "Oltita yo‘nalish — veb asoslaridan sun’iy intellektli ilovalargacha.",
+      subtitle: "Yettita yo‘nalish — ofis dasturlaridan sun’iy intellektli ilovalargacha.",
       items: [
         { name: "Web Basics", text: "Har qanday saytning poydevori: sahifa tuzilishi, dizayn va interaktivlik.", topics: ["HTML", "CSS", "JavaScript"] },
         { name: "Frontend", text: "Zamonaviy interfeyslar: komponentlar, qat’iy tiplar va tezkor dizayn.", topics: ["React", "TypeScript", "Tailwind CSS"] },
@@ -721,6 +721,7 @@ export const uz: Dictionary = {
         { name: "Database", text: "Ma’lumotlarni saqlash: jadvallar, ular orasidagi bog‘lanishlar va SQL so‘rovlari.", topics: ["MySQL", "SQL"] },
         { name: "Tools", text: "Dasturchining kundalik vositalari: versiyalar nazorati, muharrir va paketlar.", topics: ["Git", "GitHub", "VS Code", "npm"] },
         { name: "AI & Web", text: "Saytlarga sun’iy intellektni ulaymiz: tashqi API va aqlli funksiyalar.", topics: ["APIs", "Gemini / OpenAI", "AI features"] },
+        { name: "Operator kurslari", text: "Kompyuter savodxonligi: hujjatlar, jadvallar va taqdimotlar bilan ishlash.", topics: ["Microsoft Word", "Excel", "PowerPoint"] },
       ],
     },
     features: {
