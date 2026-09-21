@@ -713,7 +713,7 @@ export const uz: Dictionary = {
     },
     learn: {
       title: "Noldan o‘z loyihangizgacha",
-      subtitle: "Uch bosqich va to‘rt yo‘nalish. Qaysi formatda o‘qimang, har bir ishingizni o‘qituvchi tekshiradi.",
+      subtitle: "Uch bosqich — asoslardan o‘z mahsulotingizgacha. Qaysi formatda o‘qimang, har bir ishingizni o‘qituvchi tekshiradi.",
       goal: "Maqsad",
       stages: [
         {
@@ -742,13 +742,12 @@ export const uz: Dictionary = {
         lead: "Har bir bosqichda",
         steps: ["Codovda amaliyot", "Avtotest va AI", "O‘qituvchi tekshiruvi"],
       },
-      tracksTitle: "4 ta yo‘nalish",
-      tracks: [
-        { name: "Web Development", text: "Saytlar va veb-ilovalar: interfeysdan servergacha.", topics: ["HTML", "CSS", "JS", "React", "TypeScript", "Node.js", "Express"] },
-        { name: "Data & Backend", text: "Ma’lumotlarni saqlash va server mantiqi: jadvallar, so‘rovlar va API.", topics: ["SQL", "MySQL", "REST API", "Ma’lumotlar bazalari"] },
-        { name: "AI & Tools", text: "Ilovalarda sun’iy intellekt va dasturchining kundalik vositalari.", topics: ["AI", "Gemini", "OpenAI", "Git", "GitHub", "npm"] },
-        { name: "Digital Skills", text: "Kompyuter savodxonligi: hujjatlar, jadvallar va taqdimotlar.", topics: ["Word", "Excel", "PowerPoint"] },
-      ],
+      extra: {
+        badge: "Alohida kurs",
+        name: "Digital Skills",
+        text: "Dasturlashni rejalashtirmayapsizmi? Kompyuterda ishonchli ishlashni o‘rganing: hujjatlar, jadvallar va taqdimotlar.",
+        topics: ["Word", "Excel", "PowerPoint"],
+      },
     },
     features: {
       title: "O‘qish qanday tashkil etilgan",

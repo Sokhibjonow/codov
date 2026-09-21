@@ -12,14 +12,11 @@ import {
   Send,
   UserCheck,
   BookOpen,
-  Database,
-  Globe,
   HeartHandshake,
   Laptop,
   MonitorPlay,
   School,
   Rocket,
-  Sparkles,
   Target,
   type LucideIcon,
 } from "lucide-react";
@@ -43,11 +40,9 @@ const FORMAT_ICONS: LucideIcon[] = [School, MonitorPlay, Laptop];
 const STAGE_ICONS: LucideIcon[] = [BookOpen, Code2, Rocket];
 /** Practice on Codov, autotests and AI, teacher review */
 const REVIEW_ICONS: LucideIcon[] = [Laptop, FlaskConical, UserCheck];
-/** Web Development, Data & Backend, AI & Tools, Digital Skills */
-const TRACK_ICONS: LucideIcon[] = [Globe, Database, Sparkles, FileSpreadsheet];
 
 /**
- * Structured data for search engines (not shown on the page): the school, its four tracks and the FAQ,
+ * Structured data for search engines (not shown on the page): the school, its study path (three stages and the separate Digital Skills course) and the FAQ,
  * in the page's language. Lets Google show courses and answers right in the results.
  */
 function structuredData(t: Dictionary, locale: Locale) {
@@ -62,20 +57,23 @@ function structuredData(t: Dictionary, locale: Locale) {
     description: SITE_DESCRIPTION,
     areaServed: "UZ",
     inLanguage: ["uz", "ru"],
-    knowsAbout: [...new Set(l.learn.tracks.flatMap((track) => track.topics))],
+    knowsAbout: [...new Set([...l.learn.stages.flatMap((stage) => stage.topics), ...l.learn.extra.topics])],
     ...(CONTACTS.phone && { telephone: CONTACTS.phone }),
     sameAs: [CONTACTS.instagram, CONTACTS.channel, CONTACTS.telegram && `https://t.me/${CONTACTS.telegram}`].filter(Boolean),
   };
   const courses = {
     "@type": "ItemList",
-    name: l.learn.tracksTitle,
-    itemListElement: l.learn.tracks.map((track, index) => ({
+    name: l.learn.title,
+    itemListElement: [
+      ...l.learn.stages.map((stage) => ({ name: `${stage.key} — ${stage.name}`, topics: stage.topics, text: `${stage.tagline}. ${l.learn.goal}: ${stage.goal}` })),
+      l.learn.extra,
+    ].map((course, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
         "@type": "Course",
-        name: `${track.name}: ${track.topics.join(", ")}`,
-        description: track.text,
+        name: `${course.name}: ${course.topics.join(", ")}`,
+        description: course.text,
         inLanguage: locale,
         provider: { "@id": `${SITE_URL}/#organization` },
       },
@@ -359,32 +357,24 @@ export function Landing({ t, locale, theme }: LandingProps) {
               })}
             </div>
 
-            {/* Four tracks */}
-            <h3 data-reveal className="mt-16 text-center text-2xl font-extrabold tracking-tight md:text-3xl">{l.learn.tracksTitle}</h3>
-            <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {l.learn.tracks.map((track, index) => {
-                const Icon = TRACK_ICONS[index] ?? Code2;
-                return (
-                  <li key={track.name} data-reveal style={{ "--reveal-delay": `${index * 100}ms` } as React.CSSProperties} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
-                        <Icon size={24} />
-                      </span>
-                      <span className="font-mono text-3xl font-extrabold text-border">{String(index + 1).padStart(2, "0")}</span>
-                    </div>
-                    <h4 className="mt-4 text-xl font-extrabold">{track.name}</h4>
-                    <p className="mt-2 flex-1 text-muted">{track.text}</p>
-                    <ul className="mt-5 flex flex-wrap gap-2">
-                      {track.topics.map((topic) => (
-                        <li key={topic} className="rounded-full border border-border bg-background px-3 py-1 font-mono text-xs font-bold">
-                          {topic}
-                        </li>
-                      ))}
-                    </ul>
+            {/* A separate course outside the programming path */}
+            <div data-reveal className="card mt-12 flex flex-col gap-5 md:flex-row md:items-center">
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                <FileSpreadsheet size={28} />
+              </span>
+              <div className="flex-1">
+                <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-primary">{l.learn.extra.badge}</p>
+                <h3 className="mt-1 text-2xl font-extrabold">{l.learn.extra.name}</h3>
+                <p className="mt-1 text-muted">{l.learn.extra.text}</p>
+              </div>
+              <ul className="flex flex-wrap gap-2 md:justify-end">
+                {l.learn.extra.topics.map((topic) => (
+                  <li key={topic} className="rounded-full border border-border bg-background px-3 py-1 font-mono text-xs font-bold">
+                    {topic}
                   </li>
-                );
-              })}
-            </ol>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
