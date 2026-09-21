@@ -732,7 +732,7 @@ export const ru = {
           key: "CREATE",
           name: "Проекты",
           tagline: "Делаете собственный продукт",
-          topics: ["AI: Gemini / OpenAI", "AI-функции", "Работа с API", "Базы данных", "Полноценный backend", "Деплой", "Реальные проекты"],
+          topics: ["AI: Gemini / OpenAI", "AI-функции", "Работа с API", "Advanced backend", "Database integration", "Деплой", "Реальные проекты"],
           goal: "создать собственный проект или продукт.",
         },
       ],

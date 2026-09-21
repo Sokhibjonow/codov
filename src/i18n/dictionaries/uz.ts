@@ -734,7 +734,7 @@ export const uz: Dictionary = {
           key: "CREATE",
           name: "Loyihalar",
           tagline: "O‘z mahsulotingizni qilasiz",
-          topics: ["AI: Gemini / OpenAI", "AI funksiyalar", "API bilan ishlash", "Ma’lumotlar bazasi", "To‘liq backend", "Deploy", "Real loyihalar"],
+          topics: ["AI: Gemini / OpenAI", "AI funksiyalar", "API bilan ishlash", "Advanced backend", "Database integration", "Deploy", "Real loyihalar"],
           goal: "o‘z loyihangiz yoki mahsulotingizni yaratish.",
         },
       ],
