@@ -712,16 +712,42 @@ export const uz: Dictionary = {
       note: "Codov o‘qituvchiga o‘rgatishda, o‘quvchiga esa o‘rganishda yordam beradi. Testlar va sun’iy intellekt tezkor fikr beradi, yakuniy baho va maslahatni esa jonli o‘qituvchi beradi.",
     },
     learn: {
-      title: "Dasturlash kurslari yo‘nalishlari",
-      subtitle: "Yettita yo‘nalish — ofis dasturlaridan sun’iy intellektli ilovalargacha.",
-      items: [
-        { name: "Web Basics", text: "Har qanday saytning poydevori: sahifa tuzilishi, dizayn va interaktivlik.", topics: ["HTML", "CSS", "JavaScript"] },
-        { name: "Frontend", text: "Zamonaviy interfeyslar: komponentlar, qat’iy tiplar va tezkor dizayn.", topics: ["React", "TypeScript", "Tailwind CSS"] },
-        { name: "Backend", text: "Server tomoni: API yaratish, so‘rovlarni qayta ishlash va biznes-mantiq.", topics: ["Node.js", "Express", "REST API"] },
-        { name: "Database", text: "Ma’lumotlarni saqlash: jadvallar, ular orasidagi bog‘lanishlar va SQL so‘rovlari.", topics: ["MySQL", "SQL"] },
-        { name: "Tools", text: "Dasturchining kundalik vositalari: versiyalar nazorati, muharrir va paketlar.", topics: ["Git", "GitHub", "VS Code", "npm"] },
-        { name: "AI & Web", text: "Saytlarga sun’iy intellektni ulaymiz: tashqi API va aqlli funksiyalar.", topics: ["APIs", "Gemini / OpenAI", "AI features"] },
-        { name: "Operator kurslari", text: "Kompyuter savodxonligi: hujjatlar, jadvallar va taqdimotlar bilan ishlash.", topics: ["Microsoft Word", "Excel", "PowerPoint"] },
+      title: "Noldan o‘z loyihangizgacha",
+      subtitle: "Uch bosqich va to‘rt yo‘nalish. Qaysi formatda o‘qimang, har bir ishingizni o‘qituvchi tekshiradi.",
+      goal: "Maqsad",
+      stages: [
+        {
+          key: "START",
+          name: "Asoslar",
+          tagline: "Poydevorni o‘rganasiz",
+          topics: ["HTML", "CSS", "JavaScript", "Kompyuter savodxonligi", "Git asoslari", "SQL asoslari"],
+          goal: "poydevorni tushunish va oddiy masalalarni mustaqil yechishni o‘rganish.",
+        },
+        {
+          key: "BUILD",
+          name: "Dasturlash",
+          tagline: "Haqiqiy ilovalar yaratasiz",
+          topics: ["JavaScript", "React", "TypeScript", "Node.js", "Express", "MySQL", "REST API", "Git / GitHub", "npm"],
+          goal: "to‘liq veb-ilovalar yaratish.",
+        },
+        {
+          key: "CREATE",
+          name: "Loyihalar",
+          tagline: "O‘z mahsulotingizni qilasiz",
+          topics: ["AI: Gemini / OpenAI", "AI funksiyalar", "API bilan ishlash", "Ma’lumotlar bazasi", "To‘liq backend", "Deploy", "Real loyihalar"],
+          goal: "o‘z loyihangiz yoki mahsulotingizni yaratish.",
+        },
+      ],
+      review: {
+        lead: "Har bir bosqichda",
+        steps: ["Codovda amaliyot", "Avtotest va AI", "O‘qituvchi tekshiruvi"],
+      },
+      tracksTitle: "4 ta yo‘nalish",
+      tracks: [
+        { name: "Web Development", text: "Saytlar va veb-ilovalar: interfeysdan servergacha.", topics: ["HTML", "CSS", "JS", "React", "TypeScript", "Node.js", "Express"] },
+        { name: "Data & Backend", text: "Ma’lumotlarni saqlash va server mantiqi: jadvallar, so‘rovlar va API.", topics: ["SQL", "MySQL", "REST API", "Ma’lumotlar bazalari"] },
+        { name: "AI & Tools", text: "Ilovalarda sun’iy intellekt va dasturchining kundalik vositalari.", topics: ["AI", "Gemini", "OpenAI", "Git", "GitHub", "npm"] },
+        { name: "Digital Skills", text: "Kompyuter savodxonligi: hujjatlar, jadvallar va taqdimotlar.", topics: ["Word", "Excel", "PowerPoint"] },
       ],
     },
     features: {

@@ -18,10 +18,9 @@ import {
   Laptop,
   MonitorPlay,
   School,
-  LayoutTemplate,
-  Server,
+  Rocket,
   Sparkles,
-  Wrench,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -40,11 +39,15 @@ type LandingProps = { t: Dictionary; locale: Locale; theme: ThemeMode | null };
 const FEATURE_ICONS: LucideIcon[] = [BookOpen, Code2, FlaskConical, Bot, UserCheck, MessageCircle];
 /** Offline, online with the teacher, only Codov */
 const FORMAT_ICONS: LucideIcon[] = [School, MonitorPlay, Laptop];
-/** Web Basics, Frontend, Backend, Database, Tools, AI & Web */
-const TRACK_ICONS: LucideIcon[] = [Globe, LayoutTemplate, Server, Database, Wrench, Sparkles, FileSpreadsheet];
+/** START, BUILD, CREATE */
+const STAGE_ICONS: LucideIcon[] = [BookOpen, Code2, Rocket];
+/** Practice on Codov, autotests and AI, teacher review */
+const REVIEW_ICONS: LucideIcon[] = [Laptop, FlaskConical, UserCheck];
+/** Web Development, Data & Backend, AI & Tools, Digital Skills */
+const TRACK_ICONS: LucideIcon[] = [Globe, Database, Sparkles, FileSpreadsheet];
 
 /**
- * Structured data for search engines (not shown on the page): the school, its six courses and the FAQ,
+ * Structured data for search engines (not shown on the page): the school, its four tracks and the FAQ,
  * in the page's language. Lets Google show courses and answers right in the results.
  */
 function structuredData(t: Dictionary, locale: Locale) {
@@ -59,20 +62,20 @@ function structuredData(t: Dictionary, locale: Locale) {
     description: SITE_DESCRIPTION,
     areaServed: "UZ",
     inLanguage: ["uz", "ru"],
-    knowsAbout: l.learn.items.flatMap((item) => item.topics),
+    knowsAbout: [...new Set(l.learn.tracks.flatMap((track) => track.topics))],
     ...(CONTACTS.phone && { telephone: CONTACTS.phone }),
     sameAs: [CONTACTS.instagram, CONTACTS.channel, CONTACTS.telegram && `https://t.me/${CONTACTS.telegram}`].filter(Boolean),
   };
   const courses = {
     "@type": "ItemList",
-    name: l.learn.title,
-    itemListElement: l.learn.items.map((item, index) => ({
+    name: l.learn.tracksTitle,
+    itemListElement: l.learn.tracks.map((track, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
         "@type": "Course",
-        name: `${item.name}: ${item.topics.join(", ")}`,
-        description: item.text,
+        name: `${track.name}: ${track.topics.join(", ")}`,
+        description: track.text,
         inLanguage: locale,
         provider: { "@id": `${SITE_URL}/#organization` },
       },
@@ -290,25 +293,89 @@ export function Landing({ t, locale, theme }: LandingProps) {
         <section id="learn" className="scroll-mt-20 px-4 py-20 md:px-6">
           <div className="mx-auto max-w-6xl">
             <SectionTitle title={l.learn.title} subtitle={l.learn.subtitle} />
-            <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {l.learn.items.map((item, index) => {
-                const Icon = TRACK_ICONS[index] ?? Code2;
-                // A lone last card spans the row so the grid doesn't end with a gap
-                const count = l.learn.items.length;
-                const last = index === count - 1;
-                const span = `${last && count % 2 === 1 ? "sm:col-span-2" : ""} ${last && count % 3 === 1 ? "lg:col-span-3" : ""}`;
+
+            {/* The student's path: START → BUILD → CREATE */}
+            <ol className="grid gap-8 lg:grid-cols-3 lg:gap-6">
+              {l.learn.stages.map((stage, index) => {
+                const Icon = STAGE_ICONS[index] ?? BookOpen;
+                const count = l.learn.stages.length;
                 return (
-                  <li key={item.name} data-reveal style={{ "--reveal-delay": `${(index % 3) * 100}ms` } as React.CSSProperties} className={`card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg ${span}`}>
+                  <li key={stage.key} data-reveal style={{ "--reveal-delay": `${index * 120}ms` } as React.CSSProperties} className="card relative flex flex-col">
+                    {/* how far along the path this stage is */}
+                    <div className="flex gap-1.5" aria-hidden="true">
+                      {l.learn.stages.map((s, i) => (
+                        <span key={s.key} className={`h-1.5 flex-1 rounded-full ${i <= index ? "bg-primary" : "bg-border"}`} />
+                      ))}
+                    </div>
+                    <div className="mt-5 flex items-center gap-3">
+                      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                        <Icon size={24} />
+                      </span>
+                      <div>
+                        <p className="font-mono text-xs font-extrabold tracking-[0.2em] text-primary">
+                          {String(index + 1).padStart(2, "0")} · {stage.key}
+                        </p>
+                        <h3 className="text-2xl font-extrabold">{stage.name}</h3>
+                      </div>
+                    </div>
+                    <p className="mt-3 font-semibold text-muted">{stage.tagline}</p>
+                    <ul className="mt-4 flex flex-1 flex-wrap content-start gap-2">
+                      {stage.topics.map((topic) => (
+                        <li key={topic} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-bold">
+                          {topic}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-5 flex items-start gap-2 rounded-xl bg-primary-soft p-3 text-sm font-semibold text-primary">
+                      <Target size={18} className="mt-0.5 shrink-0" />
+                      <span>
+                        <b>{l.learn.goal}:</b> {stage.goal}
+                      </span>
+                    </p>
+                    {index < count - 1 && (
+                      <span aria-hidden="true" className="absolute left-1/2 top-full z-10 flex size-8 -translate-x-1/2 translate-y-0 items-center justify-center rounded-full border border-border bg-surface text-primary shadow-sm lg:left-full lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-[-4px]">
+                        <ArrowRight size={16} className="rotate-90 lg:rotate-0" />
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+
+            {/* Whatever the stage, the teacher checks the work */}
+            <div data-reveal className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl border border-border bg-surface px-5 py-4 text-sm font-bold">
+              <span className="text-muted">{l.learn.review.lead}:</span>
+              {l.learn.review.steps.map((step, index) => {
+                const Icon = REVIEW_ICONS[index] ?? CheckCircle2;
+                return (
+                  <span key={step} className="flex items-center gap-3">
+                    {index > 0 && <ArrowRight size={16} className="text-border" aria-hidden="true" />}
+                    <span className="flex items-center gap-2">
+                      <Icon size={18} className="text-primary" />
+                      {step}
+                    </span>
+                  </span>
+                );
+              })}
+            </div>
+
+            {/* Four tracks */}
+            <h3 data-reveal className="mt-16 text-center text-2xl font-extrabold tracking-tight md:text-3xl">{l.learn.tracksTitle}</h3>
+            <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {l.learn.tracks.map((track, index) => {
+                const Icon = TRACK_ICONS[index] ?? Code2;
+                return (
+                  <li key={track.name} data-reveal style={{ "--reveal-delay": `${index * 100}ms` } as React.CSSProperties} className="card flex flex-col transition hover:-translate-y-0.5 hover:shadow-lg">
                     <div className="flex items-start justify-between gap-3">
                       <span className="flex size-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
                         <Icon size={24} />
                       </span>
                       <span className="font-mono text-3xl font-extrabold text-border">{String(index + 1).padStart(2, "0")}</span>
                     </div>
-                    <h3 className="mt-4 text-2xl font-extrabold">{item.name}</h3>
-                    <p className="mt-2 flex-1 text-muted">{item.text}</p>
+                    <h4 className="mt-4 text-xl font-extrabold">{track.name}</h4>
+                    <p className="mt-2 flex-1 text-muted">{track.text}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">
-                      {item.topics.map((topic) => (
+                      {track.topics.map((topic) => (
                         <li key={topic} className="rounded-full border border-border bg-background px-3 py-1 font-mono text-xs font-bold">
                           {topic}
                         </li>
