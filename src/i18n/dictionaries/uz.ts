@@ -720,14 +720,14 @@ export const uz: Dictionary = {
           key: "START",
           name: "Asoslar",
           tagline: "Poydevorni o‘rganasiz",
-          topics: ["HTML", "CSS", "JavaScript", "Kompyuter savodxonligi", "Git asoslari", "SQL asoslari"],
+          topics: ["HTML", "CSS", "JavaScript", "Kompyuter savodxonligi", "Git va GitHub", "Saytni internetga joylash"],
           goal: "poydevorni tushunish va oddiy masalalarni mustaqil yechishni o‘rganish.",
         },
         {
           key: "BUILD",
           name: "Dasturlash",
           tagline: "Haqiqiy ilovalar yaratasiz",
-          topics: ["JavaScript", "React", "TypeScript", "Node.js", "Express", "MySQL", "REST API", "Git / GitHub", "npm"],
+          topics: ["JavaScript: modullar va OOP", "React", "TypeScript", "Node.js", "Express", "SQL va MySQL", "REST API", "npm"],
           goal: "to‘liq veb-ilovalar yaratish.",
         },
         {
@@ -784,6 +784,8 @@ export const uz: Dictionary = {
       title: "Ko‘p beriladigan savollar",
       items: [
         { q: "Dasturlash tajribasi kerakmi?", a: "Yo‘q. Kurs eng asoslardan boshlanadi, kompyuterdan foydalana olish kifoya." },
+        { q: "O‘qish qanday tuzilgan?", a: "3 bosqich: START — asoslar (HTML, CSS, JavaScript, Git), BUILD — dasturlash (React, TypeScript, Node.js, SQL va MySQL), CREATE — o‘z loyihangiz (AI, API, advanced backend, deploy). Har bir bosqichda ishlaringizni o‘qituvchi tekshiradi." },
+        { q: "Word va Excel kursi bormi?", a: "Ha. Digital Skills — alohida kurs: Word, Excel va PowerPoint. Dasturlashni rejalashtirmaganlar uchun." },
         { q: "Faqat platformada o‘qish mumkinmi?", a: "Ha. Darslarni o‘z sur’atingizda o‘tasiz, topshiriqlarni bajarib yuborasiz, o‘qituvchi esa har bir ishni shaxsan tekshirib, fikr bildiradi." },
         { q: "Kompyuter kerakmi?", a: "Kompyuter yoki noutbukda o‘qish qulayroq, lekin darslar va topshiriqlar telefondan ham ochiladi." },
         { q: "Darslar qaysi tilda?", a: "Platforma va darslar o‘zbek va rus tillarida, tilni istalgan payt almashtirish mumkin." },

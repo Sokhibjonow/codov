@@ -7,9 +7,9 @@ import { SITE_URL } from "./site";
 
 const SEO: Record<Locale, { title: string; description: string; keywords: string[]; ogLocale: string }> = {
   uz: {
-    title: "Dasturlash kurslari: HTML, React, Node.js va AI | codov",
+    title: "Dasturlash kurslari noldan: HTML, JavaScript, React va AI | codov",
     description:
-      "Veb-dasturlash kurslari oflayn, onlayn va mustaqil: HTML, CSS, JavaScript, React, TypeScript, Node.js, SQL, Git va sun’iy intellekt. Har bir ishni o‘qituvchi tekshiradi.",
+      "Dasturlashni noldan o‘rganing: 3 bosqich — asoslar, dasturlash va o‘z loyihangiz. Oflayn, onlayn yoki mustaqil; har bir ishni o‘qituvchi tekshiradi. Word va Excel kursi ham bor.",
     keywords: [
       "dasturlash kurslari",
       "dasturlash kursi",
@@ -37,9 +37,9 @@ const SEO: Record<Locale, { title: string; description: string; keywords: string
     ogLocale: "uz_UZ",
   },
   ru: {
-    title: "Курсы программирования: HTML, React, Node.js и ИИ | codov",
+    title: "Курсы программирования с нуля: HTML, JavaScript, React и ИИ | codov",
     description:
-      "Курсы веб-разработки офлайн, онлайн и самостоятельно: HTML, CSS, JavaScript, React, TypeScript, Node.js, SQL, Git и ИИ. Каждую работу проверяет преподаватель.",
+      "Программирование с нуля за 3 этапа: основы, разработка и собственный проект. Офлайн, онлайн или самостоятельно; каждую работу проверяет преподаватель. Есть курс Word и Excel.",
     keywords: [
       "курсы программирования",
       "IT курсы",

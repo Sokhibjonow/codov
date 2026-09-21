@@ -14,6 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
     // Search results show the platform name and topic, the tab shows the sign-in title
     title: { absolute: `${t.auth.title} · ${SITE_TITLE}` },
     alternates: { canonical: "/login" },
+    // The sign-in form is not what people search for: keep it out of results so they land on the public page
+    robots: { index: false, follow: true },
   };
 }
 
