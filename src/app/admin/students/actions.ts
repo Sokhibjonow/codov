@@ -107,6 +107,31 @@ export async function setStudentGroups(studentId: string, _prev: ActionState, fo
   return { ok: true, message: t.common.saved };
 }
 
+/** Lessons and single tasks the teacher opens for this student ahead of the usual order. */
+export async function setStudentAccess(studentId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser("ADMIN");
+  const { t } = await getDictionary();
+
+  const student = await prisma.user.findFirst({ where: { id: studentId, role: "STUDENT" }, select: { id: true } });
+  if (!student) return fail(t.common.errors.notFound);
+
+  const [lessons, assignments] = await Promise.all([
+    prisma.lesson.findMany({ where: { id: { in: formList(formData, "lessonIds") } }, select: { id: true } }),
+    prisma.assignment.findMany({ where: { id: { in: formList(formData, "assignmentIds") } }, select: { id: true } }),
+  ]);
+  const lessonIds = lessons.map((l) => l.id);
+  const assignmentIds = assignments.map((a) => a.id);
+  await prisma.$transaction([
+    prisma.studentLessonAccess.deleteMany({ where: { userId: studentId, lessonId: { notIn: lessonIds } } }),
+    prisma.studentLessonAccess.createMany({ data: lessonIds.map((lessonId) => ({ userId: studentId, lessonId })), skipDuplicates: true }),
+    prisma.studentAssignmentAccess.deleteMany({ where: { userId: studentId, assignmentId: { notIn: assignmentIds } } }),
+    prisma.studentAssignmentAccess.createMany({ data: assignmentIds.map((assignmentId) => ({ userId: studentId, assignmentId })), skipDuplicates: true }),
+  ]);
+
+  revalidatePath("/", "layout");
+  return { ok: true, message: t.common.saved };
+}
+
 export async function linkParent(studentId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
   await requireUser("ADMIN");
   const { t } = await getDictionary();

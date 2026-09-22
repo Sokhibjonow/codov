@@ -33,7 +33,8 @@ const lessonOrder =[{ order: "asc" as const }, { createdAt: "asc" as const }];
 /**
  * Lessons a student may open. In each course the first lesson is open; the next one opens once the
  * student has submitted every task of the previous one (a lesson without tasks counts once it is
- * marked as done). The teacher can also open the first N lessons for a group ahead of time.
+ * marked as done). The teacher can also open the first N lessons for a group ahead of time, or open
+ * single lessons for one student.
  */
 export async function getOpenLessonIds(userId: string, courseId?: string): Promise<Set<string>> {
   const courses = await prisma.course.findMany({
@@ -53,14 +54,16 @@ export async function getOpenLessonIds(userId: string, courseId?: string): Promi
     },
   });
   const lessons = courses.flatMap((c) => c.modules.flatMap((m) => m.lessons));
-  const [submitted, marked] = await Promise.all([
+  const [submitted, marked, granted] = await Promise.all([
     prisma.submission.findMany({
       where: { studentId: userId, assignmentId: { in: lessons.flatMap((l) => l.assignments.map((a) => a.id)) } },
       select: { assignmentId: true },
       distinct: ["assignmentId"],
     }),
     prisma.lessonProgress.findMany({ where: { userId, lessonId: { in: lessons.map((l) => l.id) } }, select: { lessonId: true } }),
+    prisma.studentLessonAccess.findMany({ where: { userId }, select: { lessonId: true } }),
   ]);
+  const openedForStudent = new Set(granted.map((g) => g.lessonId));
   const hasSubmission = new Set(submitted.map((s) => s.assignmentId));
   const markedDone = new Set(marked.map((p) => p.lessonId));
   const finished = (lesson: (typeof lessons)[number]) =>
@@ -72,16 +75,19 @@ export async function getOpenLessonIds(userId: string, courseId?: string): Promi
     const openedByTeacher = Math.max(0, ...course.groups.map((g) => g.openLessons));
     let previousFinished = true;
     ordered.forEach((lesson, index) => {
-      if (previousFinished || index < openedByTeacher) open.add(lesson.id);
+      if (previousFinished || index < openedByTeacher || openedForStudent.has(lesson.id)) open.add(lesson.id);
       previousFinished = open.has(lesson.id) && finished(lesson);
     });
   }
   return open;
 }
 
-/** Published assignments the student can work on right now: only those of open lessons. */
+/** Published assignments the student can work on right now: tasks of open lessons and tasks the teacher opened for them. */
 export async function studentOpenAssignmentWhere(userId: string): Promise<Prisma.AssignmentWhereInput> {
-  return { ...studentAssignmentWhere(userId), lessonId: { in: [...(await getOpenLessonIds(userId))] } };
+  return {
+    ...studentAssignmentWhere(userId),
+    OR: [{ lessonId: { in: [...(await getOpenLessonIds(userId))] } }, { access: { some: { userId } } }],
+  };
 }
 
 /** Courses available to a student with their published lessons in order and the progress. */

@@ -45,6 +45,8 @@ model User {
   reviewedSubmissions Submission[]       @relation("ReviewerSubmissions")
   drafts              CodeDraft[]
   lessonProgress      LessonProgress[]
+  lessonAccess        StudentLessonAccess[]
+  assignmentAccess    StudentAssignmentAccess[]
   attendance          AttendanceRecord[]
   chatMemberships     ChatMember[]
   messages            Message[]
@@ -183,6 +185,7 @@ model Lesson {
   assignments Assignment[]
   progress    LessonProgress[]
   attachments Attachment[]
+  access      StudentLessonAccess[]
 
   @@index([moduleId, order])
 }
@@ -197,6 +200,31 @@ model LessonProgress {
 
   @@id([userId, lessonId])
   @@index([lessonId])
+}
+
+// The teacher opens a lesson or a single task for one student ahead of the usual order.
+model StudentLessonAccess {
+  userId    String
+  lessonId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
+  @@index([lessonId])
+}
+
+model StudentAssignmentAccess {
+  userId       String
+  assignmentId String
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, assignmentId])
+  @@index([assignmentId])
 }
 
 model Assignment {
@@ -226,6 +254,7 @@ model Assignment {
   drafts      CodeDraft[]
   deadlines   AssignmentDeadline[]
   attachments Attachment[]
+  access      StudentAssignmentAccess[]
 
   @@index([lessonId, order])
 }

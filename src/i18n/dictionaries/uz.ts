@@ -156,6 +156,12 @@ export const uz: Dictionary = {
     noParents: "Ota-ona biriktirilmagan",
     unlink: "Ajratish",
     deleteHint: "O‘quvchining barcha ishlari va xabarlari o‘chiriladi.",
+    lessonAccess: "Darslar va topshiriqlarga ruxsat",
+    lessonAccessHint: "Darslar ketma-ket ochiladi. Shu o‘quvchiga alohida dars yoki topshiriqni oldindan ochish uchun belgilang. Dars ochilsa, uning hamma topshiriqlari ham ochiladi.",
+    lessonOpen: "Ochiq",
+    lessonLocked: "Yopiq",
+    openForStudent: "Shu o‘quvchiga ochish",
+    noCourses: "O‘quvchining guruhlariga hali kurs ochilmagan",
   },
   parents: {
     title: "Ota-onalar",

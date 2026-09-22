@@ -19,6 +19,7 @@ import { prisma } from "@/lib/db";
 import { formatPhone, fullName } from "@/lib/users";
 import { linkParent, setStudentGroups } from "../actions";
 import { LinkParentFields } from "../LinkParentFields";
+import { LessonAccess } from "./LessonAccess";
 
 export default async function StudentPage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser("ADMIN");
@@ -148,6 +149,8 @@ export default async function StudentPage({ params }: { params: Promise<{ id: st
           deleteHint={t.students.deleteHint}
         />
       </div>
+
+      <LessonAccess t={t} locale={locale} studentId={student.id} />
 
       <section className="mt-8">
         <h2 className="mb-3 text-xl font-extrabold">{t.progress.title}</h2>
