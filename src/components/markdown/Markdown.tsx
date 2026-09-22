@@ -1,6 +1,7 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
+import { MEDIA_BASE } from "@/lib/preview";
 import { splitContent } from "./parse";
 
 const components: Components = {
@@ -35,7 +36,7 @@ function ResultFrame({ label, code, src }: { label: string; code?: string; src?:
       {src ? (
         <iframe title={label} sandbox={FRAME_SANDBOX} src={src} loading="lazy" />
       ) : (
-        <iframe title={label} sandbox={FRAME_SANDBOX} srcDoc={code} loading="lazy" />
+        <iframe title={label} sandbox={FRAME_SANDBOX} srcDoc={MEDIA_BASE + code} loading="lazy" />
       )}
     </div>
   );

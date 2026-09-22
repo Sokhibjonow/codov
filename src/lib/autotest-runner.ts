@@ -1,5 +1,5 @@
 import type { AutotestRule } from "./autotests";
-import type { CodeFiles } from "./preview";
+import { MEDIA_BASE, type CodeFiles } from "./preview";
 
 export type RunnerMessage = { __cubickTests: true; runId: string; results: unknown };
 
@@ -132,6 +132,7 @@ export function buildTestDocument({ html, css, js }: CodeFiles, rules: AutotestR
     "<head>",
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    MEDIA_BASE,
     PRELUDE,
     `<style>\n${css.replace(/<\/style/gi, "<\\/style")}\n</style>`,
     "</head>",

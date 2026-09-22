@@ -1,6 +1,7 @@
 import { resultBlocks } from "@/components/markdown/parse";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { MEDIA_BASE } from "@/lib/preview";
 import { getOpenLessonIds, studentCourseWhere, studentOpenAssignmentWhere } from "@/lib/learning";
 
 type Params = Promise<{ target: string; id: string; lang: string; index: string }>;
@@ -45,7 +46,7 @@ export async function GET(_request: Request, { params }: { params: Params }) {
   const code = text === undefined ? undefined : resultBlocks(text)[blockIndex];
   if (code === undefined) return notFound();
 
-  return new Response(code, {
+  return new Response(MEDIA_BASE + code, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       // Runs as an isolated page even if opened directly, and only inside our own pages
