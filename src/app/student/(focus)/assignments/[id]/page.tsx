@@ -94,8 +94,9 @@ export default async function AssignmentWorkspacePage({ params }: Props) {
       tests={parseRules(assignment.tests)}
       saveDraft={saveDraft.bind(null, assignment.id)}
       submitWork={submitWork.bind(null, assignment.id)}
+      // Keyed: Workspace renders it among other children and it can reach the client as a lazy chunk
       description={
-        <div className="space-y-5">
+        <div key="description" className="space-y-5">
           {description.trim() && (
             <Markdown
               content={description}

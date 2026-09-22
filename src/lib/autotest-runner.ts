@@ -25,6 +25,8 @@ const RUNNER = `(function (config) {
     var probe = document.createElement("div");
     probe.style.setProperty(property, value);
     if (!probe.style.getPropertyValue(property)) return norm(value);
+    // A border/outline width computes to 0px unless the matching style is set
+    if (/^(border(-(top|right|bottom|left))?|outline)-width$/.test(property)) probe.style.setProperty(property.replace(/width$/, "style"), "solid");
     probe.style.position = "absolute";
     document.body.appendChild(probe);
     var result = getComputedStyle(probe).getPropertyValue(property);
