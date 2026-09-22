@@ -1,7 +1,7 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { publish } from "./chat/bus";
 import { prisma } from "./db";
-import { studentAssignmentWhere } from "./learning";
+import { studentOpenAssignmentWhere } from "./learning";
 
 // In-app notifications (the bell). Texts are built on the client from `type` + `data`,
 // so they follow the viewer's language.
@@ -87,7 +87,7 @@ export async function ensureDeadlineReminders(studentId: string) {
   const now = new Date();
   const soon = await prisma.assignment.findMany({
     where: {
-      ...studentAssignmentWhere(studentId),
+      ...(await studentOpenAssignmentWhere(studentId)),
       deadlines: { some: { dueAt: { gt: now, lte: new Date(now.getTime() + REMINDER_WINDOW_MS) }, group: { members: { some: { userId: studentId } } } } },
       submissions: { none: { studentId, status: { in: ["SUBMITTED", "NEEDS_REVIEW", "ACCEPTED"] } } },
     },

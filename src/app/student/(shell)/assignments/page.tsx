@@ -7,7 +7,7 @@ import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatDateTime, isPast } from "@/lib/format";
-import { assignmentProgress, pick, studentAssignmentWhere, type AssignmentProgress } from "@/lib/learning";
+import { assignmentProgress, pick, studentOpenAssignmentWhere, type AssignmentProgress } from "@/lib/learning";
 
 const sectionOf: Record<AssignmentProgress, "todo" | "review" | "done"> = {
   NOT_STARTED: "todo",
@@ -23,7 +23,7 @@ export default async function StudentAssignmentsPage() {
   const { t, locale } = await getDictionary();
 
   const assignments = await prisma.assignment.findMany({
-    where: studentAssignmentWhere(user.id),
+    where: await studentOpenAssignmentWhere(user.id),
     orderBy: [
       { lesson: { module: { course: { order: "asc" } } } },
       { lesson: { module: { order: "asc" } } },

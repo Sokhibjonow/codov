@@ -10,14 +10,14 @@ import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatDateTime, isPast } from "@/lib/format";
-import { pick, studentAssignmentWhere } from "@/lib/learning";
+import { pick, studentOpenAssignmentWhere } from "@/lib/learning";
 import { Workspace } from "./Workspace";
 
 type Props = { params: Promise<{ id: string }> };
 
 async function loadAssignment(userId: string, id: string) {
   return prisma.assignment.findFirst({
-    where: { id, ...studentAssignmentWhere(userId) },
+    where: { id, ...(await studentOpenAssignmentWhere(userId)) },
     select: {
       id: true,
       titleUz: true,

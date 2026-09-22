@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { studentCourseWhere } from "@/lib/learning";
+import { getOpenLessonIds, studentCourseWhere } from "@/lib/learning";
 
 export async function setLessonCompleted(lessonId: string, completed: boolean) {
   const user = await requireUser("STUDENT");
@@ -12,7 +12,7 @@ export async function setLessonCompleted(lessonId: string, completed: boolean) {
     where: { id: lessonId, isPublished: true, module: { course: studentCourseWhere(user.id) } },
     select: { id: true },
   });
-  if (!lesson) return;
+  if (!lesson || !(await getOpenLessonIds(user.id)).has(lesson.id)) return;
 
   if (completed) {
     await prisma.lessonProgress.createMany({ data: [{ userId: user.id, lessonId }], skipDuplicates: true });

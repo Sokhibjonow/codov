@@ -26,6 +26,7 @@ import {
   moveLesson,
   moveModule,
   setCourseGroups,
+  setCourseOpenLessons,
   setCoursePublished,
   updateCourse,
   updateModule,
@@ -47,7 +48,7 @@ export default async function CourseEditorPage({ params }: { params: Promise<{ i
       descriptionUz: true,
       descriptionRu: true,
       isPublished: true,
-      groups: { select: { groupId: true } },
+      groups: { orderBy: { group: { name: "asc" } }, select: { groupId: true, openLessons: true, group: { select: { name: true } } } },
       attachments: { orderBy: attachmentOrder, select: attachmentSelect },
       modules: {
         orderBy: byOrder,
@@ -73,6 +74,8 @@ export default async function CourseEditorPage({ params }: { params: Promise<{ i
     },
   });
   if (!course) notFound();
+  // Students see published lessons only, so the teacher opens lessons by that count
+  const lessonTotal = course.modules.reduce((sum, m) => sum + m.lessons.filter((l) => l.isPublished).length, 0);
 
   const groups = await prisma.group.findMany({
     where: { OR: [{ isArchived: false }, { courses: { some: { courseId: id } } }] },
@@ -285,6 +288,30 @@ export default async function CourseEditorPage({ params }: { params: Promise<{ i
               />
             </ActionForm>
           </section>
+
+          {course.groups.length > 0 && (
+            <section className="card">
+              <h2 className="text-lg font-extrabold">{t.courses.openLessons}</h2>
+              <p className="mb-4 mt-1 text-xs text-muted">{t.courses.openLessonsHint}</p>
+              <ActionForm action={setCourseOpenLessons.bind(null, course.id)} submitLabel={t.common.save}>
+                <div className="space-y-3">
+                  {course.groups.map((g) => (
+                    <label key={g.groupId} className="block">
+                      <span className="mb-1 block text-sm font-bold">{g.group.name}</span>
+                      <select name={`open-${g.groupId}`} defaultValue={String(Math.min(g.openLessons, lessonTotal))} className="input">
+                        <option value="0">{t.courses.openInOrder}</option>
+                        {Array.from({ length: lessonTotal }, (_, i) => i + 1).map((n) => (
+                          <option key={n} value={n}>
+                            {n === lessonTotal ? t.courses.openAll : format(t.courses.openUpTo, { n })}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+              </ActionForm>
+            </section>
+          )}
 
           <section className="rounded-2xl border border-danger/30 bg-surface p-5">
             <h2 className="text-sm font-extrabold text-danger">{t.common.dangerZone}</h2>

@@ -1,7 +1,7 @@
 import type { AttendanceStatus } from "@/generated/prisma/client";
 import { prisma } from "./db";
 import { fromDbDate, isPast } from "./format";
-import { assignmentProgress, getStudentCourses, studentAssignmentWhere, type AssignmentProgress } from "./learning";
+import { assignmentProgress, getStudentCourses, studentOpenAssignmentWhere, type AssignmentProgress } from "./learning";
 
 // Progress report of one student: shown to the student, their parents and the teacher.
 // Deliberately without AI reports and integrity data.
@@ -35,7 +35,7 @@ export async function getStudentReport(studentId: string) {
   const [courses, assignments, attendance] = await Promise.all([
     getStudentCourses(studentId),
     prisma.assignment.findMany({
-      where: studentAssignmentWhere(studentId),
+      where: await studentOpenAssignmentWhere(studentId),
       orderBy: [
         { lesson: { module: { course: { order: "asc" } } } },
         { lesson: { module: { order: "asc" } } },

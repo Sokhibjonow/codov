@@ -11,7 +11,7 @@ import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { mergeSegment, parseSegment, parseSegments, summarize } from "@/lib/integrity";
-import { studentAssignmentWhere } from "@/lib/learning";
+import { studentOpenAssignmentWhere } from "@/lib/learning";
 import type { CodeFiles } from "@/lib/preview";
 
 const MAX_FILE = 100_000;
@@ -26,7 +26,7 @@ const LOCKED_STATUSES = new Set(["SUBMITTED", "NEEDS_REVIEW", "ACCEPTED"]);
 
 async function loadForStudent(userId: string, assignmentId: string) {
   return prisma.assignment.findFirst({
-    where: { id: assignmentId, ...studentAssignmentWhere(userId) },
+    where: { id: assignmentId, ...(await studentOpenAssignmentWhere(userId)) },
     select: {
       id: true,
       titleUz: true,

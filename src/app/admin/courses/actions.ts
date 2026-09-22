@@ -101,6 +101,26 @@ export async function setCourseGroups(courseId: string, _prev: ActionState, form
   return { ok: true, message: t.common.saved };
 }
 
+/** How many first lessons each linked group gets open regardless of progress (0 = strictly in order). */
+export async function setCourseOpenLessons(courseId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser("ADMIN");
+  const { t } = await getDictionary();
+
+  const links = await prisma.groupCourse.findMany({ where: { courseId }, select: { groupId: true } });
+  if (links.length === 0) return fail(t.common.errors.notFound);
+
+  await prisma.$transaction(
+    links.map(({ groupId }) => {
+      const value = Number(formText(formData, `open-${groupId}`));
+      const openLessons = Number.isInteger(value) ? Math.min(Math.max(value, 0), 1000) : 0;
+      return prisma.groupCourse.update({ where: { groupId_courseId: { groupId, courseId } }, data: { openLessons } });
+    }),
+  );
+
+  refresh();
+  return { ok: true, message: t.common.saved };
+}
+
 export async function deleteCourse(courseId: string) {
   await requireUser("ADMIN");
   await prisma.course.deleteMany({ where: { id: courseId } });

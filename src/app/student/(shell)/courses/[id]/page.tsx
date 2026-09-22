@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Circle, Lock } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BackLink } from "@/components/admin/BackLink";
@@ -64,6 +64,17 @@ export default async function StudentCoursePage({ params }: { params: Promise<{ 
               {module.lessons.map((lesson) => {
                 const done = course.completed.has(lesson.id);
                 const isNext = course.nextLesson?.id === lesson.id;
+                if (!course.open.has(lesson.id)) {
+                  return (
+                    <li key={lesson.id} className="flex items-center gap-3 px-4 py-3 text-muted">
+                      <Lock size={20} className="shrink-0" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold">{format(t.learn.lesson, { n: lesson.number })} · {t.learn.lockedShort}</span>
+                        <span className="block truncate font-bold">{pick(locale, lesson.titleUz, lesson.titleRu)}</span>
+                      </span>
+                    </li>
+                  );
+                }
                 return (
                   <li key={lesson.id}>
                     <Link

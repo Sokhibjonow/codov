@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, ClipboardList, Languages, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, ClipboardList, Languages, Lock, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BackLink } from "@/components/admin/BackLink";
@@ -51,6 +51,28 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
   const prev = course.lessons[index - 1];
   const next = course.lessons[index + 1];
   const done = course.completed.has(lesson.id);
+
+  if (!course.open.has(lesson.id)) {
+    return (
+      <article className="mx-auto max-w-3xl">
+        <BackLink href={`/student/courses/${course.id}`} label={pick(locale, course.titleUz, course.titleRu)} />
+        <div className="card flex flex-col items-center gap-3 py-12 text-center">
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+            <Lock size={28} />
+          </span>
+          <p className="text-xs font-extrabold uppercase tracking-wide text-primary">{format(t.learn.lesson, { n: index + 1 })}</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">{t.learn.lockedTitle}</h1>
+          <p className="max-w-md text-muted">{t.learn.lockedHint}</p>
+          {prev && (
+            <Link href={`/student/lessons/${prev.id}`} className="btn btn-primary mt-2">
+              <ArrowLeft size={18} />
+              {t.learn.backToPrev}
+            </Link>
+          )}
+        </div>
+      </article>
+    );
+  }
 
   const ownText = locale === "uz" ? lesson.contentUz : lesson.contentRu;
   const content = pick(locale, lesson.contentUz, lesson.contentRu);
@@ -145,7 +167,16 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
         ) : (
           <span />
         )}
-        {next && (
+        {next && !course.open.has(next.id) && (
+          <div className="card flex items-center justify-end gap-2 p-4 text-right text-muted" aria-disabled="true">
+            <span className="min-w-0">
+              <span className="block text-xs">{t.learn.lockedShort}</span>
+              <span className="block truncate font-bold">{pick(locale, next.titleUz, next.titleRu)}</span>
+            </span>
+            <Lock size={18} className="shrink-0" />
+          </div>
+        )}
+        {next && course.open.has(next.id) && (
           <Link href={`/student/lessons/${next.id}`} className="card flex items-center justify-end gap-2 p-4 text-right hover:border-primary">
             <span className="min-w-0">
               <span className="block text-xs text-muted">{t.learn.next}</span>

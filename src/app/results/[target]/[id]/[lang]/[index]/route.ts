@@ -1,7 +1,7 @@
 import { resultBlocks } from "@/components/markdown/parse";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { studentAssignmentWhere, studentCourseWhere } from "@/lib/learning";
+import { getOpenLessonIds, studentCourseWhere, studentOpenAssignmentWhere } from "@/lib/learning";
 
 type Params = Promise<{ target: string; id: string; lang: string; index: string }>;
 
@@ -25,14 +25,18 @@ export async function GET(_request: Request, { params }: { params: Params }) {
   let text: string | undefined;
 
   if (target === "lesson") {
-    const lesson = await prisma.lesson.findFirst({
-      where: isAdmin ? { id } : { id, isPublished: true, module: { course: studentCourseWhere(user.id) } },
-      select: { contentUz: true, contentRu: true },
-    });
+    // Students only see results of lessons that are open for them
+    const allowed = isAdmin || (await getOpenLessonIds(user.id)).has(id);
+    const lesson = !allowed
+      ? null
+      : await prisma.lesson.findFirst({
+          where: isAdmin ? { id } : { id, isPublished: true, module: { course: studentCourseWhere(user.id) } },
+          select: { contentUz: true, contentRu: true },
+        });
     text = lang === "uz" ? lesson?.contentUz : lesson?.contentRu;
   } else if (target === "assignment") {
     const assignment = await prisma.assignment.findFirst({
-      where: isAdmin ? { id } : { id, ...studentAssignmentWhere(user.id) },
+      where: isAdmin ? { id } : { id, ...(await studentOpenAssignmentWhere(user.id)) },
       select: { descriptionUz: true, descriptionRu: true },
     });
     text = lang === "uz" ? assignment?.descriptionUz : assignment?.descriptionRu;

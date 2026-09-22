@@ -140,6 +140,9 @@ model GroupCourse {
   groupId  String
   courseId String
   openedAt DateTime @default(now())
+  // Lessons open in order: the next one opens once every task of the previous one is submitted.
+  // The teacher can open the first N lessons for the group regardless of progress (0 = in order only).
+  openLessons Int @default(0)
 
   group  Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
