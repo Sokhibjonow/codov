@@ -1,7 +1,8 @@
 # codov — technical documentation
 
-The [top-level README](../README.md) covers installing and deploying the app. These pages explain how
-it works inside.
+Start with the [handbook](../HANDBOOK.md) — how to run the app, how it is written, recipes and traps.
+These pages are the deeper reference behind it. The [top-level README](../README.md) covers setup and
+deployment.
 
 | Page | What it answers |
 |---|---|
@@ -12,7 +13,7 @@ it works inside.
 | [autotests.md](autotests.md) | Rule types and how to write tests that hold |
 | [content-pipeline.md](content-pipeline.md) | How course content is authored and imported |
 | [operations.md](operations.md) | Environments, variables, releases, scripts, backups |
-| [../CONVENTIONS.md](../CONVENTIONS.md) | How the project is written: code, database, content, git, security |
+
 
 Guides for the teacher (in Russian) live with the course materials, outside this repository:
 `Documents/codov/docs` — using the admin area, the state of the START course, and working with the site.
