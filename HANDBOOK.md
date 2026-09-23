@@ -256,6 +256,8 @@ PowerShell 5.1 has no `&&`, hence the `if ($?)` chain. Vercel builds on push and
 - **Computed styles, not source text.** An autotest `style` rule compares computed values;
   percentages arrive as pixels.
 - **A published lesson with no tasks counts as finished** and lets students skip ahead.
+- **Content is matched by `Lesson.slug` / `Assignment.key`, not by order.** Matching by order once
+  re-pointed a student's submission to a different task when a lesson was inserted in the middle.
 - **The dev server caches the Prisma client.** After changing the schema, restart it, or you get
   `Cannot read properties of undefined (reading 'findMany')`.
 - **Deleting cascades.** Removing a user removes their submissions, drafts, messages and progress.

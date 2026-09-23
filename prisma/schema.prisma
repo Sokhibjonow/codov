@@ -171,6 +171,9 @@ model Module {
 model Lesson {
   id          String   @id @default(cuid())
   moduleId    String
+  // Stable name from the content folder: imports match by it, so inserting a lesson
+  // in the middle never re-points someone else's work.
+  slug        String?
   titleUz     String
   titleRu     String
   // Markdown
@@ -187,6 +190,7 @@ model Lesson {
   attachments Attachment[]
   access      StudentLessonAccess[]
 
+  @@unique([moduleId, slug])
   @@index([moduleId, order])
 }
 
@@ -230,6 +234,8 @@ model StudentAssignmentAccess {
 model Assignment {
   id              String   @id @default(cuid())
   lessonId        String
+  // Stable key from the content folder (see Lesson.slug)
+  key             String?
   titleUz         String
   titleRu         String
   // Markdown task description (ТЗ)
@@ -256,6 +262,7 @@ model Assignment {
   attachments Attachment[]
   access      StudentAssignmentAccess[]
 
+  @@unique([lessonId, key])
   @@index([lessonId, order])
 }
 

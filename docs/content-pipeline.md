@@ -37,7 +37,8 @@ export const TASKS = [{ key, titleUz, titleRu, topic, maxScore, starterHtml, sta
 
 `import-course.mts` (in the content repo's scripts) upserts the whole tree:
 
-- courses, modules, lessons and assignments are matched **by order**, not by id;
+- a lesson is matched by its folder name (`Lesson.slug`) and a task by its `key` — never by order, so a lesson can be inserted in the middle without re-pointing existing submissions;
+- `order` is rewritten on every run, so the folder list in `course.mjs` is the source of truth for the sequence;
 - texts, starters and tests are overwritten on every run;
 - **nothing is ever deleted** — removing a lesson from `course.mjs` leaves it in the database;
 - rules are validated with `autotestRuleSchema` before writing, so a bad test aborts the import.

@@ -25,13 +25,16 @@ issued before (see [access-control.md](access-control.md)).
 
 | Model | What it holds |
 |---|---|
-| `Course` → `Module` → `Lesson` → `Assignment` | The content tree. Every text exists twice: `…Uz` and `…Ru`. |
+| `Course` → `Module` → `Lesson` → `Assignment` | The content tree. Every text exists twice: `…Uz` and `…Ru`. `Lesson.slug` and `Assignment.key` carry the stable name from the content folder, unique inside their parent. |
 | `GroupCourse` | Opens a course for a group. `openLessons` lets the teacher open the first N lessons regardless of progress. |
 | `LessonProgress` | The student marked a lesson as done. |
 | `Attachment` | A file or link attached to a course, lesson or assignment (exactly one of the three ids is set). |
 | `AssignmentDeadline` | Due date per assignment per group. |
 
 Ordering is always `order ASC, createdAt ASC` — new rows keep a stable place when several share an `order`.
+
+Imports match a lesson by `slug` and a task by `key`, never by `order`: inserting a lesson in the
+middle of a course must not re-point work students already sent.
 
 Lesson content is Markdown with a few custom fences; see [content-pipeline.md](content-pipeline.md).
 `Assignment.tests` is JSON validated by `autotestRuleSchema`; see [autotests.md](autotests.md).
