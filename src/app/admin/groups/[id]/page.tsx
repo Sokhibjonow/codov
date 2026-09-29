@@ -13,13 +13,14 @@ import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { pick } from "@/lib/learning";
 import { formatPhone, fullName } from "@/lib/users";
-import { addGroupMembers, deleteGroup, removeGroupMember, setGroupArchived, updateGroup } from "../actions";
+import { addGroupMembers, deleteGroup, removeGroupMember, setGroupArchived, setGroupCourses, updateGroup } from "../actions";
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser("ADMIN");
   const { id } = await params;
-  const { t } = await getDictionary();
+  const { t, locale } = await getDictionary();
 
   const group = await prisma.group.findUnique({
     where: { id },
@@ -28,6 +29,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
       name: true,
       description: true,
       isArchived: true,
+      courses: { select: { courseId: true } },
       members: {
         orderBy: [{ user: { lastName: "asc" } }, { user: { firstName: "asc" } }],
         select: { user: { select: { id: true, firstName: true, lastName: true, login: true, phone: true, isActive: true } } },
@@ -35,6 +37,11 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
     },
   });
   if (!group) notFound();
+
+  const courses = await prisma.course.findMany({
+    orderBy: [{ isPublished: "desc" }, { createdAt: "asc" }],
+    select: { id: true, titleUz: true, titleRu: true, isPublished: true },
+  });
 
   const candidates = await prisma.user.findMany({
     where: { role: "STUDENT", isActive: true, groupMemberships: { none: { groupId: id } } },
@@ -113,6 +120,20 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
         </section>
 
         <div className="space-y-4">
+          <section className="card">
+            <h2 className="text-lg font-extrabold">{t.groups.courses}</h2>
+            <p className="mb-4 mt-1 text-xs text-muted">{t.groups.coursesHint}</p>
+            <ActionForm action={setGroupCourses.bind(null, group.id)} submitLabel={t.common.save}>
+              <CheckboxList
+                name="courseIds"
+                options={courses.map((c) => ({ value: c.id, label: pick(locale, c.titleUz, c.titleRu), hint: c.isPublished ? undefined : t.courses.draft }))}
+                defaultSelected={group.courses.map((c) => c.courseId)}
+                emptyText={t.groups.noCourses}
+                searchPlaceholder={t.common.search}
+              />
+            </ActionForm>
+          </section>
+
           <section className="card">
             <h2 className="mb-4 text-lg font-extrabold">{t.groups.settings}</h2>
             <ActionForm action={updateGroup.bind(null, group.id)} submitLabel={t.common.save}>

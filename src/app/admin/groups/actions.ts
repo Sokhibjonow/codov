@@ -71,6 +71,27 @@ export async function addGroupMembers(groupId: string, _prev: ActionState, formD
   return { ok: true, message: t.groups.membersAdded };
 }
 
+/** The courses the group's students see (the same link as "Guruhlar uchun ruxsat" on a course page). */
+export async function setGroupCourses(groupId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser("ADMIN");
+  const { t } = await getDictionary();
+
+  const group = await prisma.group.findUnique({ where: { id: groupId }, select: { id: true } });
+  if (!group) return fail(t.common.errors.notFound);
+
+  const ids = formList(formData, "courseIds");
+  const courses = await prisma.course.findMany({ where: { id: { in: ids } }, select: { id: true } });
+  const courseIds = courses.map((c) => c.id);
+  await prisma.$transaction([
+    prisma.groupCourse.deleteMany({ where: { groupId, courseId: { notIn: courseIds } } }),
+    prisma.groupCourse.createMany({ data: courseIds.map((courseId) => ({ groupId, courseId })), skipDuplicates: true }),
+  ]);
+
+  revalidatePath("/admin", "layout");
+  revalidatePath("/student", "layout");
+  return { ok: true, message: t.common.saved };
+}
+
 export async function removeGroupMember(groupId: string, userId: string) {
   await requireUser("ADMIN");
   await prisma.groupMember.deleteMany({ where: { groupId, userId } });

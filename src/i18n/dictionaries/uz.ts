@@ -125,6 +125,9 @@ export const uz: Dictionary = {
     remove: "Guruhdan chiqarish",
     allInGroup: "Barcha o‘quvchilar allaqachon shu guruhda",
     deleteHint: "O‘quvchilar platformada qoladi, faqat guruh o‘chiriladi.",
+    courses: "Guruh kurslari",
+    coursesHint: "Guruh o‘quvchilari faqat shu yerda belgilangan kurslarni ko‘radi. Qoralama kursni o‘quvchilar ko‘rmaydi.",
+    noCourses: "Hozircha kurslar yo‘q",
   },
   students: {
     title: "O‘quvchilar",
