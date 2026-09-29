@@ -74,6 +74,9 @@ sitting next to the page, which is what the lesson about relative URLs teaches.
 `public/media` currently holds `img12.jpg`, `img/img12.jpg`, `fon.jpg`, `img1.jpg`, `img2.jpg`,
 `img3.jpg` and `codov-fon.png` (the codov watermark used by the layout tasks).
 
+`public/media/api/*.json` is practice data for the `fetch` lessons (`fetch("api/weather.json")`); it is
+served with `Access-Control-Allow-Origin: *` because student pages have an opaque origin.
+
 ## House rules for content
 
 - Colours by name only (`tomato`, `midnightblue`, `whitesmoke`) — no `#` codes.

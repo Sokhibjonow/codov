@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         source: "/monaco/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
       },
+      {
+        // Practice data for fetch lessons: students' pages run in sandboxed frames with an opaque
+        // origin, so a same-server fetch is cross-origin for them
+        source: "/media/api/:path*",
+        headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
+      },
     ];
   },
 };

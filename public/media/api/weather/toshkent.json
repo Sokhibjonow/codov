@@ -1,0 +1,9 @@
+{
+  "city": "Toshkent",
+  "current": { "temp": 24, "wind": 9, "sky": "Quyoshli" },
+  "daily": [
+    { "day": "Dushanba", "max": 26, "min": 14 },
+    { "day": "Seshanba", "max": 25, "min": 13 },
+    { "day": "Chorshanba", "max": 22, "min": 12 }
+  ]
+}

@@ -27,7 +27,13 @@ A rule is `{ id, points, type, … }`. `id` is free text (shown in the results),
 Browser rules run in a sandboxed iframe built by `buildTestDocument`
 ([`src/lib/autotest-runner.ts`](../src/lib/autotest-runner.ts)): the student's HTML, CSS and JS plus a
 small runner that evaluates the rules and posts the results back. The frame has no
-`allow-same-origin`, so student code can never touch the platform.
+`allow-same-origin`, so student code can never touch the platform. The real `localStorage` throws
+in such a frame, so `storageShim` puts an in-memory stand-in in its place; every test run starts
+with empty storage.
+
+Rules run one after another on the same page, 300 ms after load. A failing `exists`, `count`,
+`text`, `attribute`, `style` or `console` rule is re-checked every 100 ms while the run is younger than
+2 s, so data from `fetch` or a timer can arrive; `click` and `input` are never repeated.
 
 `code` rules never reach the browser — they are evaluated server-side by `runCodeRules`.
 

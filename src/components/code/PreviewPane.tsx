@@ -3,7 +3,14 @@
 import { ChevronDown, ChevronUp, Play, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
-import { buildPreviewDocument, type CodeFiles, type PreviewMessage } from "@/lib/preview";
+import {
+  buildPreviewDocument,
+  MAX_STORAGE_CHARS,
+  type CodeFiles,
+  type PreviewMessage,
+  type StorageItems,
+  type StorageMessage,
+} from "@/lib/preview";
 
 type LogEntry = { id: number; level: PreviewMessage["level"]; text: string };
 
@@ -20,6 +27,17 @@ function isPreviewMessage(data: unknown): data is PreviewMessage {
   return typeof data === "object" && data !== null && (data as PreviewMessage).__cubick === true;
 }
 
+/** The page's localStorage stand-in reports its items; only a plain, not too large string map is kept. */
+function storageItems(data: unknown): StorageItems | null {
+  if (typeof data !== "object" || data === null || (data as StorageMessage).__cubickStorage !== true) return null;
+  const items = (data as StorageMessage).items;
+  if (typeof items !== "object" || items === null) return null;
+  const entries = Object.entries(items);
+  if (!entries.every(([, v]) => typeof v === "string")) return null;
+  if (entries.reduce((n, [k, v]) => n + k.length + v.length, 0) > MAX_STORAGE_CHARS) return null;
+  return Object.fromEntries(entries);
+}
+
 export function PreviewPane({ code, t, className = "" }: { code: CodeFiles; t: Dictionary; className?: string }) {
   const [autoRun, setAutoRun] = useState(true);
   // Starts empty: an iframe rendered on the server would run before our message listener exists
@@ -31,10 +49,12 @@ export function PreviewPane({ code, t, className = "" }: { code: CodeFiles; t: D
   const frameRef = useRef<HTMLIFrameElement>(null);
   const docRef = useRef(doc);
   const nextLogId = useRef(0);
+  // What the page saved in localStorage survives re-runs, like a page reload in a real browser
+  const storageRef = useRef<StorageItems>({});
 
   const run = useCallback(
     (force: boolean) => {
-      const next = buildPreviewDocument(code);
+      const next = buildPreviewDocument(code, storageRef.current);
       if (!force && next === docRef.current) return;
       docRef.current = next;
       setLogs([]);
@@ -53,7 +73,10 @@ export function PreviewPane({ code, t, className = "" }: { code: CodeFiles; t: D
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       // Only accept messages from our own preview frame
-      if (event.source !== frameRef.current?.contentWindow || !isPreviewMessage(event.data)) return;
+      if (event.source !== frameRef.current?.contentWindow) return;
+      const items = storageItems(event.data);
+      if (items) storageRef.current = items;
+      if (!isPreviewMessage(event.data)) return;
       const { level, args } = event.data;
       setLogs((prev) => [...prev.slice(-(MAX_LOGS - 1)), { id: nextLogId.current++, level, text: args.join(" ") }]);
     };

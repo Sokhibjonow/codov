@@ -1,5 +1,5 @@
 import type { AutotestRule } from "./autotests";
-import { MEDIA_BASE, type CodeFiles } from "./preview";
+import { MEDIA_BASE, storageShim, type CodeFiles } from "./preview";
 
 export type RunnerMessage = { __cubickTests: true; runId: string; results: unknown };
 
@@ -110,11 +110,22 @@ const RUNNER = `(function (config) {
         return result(rule, false, "error");
     }
   }
+  // Rules without side effects are re-checked for a while if they fail: data from fetch or a timer
+  // may still be on its way. The budget is shared by the whole run, so a failing page stays fast.
+  var RETRY = { exists: 1, count: 1, text: 1, attribute: 1, style: 1, console: 1 };
   async function run() {
     var results = [];
+    var deadline = Date.now() + 2000;
     for (var i = 0; i < config.rules.length; i++) {
       var rule = config.rules[i];
-      try { results.push(await check(rule)); }
+      try {
+        var r = await check(rule);
+        while (!r.passed && RETRY[rule.type] && Date.now() < deadline) {
+          await wait(100);
+          r = await check(rule);
+        }
+        results.push(r);
+      }
       catch (e) { results.push(result(rule, false, "error", e && e.message)); }
     }
     parent.postMessage({ __cubickTests: true, runId: config.runId, results: results }, "*");
@@ -134,6 +145,7 @@ export function buildTestDocument({ html, css, js }: CodeFiles, rules: AutotestR
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
     MEDIA_BASE,
     PRELUDE,
+    storageShim(),
     `<style>\n${css.replace(/<\/style/gi, "<\\/style")}\n</style>`,
     "</head>",
     "<body>",

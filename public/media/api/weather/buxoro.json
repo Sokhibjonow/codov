@@ -1,0 +1,9 @@
+{
+  "city": "Buxoro",
+  "current": { "temp": 29, "wind": 6, "sky": "Quyoshli" },
+  "daily": [
+    { "day": "Dushanba", "max": 31, "min": 17 },
+    { "day": "Seshanba", "max": 30, "min": 16 },
+    { "day": "Chorshanba", "max": 28, "min": 15 }
+  ]
+}

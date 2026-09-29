@@ -18,7 +18,11 @@ from the three files and adds:
 
 - `<base href="/media/">` so relative image paths resolve to `public/media`;
 - a one-line console/error bridge that `postMessage`s logs and errors to the parent (kept on one line
-  so the student's script keeps its own line numbers).
+  so the student's script keeps its own line numbers);
+- `storageShim`: an in-memory `localStorage`/`sessionStorage` (the real one throws in a frame without
+  `allow-same-origin`). The preview posts every change to `PreviewPane`, which passes the items into
+  the next run, so saved data survives re-runs like a page reload. Lesson examples and result pages
+  get the same stand-in without persistence (`FRAME_HEAD`).
 
 The frame is sandboxed **without** `allow-same-origin`, so the page cannot reach the platform's
 cookies or DOM. `PreviewPane` only accepts messages coming from its own frame, keeps the last 200 log
