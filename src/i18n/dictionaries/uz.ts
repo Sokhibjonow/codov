@@ -814,20 +814,7 @@ export const uz: Dictionary = {
     },
     lead: {
       title: "Savollaringiz qoldimi? Biz bilan bog‘laning!",
-      text: "Ismingiz va telefoningizni qoldiring — o‘qituvchi qo‘ng‘iroq qilib, kurslar haqida aytib beradi va formatni tanlashga yordam beradi.",
-      name: "Ismingiz",
-      phone: "Telefon",
-      submit: "Ariza qoldirish",
-      sending: "Yuborilmoqda…",
-      success: "Rahmat! Ariza yuborildi",
-      successText: "O‘qituvchi tez orada siz bilan bog‘lanadi.",
-      orTelegram: "yoki bizga yozing",
-      errors: {
-        name: "Ismingizni kiriting",
-        phone: "Raqamni to‘liq kiriting: +998 (__) ___-__-__",
-        tooMany: "Arizalar juda ko‘p. Keyinroq urinib ko‘ring yoki Telegramda yozing",
-        generic: "Yuborib bo‘lmadi. Qaytadan urinib ko‘ring",
-      },
+      text: "Telegramga yozing — o‘qituvchi savollaringizga javob beradi, kurslar haqida aytib beradi va formatni tanlashga yordam beradi.",
     },
     contact: {
       title: "Birinchi sahifangizni yozishga tayyormisiz?",

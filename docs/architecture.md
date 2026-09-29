@@ -82,9 +82,9 @@ through `pick(locale, uz, ru)`. The theme is a cookie plus an inline script that
 ### Public page
 
 One `Landing` component at `/` (uz) and `/ru` (ru), with JSON-LD, per-language metadata,
-`sitemap.ts` and `robots.ts` (cabinets, `/api`, `/files`, `/results` are disallowed). The sign-up
-form posts to `submitLead`: honeypot field, `+998########` phone check, in-memory IP rate limit, then
-a `Lead` row and a notification for the teacher.
+`sitemap.ts` and `robots.ts` (cabinets, `/api`, `/files`, `/results` are disallowed). Visitors
+reach the teacher through Telegram and the social links; the sign-up form was removed on 2026-09-29,
+so `Lead` rows and `/admin/leads` only hold the requests sent before that.
 
 ## Things worth knowing before changing something
 

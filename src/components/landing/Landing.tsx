@@ -24,7 +24,6 @@ import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import { LeadForm } from "./LeadForm";
 import { RevealOnScroll } from "./RevealOnScroll";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
@@ -451,7 +450,7 @@ export function Landing({ t, locale, theme }: LandingProps) {
           </div>
         </section>
 
-        {/* Contact: sign-up request form, then Telegram and socials */}
+        {/* Contact: Telegram and socials */}
         <section id="contact" className="scroll-mt-20 px-4 py-20 md:px-6">
           <div className="mx-auto max-w-6xl">
             <div
@@ -461,8 +460,20 @@ export function Landing({ t, locale, theme }: LandingProps) {
               <div className="relative z-10 max-w-3xl">
                 <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{l.lead.title}</h2>
                 <p className="mt-2 text-muted">{l.lead.text}</p>
-                <div className="mt-6">
-                  <LeadForm t={l.lead} />
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {CONTACTS.telegram && (
+                    <a href={`https://t.me/${CONTACTS.telegram}`} className="btn btn-primary px-6 py-3" target="_blank" rel="noopener noreferrer">
+                      <Send size={18} />
+                      {l.contact.telegram}
+                    </a>
+                  )}
+                  {CONTACTS.phone && (
+                    <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
+                      <Phone size={18} />
+                      {CONTACTS.phoneLabel}
+                    </a>
+                  )}
+                  <SocialLinks labels={l.contact} />
                 </div>
               </div>
               {/* Q / A speech bubbles */}
@@ -478,24 +489,6 @@ export function Landing({ t, locale, theme }: LandingProps) {
               </div>
             </div>
 
-            <div data-reveal className="mt-10 text-center">
-              <p className="text-sm font-bold text-muted">{l.lead.orTelegram}</p>
-              <div className="mt-3 flex flex-wrap justify-center gap-3">
-                {CONTACTS.telegram && (
-                  <a href={`https://t.me/${CONTACTS.telegram}`} className="btn btn-primary px-6 py-3" target="_blank" rel="noopener noreferrer">
-                    <Send size={18} />
-                    {l.contact.telegram}
-                  </a>
-                )}
-                {CONTACTS.phone && (
-                  <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
-                    <Phone size={18} />
-                    {CONTACTS.phoneLabel}
-                  </a>
-                )}
-                <SocialLinks labels={l.contact} />
-              </div>
-            </div>
           </div>
         </section>
       </main>
