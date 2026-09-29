@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, CalendarX, CheckCheck, CheckCircle2, ClipboardCheck, ClipboardList, Clock, Inbox, Loader2, Undo2, type LucideIcon } from "lucide-react";
+import { Bell, BookOpen, CalendarX, CheckCheck, CheckCircle2, ClipboardCheck, ClipboardList, Clock, Inbox, Loader2, Undo2, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useRealtime } from "@/components/realtime/RealtimeProvider";
@@ -48,6 +48,13 @@ function describe(t: Pick<Dictionary, "notifications">, locale: Locale, role: Ro
         href: `/student/assignments/${item.data.assignmentId}`,
         icon: ClipboardList,
         tone: "text-primary",
+      };
+    case "lesson.opened":
+      return {
+        text: format(tn.lessonOpened, { title: title(item.data) }),
+        href: `/student/lessons/${item.data.lessonId}`,
+        icon: BookOpen,
+        tone: "text-success",
       };
     case "deadline.soon":
       return {

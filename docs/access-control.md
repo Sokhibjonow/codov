@@ -35,8 +35,9 @@ Implemented in [`src/lib/learning.ts`](../src/lib/learning.ts).
 `getOpenLessonIds(userId, courseId?)` walks each course's published lessons in order
 (module order, then lesson order) and opens a lesson when **any** of these holds:
 
-1. the previous lesson is *finished* — every published task of it has a submission (any status); a
-   lesson without tasks counts once `LessonProgress` exists;
+1. the previous lesson is *finished* — the teacher **accepted** every published task of it (a
+   submission with status `ACCEPTED`; submitted or returned work does not count); a lesson without
+   tasks counts once `LessonProgress` exists;
 2. its index is below the group's `GroupCourse.openLessons` (the teacher opened the first N lessons;
    the largest value among the student's groups wins);
 3. the teacher opened this exact lesson for this student (`StudentLessonAccess`).

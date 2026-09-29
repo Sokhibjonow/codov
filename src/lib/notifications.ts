@@ -21,6 +21,7 @@ export type NotificationData = {
     childName?: string;
   };
   "assignment.new": { assignmentId: string; titleUz: string; titleRu: string };
+  "lesson.opened": { lessonId: string; titleUz: string; titleRu: string };
   "deadline.soon": { assignmentId: string; titleUz: string; titleRu: string; dueAt: string };
   "attendance.absent": { childId: string; childName: string; date: string; groupName: string };
   "lead.new": { leadId: string; name: string; phone: string };

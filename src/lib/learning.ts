@@ -32,7 +32,7 @@ const lessonOrder =[{ order: "asc" as const }, { createdAt: "asc" as const }];
 
 /**
  * Lessons a student may open. In each course the first lesson is open; the next one opens once the
- * student has submitted every task of the previous one (a lesson without tasks counts once it is
+ * teacher has accepted every task of the previous one (a lesson without tasks counts once it is
  * marked as done). The teacher can also open the first N lessons for a group ahead of time, or open
  * single lessons for one student.
  */
@@ -54,9 +54,10 @@ export async function getOpenLessonIds(userId: string, courseId?: string): Promi
     },
   });
   const lessons = courses.flatMap((c) => c.modules.flatMap((m) => m.lessons));
-  const [submitted, marked, granted] = await Promise.all([
+  const [accepted, marked, granted] = await Promise.all([
+    // Only work the teacher accepted counts: a submitted or returned task keeps the next lesson closed
     prisma.submission.findMany({
-      where: { studentId: userId, assignmentId: { in: lessons.flatMap((l) => l.assignments.map((a) => a.id)) } },
+      where: { studentId: userId, status: "ACCEPTED", assignmentId: { in: lessons.flatMap((l) => l.assignments.map((a) => a.id)) } },
       select: { assignmentId: true },
       distinct: ["assignmentId"],
     }),
@@ -64,10 +65,10 @@ export async function getOpenLessonIds(userId: string, courseId?: string): Promi
     prisma.studentLessonAccess.findMany({ where: { userId }, select: { lessonId: true } }),
   ]);
   const openedForStudent = new Set(granted.map((g) => g.lessonId));
-  const hasSubmission = new Set(submitted.map((s) => s.assignmentId));
+  const isAccepted = new Set(accepted.map((s) => s.assignmentId));
   const markedDone = new Set(marked.map((p) => p.lessonId));
   const finished = (lesson: (typeof lessons)[number]) =>
-    lesson.assignments.length > 0 ? lesson.assignments.every((a) => hasSubmission.has(a.id)) : markedDone.has(lesson.id);
+    lesson.assignments.length > 0 ? lesson.assignments.every((a) => isAccepted.has(a.id)) : markedDone.has(lesson.id);
 
   const open = new Set<string>();
   for (const course of courses) {

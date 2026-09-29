@@ -6,6 +6,7 @@ import { after } from "next/server";
 import type { Prisma } from "@/generated/prisma/client";
 import { kickAiQueue } from "@/lib/ai/queue";
 import { autotestScore, parseResults, parseRules } from "@/lib/autotests";
+import { getOpenLessonIds } from "@/lib/learning";
 import { notify } from "@/lib/notifications";
 import { fullName } from "@/lib/users";
 import { format } from "@/i18n/config";
@@ -69,6 +70,8 @@ export async function reviewSubmission(submissionId: string, _prev: ActionState,
   if (score !== null && (!Number.isInteger(score) || score < 0 || score > maxScore)) return fail(scoreError);
   if (decision === "ACCEPTED" && score === null) return fail(scoreError);
 
+  // Lessons open only after the teacher accepts the previous one, so a review can open (or close) lessons
+  const openBefore = await getOpenLessonIds(submission.studentId);
   await prisma.submission.update({
     where: { id: submissionId },
     data: {
@@ -95,6 +98,15 @@ export async function reviewSubmission(submissionId: string, _prev: ActionState,
     "submission.reviewed",
     { ...reviewed, childId: submission.studentId, childName: fullName(submission.student) },
   );
+
+  const openAfter = await getOpenLessonIds(submission.studentId);
+  const opened = await prisma.lesson.findMany({
+    where: { id: { in: [...openAfter].filter((id) => !openBefore.has(id)) } },
+    select: { id: true, titleUz: true, titleRu: true },
+  });
+  for (const lesson of opened) {
+    await notify([submission.studentId], "lesson.opened", { lessonId: lesson.id, titleUz: lesson.titleUz, titleRu: lesson.titleRu });
+  }
 
   revalidatePath("/", "layout");
 
