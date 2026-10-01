@@ -246,6 +246,10 @@ model Assignment {
   starterHtml     String   @default("") @db.Text
   starterCss      String   @default("") @db.Text
   starterJs       String   @default("") @db.Text
+  // Model answer: shown to the teacher only (editor and review page), never selected for students
+  solutionHtml    String   @default("") @db.Text
+  solutionCss     String   @default("") @db.Text
+  solutionJs      String   @default("") @db.Text
   // Autotest rules, see src/lib/autotests
   tests           Json     @default("[]")
   maxScore        Int      @default(100)

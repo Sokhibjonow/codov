@@ -1,5 +1,6 @@
 "use client";
 
+import { LockKeyhole } from "lucide-react";
 import { useRef, useState } from "react";
 import { useEditorGuards } from "@/components/admin/useEditorGuards";
 import { AutotestsEditor } from "@/components/autotests/AutotestsEditor";
@@ -24,6 +25,9 @@ type AssignmentEditorProps = {
     starterHtml: string;
     starterCss: string;
     starterJs: string;
+    solutionHtml: string;
+    solutionCss: string;
+    solutionJs: string;
     maxScore: number;
     aiReviewEnabled: boolean;
     tests: AutotestRule[];
@@ -38,6 +42,11 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
     html: assignment.starterHtml,
     css: assignment.starterCss,
     js: assignment.starterJs,
+  });
+  const [solution, setSolution] = useState<CodeFiles>({
+    html: assignment.solutionHtml,
+    css: assignment.solutionCss,
+    js: assignment.solutionJs,
   });
   const [topic, setTopic] = useState(assignment.topic);
   const [maxScore, setMaxScore] = useState(String(assignment.maxScore));
@@ -106,6 +115,31 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
             }}
           />
           <PreviewPane code={starter} t={t} className="h-[50vh] border-t border-border lg:border-l lg:border-t-0" />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-extrabold">
+            <LockKeyhole size={18} className="text-primary" />
+            {t.assignments.solution}
+          </h2>
+          <p className="text-sm text-muted">{t.assignments.solutionHint}</p>
+        </div>
+        <input type="hidden" name="solutionHtml" value={solution.html} />
+        <input type="hidden" name="solutionCss" value={solution.css} />
+        <input type="hidden" name="solutionJs" value={solution.js} />
+        <div className="grid overflow-hidden rounded-2xl border border-border lg:grid-cols-2">
+          <CodeTabsEditor
+            code={solution}
+            className="h-[50vh]"
+            onChange={(file, value) => {
+              setSolution((prev) => ({ ...prev, [file]: value }));
+              setDirty(true);
+              setResult(undefined);
+            }}
+          />
+          <PreviewPane code={solution} t={t} className="h-[50vh] border-t border-border lg:border-l lg:border-t-0" />
         </div>
       </section>
 

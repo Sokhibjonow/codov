@@ -38,6 +38,8 @@ middle of a course must not re-point work students already sent.
 
 Lesson content is Markdown with a few custom fences; see [content-pipeline.md](content-pipeline.md).
 `Assignment.tests` is JSON validated by `autotestRuleSchema`; see [autotests.md](autotests.md).
+`Assignment.solutionHtml` / `solutionCss` / `solutionJs` hold the model answer for the teacher (assignment
+editor and the "Yechim" tab of the review page); student queries never select them.
 
 ### Per-student access
 

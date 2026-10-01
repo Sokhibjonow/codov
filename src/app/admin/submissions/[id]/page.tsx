@@ -68,6 +68,9 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
           maxScore: true,
           tests: true,
           aiReviewEnabled: true,
+          solutionHtml: true,
+          solutionCss: true,
+          solutionJs: true,
           lesson: { select: { titleUz: true, titleRu: true } },
         },
       },
@@ -121,6 +124,7 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
           code={code}
           segments={parseSegments(submission.replay)}
           task={description.trim() ? <Markdown content={description} resultLabel={t.lessons.result} hiddenCodeNote={t.lessons.codeHidden} /> : null}
+          solution={{ html: submission.assignment.solutionHtml, css: submission.assignment.solutionCss, js: submission.assignment.solutionJs }}
         />
 
         <div className="space-y-4">

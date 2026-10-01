@@ -39,7 +39,8 @@ export const TASKS = [{ key, titleUz, titleRu, topic, maxScore, starterHtml, sta
 
 - a lesson is matched by its folder name (`Lesson.slug`) and a task by its `key` — never by order, so a lesson can be inserted in the middle without re-pointing existing submissions;
 - `order` is rewritten on every run, so the folder list in `course.mjs` is the source of truth for the sequence;
-- texts, starters and tests are overwritten on every run;
+- texts, starters, tests and model solutions are overwritten on every run (the solution comes from
+  `solutions.mjs`; a part it leaves out is the starter file, which the student does not change);
 - **nothing is ever deleted** — removing a lesson from `course.mjs` leaves it in the database;
 - rules are validated with `autotestRuleSchema` before writing, so a bad test aborts the import.
 
