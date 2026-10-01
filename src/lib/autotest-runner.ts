@@ -130,7 +130,20 @@ const RUNNER = `(function (config) {
     }
     parent.postMessage({ __cubickTests: true, runId: config.runId, results: results }, "*");
   }
-  function start() { setTimeout(run, 300); }
+  // Seeking or reading the duration of a video does nothing until its metadata has loaded, so
+  // pages with audio/video wait for it (at most 3 s; a broken source doesn't hold the run)
+  function mediaReady() {
+    var until = Date.now() + 3000;
+    return new Promise(function (resolve) {
+      (function poll() {
+        var media = Array.prototype.slice.call(document.querySelectorAll("video, audio"));
+        var waiting = media.some(function (m) { return m.readyState < 1 && !m.error && m.networkState !== 3; });
+        if (!waiting || Date.now() > until) resolve();
+        else setTimeout(poll, 50);
+      })();
+    });
+  }
+  function start() { setTimeout(function () { mediaReady().then(run); }, 300); }
   if (document.readyState === "complete") start(); else window.addEventListener("load", start);
 })`;
 

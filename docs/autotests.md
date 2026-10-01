@@ -31,7 +31,8 @@ small runner that evaluates the rules and posts the results back. The frame has 
 in such a frame, so `storageShim` puts an in-memory stand-in in its place; every test run starts
 with empty storage.
 
-Rules run one after another on the same page, 300 ms after load. A failing `exists`, `count`,
+Rules run one after another on the same page, 300 ms after load (a page with `<video>` / `<audio>`
+first waits up to 3 s for their metadata, since seeking does nothing before it). A failing `exists`, `count`,
 `text`, `attribute`, `style` or `console` rule is re-checked every 100 ms while the run is younger than
 2 s, so data from `fetch` or a timer can arrive; `click` and `input` are never repeated.
 

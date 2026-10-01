@@ -1,9 +1,9 @@
 {
-  "city": "Samarqand",
-  "current": { "temp": 21, "wind": 12, "sky": "Bulutli" },
+  "city": "Samarkand",
+  "current": { "temp": 21, "wind": 12, "sky": "Cloudy" },
   "daily": [
-    { "day": "Dushanba", "max": 23, "min": 11 },
-    { "day": "Seshanba", "max": 20, "min": 10 },
-    { "day": "Chorshanba", "max": 19, "min": 9 }
+    { "day": "Monday", "max": 23, "min": 11 },
+    { "day": "Tuesday", "max": 20, "min": 10 },
+    { "day": "Wednesday", "max": 19, "min": 9 }
   ]
 }

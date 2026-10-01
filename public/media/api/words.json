@@ -1,7 +1,7 @@
 [
-  { "word": "array", "uz": "massiv" },
-  { "word": "object", "uz": "obyekt" },
-  { "word": "event", "uz": "hodisa" },
-  { "word": "function", "uz": "funksiya" },
-  { "word": "loop", "uz": "sikl" }
+  { "word": "array", "uz": "a list of values" },
+  { "word": "object", "uz": "a set of named fields" },
+  { "word": "event", "uz": "something that happens on the page" },
+  { "word": "function", "uz": "a named block of code" },
+  { "word": "loop", "uz": "code that repeats" }
 ]
