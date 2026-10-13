@@ -74,6 +74,12 @@ export default async function LoginPage() {
           <h1 className="text-3xl font-extrabold tracking-tight">{t.auth.title}</h1>
           <p className="mb-8 mt-2 text-muted">{t.auth.subtitle}</p>
           <LoginForm t={t.auth} />
+          <p className="mt-6 text-center text-sm text-muted">
+            {t.auth.noAccount}{" "}
+            <Link href="/register" className="font-bold text-primary hover:underline">
+              {t.auth.tryFree}
+            </Link>
+          </p>
         </div>
       </main>
     </div>

@@ -65,6 +65,10 @@ first). Treat the flags as a reason to look, not as proof.
    `status: NEEDS_REVIEW`, the autotest results and score, the integrity summary and the recording.
    The draft is reset to the submitted code so the next attempt records from scratch. The teacher gets
    a `submission.new` notification, and the AI queue is kicked when AI review is enabled.
+   The student sees an "AI fikri" card while waiting: a spinner while the review is `QUEUED`/`RUNNING`
+   (the page refreshes every 6 s for about 3 minutes, and each load kicks the queue), then only the
+   positives and tips in their language. Scores, the verdict and the hand-written-code estimate stay
+   with the teacher. The card is hidden once the work is `ACCEPTED`.
 4. The editor stays locked while the status is `SUBMITTED`, `NEEDS_REVIEW` or `ACCEPTED`. Only
    `RETURNED` reopens it.
 5. The teacher reviews: score (required when accepting) and comment; `ACCEPTED` or `RETURNED`.

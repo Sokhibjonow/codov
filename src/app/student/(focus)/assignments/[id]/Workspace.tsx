@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, ArrowDown, ArrowLeft, CalendarClock, CheckCircle2, ClipboardCheck, Code2, Hourglass, Loader2, RotateCcw, Send, Undo2, X } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowLeft, CalendarClock, CheckCircle2, Sparkles, ClipboardCheck, Code2, Hourglass, Loader2, RotateCcw, Send, Undo2, X } from "lucide-react";
 import { AutotestResults } from "@/components/autotests/AutotestResults";
 import { useAutotestRunner } from "@/components/autotests/useAutotestRunner";
 import type { AutotestResult, AutotestRule } from "@/lib/autotests";
@@ -21,6 +21,8 @@ export type WorkspaceSubmission = {
   status: "SUBMITTED" | "NEEDS_REVIEW" | "ACCEPTED" | "RETURNED";
   score: number | null;
   comment: string | null;
+  /** The instant AI feedback (only the tips for the student; the teacher sees the full report) */
+  ai: { state: "pending" } | { state: "done"; positives: string; improvements: string[] } | null;
 };
 
 type WorkspaceProps = {
@@ -198,6 +200,7 @@ export function Workspace({
       <section className="task-view border-b border-border bg-surface px-4 py-6 md:px-8">
         <div className="space-y-4">
           {submission && <SubmissionBanner submission={submission} maxScore={maxScore} t={t} />}
+          {submission?.ai && <AiFeedback ai={submission.ai} t={t} />}
           {due && (
             <p className={`flex items-center gap-1.5 text-sm font-bold md:hidden ${due.overdue ? "text-danger" : "text-muted"}`}>
               <CalendarClock size={16} />
@@ -284,6 +287,60 @@ function SubmissionBanner({ submission, maxScore, t }: { submission: WorkspaceSu
         </div>
       )}
     </div>
+  );
+}
+
+const AI_POLL_MS = 6_000;
+const AI_POLL_LIMIT = 30;
+
+function AiFeedback({ ai, t }: { ai: NonNullable<WorkspaceSubmission["ai"]>; t: Dictionary }) {
+  const router = useRouter();
+  const pending = ai.state === "pending";
+
+  // While the review runs, refresh the page data every few seconds (for about three minutes)
+  useEffect(() => {
+    if (!pending) return;
+    let polls = 0;
+    const timer = setInterval(() => {
+      if (++polls > AI_POLL_LIMIT) clearInterval(timer);
+      else router.refresh();
+    }, AI_POLL_MS);
+    return () => clearInterval(timer);
+  }, [pending, router]);
+
+  return (
+    <section className="rounded-xl border border-primary/25 bg-primary-soft/40 px-4 py-3" aria-live="polite">
+      <h2 className="flex items-center gap-2 font-extrabold text-primary">
+        <Sparkles size={18} className="shrink-0" />
+        {t.aiFeedback.title}
+      </h2>
+      {ai.state === "pending" ? (
+        <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-muted">
+          <Loader2 size={16} className="shrink-0 animate-spin" />
+          {t.aiFeedback.pending}
+        </p>
+      ) : (
+        <div className="mt-2 space-y-3 text-sm">
+          {ai.positives.trim() && (
+            <div>
+              <p className="mb-1 text-xs font-bold text-success">{t.aiFeedback.positives}</p>
+              <p className="whitespace-pre-wrap">{ai.positives}</p>
+            </div>
+          )}
+          {ai.improvements.length > 0 && (
+            <div>
+              <p className="mb-1 text-xs font-bold text-warning-strong">{t.aiFeedback.improvements}</p>
+              <ul className="list-disc space-y-1 pl-5">
+                {ai.improvements.map((tip, i) => (
+                  <li key={i}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <p className="text-xs text-muted">{t.aiFeedback.note}</p>
+        </div>
+      )}
+    </section>
   );
 }
 

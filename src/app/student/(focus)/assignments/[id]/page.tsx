@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { saveDraft, submitWork } from "@/app/student/actions/drafts";
 import { AttachmentsList } from "@/components/attachments/AttachmentsList";
 import { Markdown } from "@/components/markdown/Markdown";
+import { kickAiQueue } from "@/lib/ai/queue";
+import { readAiReport } from "@/lib/ai/review";
 import { attachmentOrder, attachmentSelect } from "@/lib/attachments";
 import { parseRules } from "@/lib/autotests";
 import { format } from "@/i18n/config";
@@ -34,7 +37,7 @@ async function loadAssignment(userId: string, id: string) {
         where: { studentId: userId },
         orderBy: { attempt: "desc" },
         take: 1,
-        select: { status: true, score: true, teacherComment: true },
+        select: { status: true, score: true, teacherComment: true, aiStatus: true, aiReport: true },
       },
       deadlines: {
         where: { group: { members: { some: { userId } } } },
@@ -71,6 +74,17 @@ export default async function AssignmentWorkspacePage({ params }: Props) {
   const description = pick(locale, assignment.descriptionUz, assignment.descriptionRu);
   const descriptionLang = description === assignment.descriptionUz ? "uz" : "ru";
   const lastSubmission = assignment.submissions[0];
+  // The student's page also moves the AI queue on, so the feedback arrives while they wait
+  if (lastSubmission?.aiStatus === "QUEUED") after(() => kickAiQueue());
+  const report = lastSubmission?.aiStatus === "DONE" ? readAiReport(lastSubmission.aiReport) : null;
+  const aiFeedback =
+    !lastSubmission || lastSubmission.status === "ACCEPTED"
+      ? null
+      : lastSubmission.aiStatus === "QUEUED" || lastSubmission.aiStatus === "RUNNING"
+        ? ({ state: "pending" } as const)
+        : report
+          ? ({ state: "done", ...(report.feedback[locale] ?? report.feedback.uz) } as const)
+          : null;
 
   return (
     <Workspace
@@ -88,7 +102,7 @@ export default async function AssignmentWorkspacePage({ params }: Props) {
       initialCode={assignment.drafts[0] ?? starter}
       submission={
         lastSubmission
-          ? { status: lastSubmission.status, score: lastSubmission.score, comment: lastSubmission.teacherComment }
+          ? { status: lastSubmission.status, score: lastSubmission.score, comment: lastSubmission.teacherComment, ai: aiFeedback }
           : null
       }
       tests={parseRules(assignment.tests)}

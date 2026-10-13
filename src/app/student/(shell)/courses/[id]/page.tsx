@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/admin/BackLink";
 import { AttachmentsList } from "@/components/attachments/AttachmentsList";
 import { ProgressBar } from "@/components/learn/ProgressBar";
+import { TrialOffer } from "@/components/learn/TrialOffer";
 import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { attachmentOrder, attachmentSelect } from "@/lib/attachments";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getStudentCourses, pick } from "@/lib/learning";
+import { getStudentCourses, getTrialOffer, pick } from "@/lib/learning";
 
 export default async function StudentCoursePage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requireUser("STUDENT");
@@ -20,11 +21,14 @@ export default async function StudentCoursePage({ params }: { params: Promise<{ 
   if (!course) notFound();
 
   // Access was checked by getStudentCourses above
-  const attachments = await prisma.attachment.findMany({
-    where: { courseId: course.id },
-    orderBy: attachmentOrder,
-    select: attachmentSelect,
-  });
+  const [attachments, offer] = await Promise.all([
+    prisma.attachment.findMany({ where: { courseId: course.id }, orderBy: attachmentOrder, select: attachmentSelect }),
+    course.trialLimit != null ? getTrialOffer(user.id) : null,
+  ]);
+  const trialLimit = course.trialLimit;
+  // Why a lesson is closed: past the free part of a trial, or waiting for the previous lesson
+  const lockedReason = (n: number) =>
+    trialLimit == null ? t.learn.lockedShort : n > trialLimit ? t.trial.lockedShort : t.trial.lockedNextShort;
 
   let lessonNumber = 0;
   const modules = course.modules
@@ -49,6 +53,8 @@ export default async function StudentCoursePage({ params }: { params: Promise<{ 
         )}
       </div>
 
+      {offer && <TrialOffer offer={offer} t={t.trial} locale={locale} locked={!course.nextLesson && course.total > (trialLimit ?? 0)} />}
+
       <AttachmentsList items={attachments} t={t} className="mb-4" />
 
       {modules.length === 0 && <p className="card py-10 text-center text-muted">{t.learn.noLessonsYet}</p>}
@@ -69,7 +75,7 @@ export default async function StudentCoursePage({ params }: { params: Promise<{ 
                     <li key={lesson.id} className="flex items-center gap-3 px-4 py-3 text-muted">
                       <Lock size={20} className="shrink-0" />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-xs font-semibold">{format(t.learn.lesson, { n: lesson.number })} · {t.learn.lockedShort}</span>
+                        <span className="block text-xs font-semibold">{format(t.learn.lesson, { n: lesson.number })} · {lockedReason(lesson.number)}</span>
                         <span className="block truncate font-bold">{pick(locale, lesson.titleUz, lesson.titleRu)}</span>
                       </span>
                     </li>

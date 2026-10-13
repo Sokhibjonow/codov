@@ -12,9 +12,9 @@ Every query goes through the single client in [`src/lib/db.ts`](../src/lib/db.ts
 
 | Model | What it holds |
 |---|---|
-| `User` | One row per person. `role` is `ADMIN` (the teacher), `STUDENT` or `PARENT`. Login is unique, the password is a bcrypt hash. |
+| `User` | One row per person. `role` is `ADMIN` (the teacher), `STUDENT` or `PARENT`. Login is unique, the password is a bcrypt hash. `selfRegistered` marks free-trial sign-ups. |
 | `ParentChild` | Links a parent to a child. |
-| `Group` | A study group; can be archived instead of deleted. |
+| `Group` | A study group; can be archived instead of deleted. `isTrial` marks the free-trial group that `/register` sign-ups join (`trialLessons`, `offerStart`, `offerSeats`, `offerLink`). |
 | `GroupMember` | Student ↔ group. |
 | `AttendanceRecord` | One row per student per day with `PRESENT / ABSENT / LATE / EXCUSED`. |
 

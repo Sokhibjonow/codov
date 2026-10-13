@@ -22,7 +22,7 @@ Two separate questions: *who is this* (sessions and roles) and *what may this st
 ## Roles
 
 `src/proxy.ts` guards the areas by prefix (`/admin`, `/student`, `/parent`, plus `/`, `/ru`,
-`/login`) and redirects anyone in the wrong area. Server code calls `requireUser("ADMIN")` from
+`/login`, `/register`) and redirects anyone in the wrong area. Server code calls `requireUser("ADMIN")` from
 [`src/lib/auth.ts`](../src/lib/auth.ts) before any privileged action — the proxy is a convenience, the
 check in the action is the real guard.
 
@@ -33,7 +33,8 @@ Implemented in [`src/lib/learning.ts`](../src/lib/learning.ts).
 `studentCourseWhere(userId)` — published courses opened for at least one of the student's groups.
 
 `getOpenLessonIds(userId, courseId?)` walks each course's published lessons in order
-(module order, then lesson order) and opens a lesson when **any** of these holds:
+(module order, then lesson order) and opens a lesson when **any** of these holds (a trial student
+follows the rules in the next section instead):
 
 1. the previous lesson is *finished* — the teacher **accepted** every published task of it (a
    submission with status `ACCEPTED`; submitted or returned work does not count); a lesson without
@@ -52,12 +53,33 @@ Every path that reads a task uses that filter — the task page, the task list, 
 deadline reminders, the progress report and the `/results` route — so a locked task cannot be reached
 by guessing its URL.
 
+## Free trial (self sign-up)
+
+`/register` lets anyone create a student account (`User.selfRegistered`): login is the phone number
+without `+` (`998901234567`), the password is their own. The account joins the newest non-archived
+group with `Group.isTrial`; without one registration is closed. Each sign-up also creates a `Lead`
+and a `lead.new` notification so the teacher can call back. Registrations are rate limited to 10
+per 15 minutes per IP, and a hidden `website` field catches form bots.
+
+A student whose every group linked to a course is a trial group (`courseAccess` in `learning.ts`):
+
+- opens the next lesson once every task of the previous one is **submitted** (any status but
+  `RETURNED`) — no teacher review needed, so the first experience is instant;
+- never gets past the first `Group.trialLessons` lessons, whatever else applies.
+
+As soon as the teacher adds the student to a regular group with the course, the usual rules apply.
+Trial students see an offer card (`getTrialOffer`, `TrialOffer.tsx`) on the dashboard, the course page,
+the last free lesson and every lesson past the free part: start date (`offerStart`), seats left
+(`offerSeats`) and a sign-up link (`offerLink`, Telegram by default). Trial groups have no group chat
+for students — sign-ups are strangers to each other.
+
 ## Where the teacher changes this
 
 | UI | Effect |
 |---|---|
 | Course page → "Guruhlar uchun ruxsat" | `GroupCourse` rows: which groups see the course at all |
 | Course page → "Darslarni oldindan ochish" | `GroupCourse.openLessons` per group |
+| Group page → "Sinov guruhi" | `Group.isTrial`, `trialLessons` and the offer fields |
 | Student page → "Darslar va topshiriqlarga ruxsat" | `StudentLessonAccess` / `StudentAssignmentAccess` |
 
 ## Sandboxing student code

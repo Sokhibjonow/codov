@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
 
   const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value);
 
-  if (pathname === "/login") {
+  if (pathname === "/login" || pathname === "/register") {
     return session
       ? NextResponse.redirect(new URL(homePathFor(session.role), request.url))
       : NextResponse.next();
@@ -63,5 +63,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/ru", "/login", "/admin/:path*", "/student/:path*", "/parent/:path*"],
+  matcher: ["/", "/ru", "/login", "/register", "/admin/:path*", "/student/:path*", "/parent/:path*"],
 };

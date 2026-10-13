@@ -97,3 +97,35 @@ export async function removeGroupMember(groupId: string, userId: string) {
   await prisma.groupMember.deleteMany({ where: { groupId, userId } });
   revalidatePath("/admin", "layout");
 }
+
+/** Trial group settings: free lessons and the online-group offer its students see. */
+export async function setGroupTrial(groupId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser("ADMIN");
+  const { t } = await getDictionary();
+
+  const lessons = Number(formText(formData, "trialLessons"));
+  const seatsText = formText(formData, "offerSeats");
+  const seats = seatsText ? Number(seatsText) : null;
+  const day = formText(formData, "offerStart");
+  const link = formText(formData, "offerLink").slice(0, 300);
+  if (!Number.isInteger(lessons) || lessons < 1 || lessons > 100) return fail(t.common.errors.required);
+  if (seats !== null && (!Number.isInteger(seats) || seats < 0 || seats > 999)) return fail(t.common.errors.required);
+  if (day && !/^\d{4}-\d{2}-\d{2}$/.test(day)) return fail(t.common.errors.required);
+  if (link && !/^https:\/\/\S+$/.test(link)) return fail(t.common.errors.required);
+
+  const { count } = await prisma.group.updateMany({
+    where: { id: groupId },
+    data: {
+      isTrial: formData.get("isTrial") === "on",
+      trialLessons: lessons,
+      offerSeats: seats,
+      // The whole start day in Tashkent: the date stays on the card until that day is over
+      offerStart: day ? new Date(`${day}T23:59:00+05:00`) : null,
+      offerLink: link || null,
+    },
+  });
+  if (count === 0) return fail(t.common.errors.notFound);
+
+  revalidatePath("/", "layout");
+  return { ok: true, message: t.common.saved };
+}

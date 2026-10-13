@@ -174,13 +174,14 @@ export function Landing({ t, locale, theme }: LandingProps) {
               <h1 data-reveal style={{ "--reveal-delay": `${100}ms` } as React.CSSProperties} className="mt-5 text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">{l.hero.title}</h1>
               <p data-reveal style={{ "--reveal-delay": `${200}ms` } as React.CSSProperties} className="mt-5 max-w-xl text-lg text-white/80">{l.hero.text}</p>
               <div data-reveal style={{ "--reveal-delay": `${300}ms` } as React.CSSProperties} className="mt-8 flex flex-wrap gap-3">
-                <a href="#contact" className="btn bg-brand-light px-6 py-3 text-navy hover:bg-white">
-                  {l.hero.cta}
+                {/* The free trial is the first step: sign up and the first lessons open at once */}
+                <Link href="/register" className="btn bg-brand-light px-6 py-3 text-navy hover:bg-white">
+                  {l.hero.trial}
                   <ArrowRight size={18} />
-                </a>
-                <Link href="/login" className="btn border border-white/25 px-6 py-3 text-white hover:bg-white/10">
-                  {l.hero.login}
                 </Link>
+                <a href="#contact" className="btn border border-white/25 px-6 py-3 text-white hover:bg-white/10">
+                  {l.hero.cta}
+                </a>
               </div>
               <ul data-reveal style={{ "--reveal-delay": `${400}ms` } as React.CSSProperties} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/80">
                 {l.hero.chips.map((chip) => (
@@ -467,6 +468,10 @@ export function Landing({ t, locale, theme }: LandingProps) {
                       {l.contact.telegram}
                     </a>
                   )}
+                  <Link href="/register" className="btn border border-border bg-surface px-6 py-3">
+                    {l.hero.trial}
+                    <ArrowRight size={18} />
+                  </Link>
                   {CONTACTS.phone && (
                     <a href={`tel:${CONTACTS.phone}`} className="btn border border-border bg-surface px-6 py-3">
                       <Phone size={18} />

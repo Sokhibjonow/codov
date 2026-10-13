@@ -99,7 +99,8 @@ export async function ensureUserChats(user: ChatUser) {
 
   if (user.role === "ADMIN" || user.role === "STUDENT") {
     const groups = await prisma.group.findMany({
-      where: { isArchived: false, ...(user.role === "STUDENT" && { members: { some: { userId: user.id } } }) },
+      // Trial sign-ups don't know each other: no shared chat for students of a trial group
+      where: { isArchived: false, ...(user.role === "STUDENT" && { isTrial: false, members: { some: { userId: user.id } } }) },
       select: { id: true, chat: { select: { id: true, members: { where: { userId: user.id }, select: { userId: true } } } } },
     });
 
@@ -167,7 +168,7 @@ export async function chatRecipients(chat: LoadedChat) {
 export function visibleChatsWhere(user: ChatUser): Prisma.ChatWhereInput {
   const groupChat: Prisma.ChatWhereInput = {
     type: "GROUP",
-    group: { isArchived: false, ...(user.role === "STUDENT" && { members: { some: { userId: user.id } } }) },
+    group: { isArchived: false, ...(user.role === "STUDENT" && { isTrial: false, members: { some: { userId: user.id } } }) },
   };
   return user.role === "PARENT" ? { type: "DIRECT" } : { OR: [{ type: "DIRECT" }, groupChat] };
 }

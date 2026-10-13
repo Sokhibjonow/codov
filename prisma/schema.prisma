@@ -32,6 +32,8 @@ model User {
   phone          String?
   locale         Locale?
   isActive       Boolean   @default(true)
+  // Signed up on /register (a free trial), not created by the teacher
+  selfRegistered Boolean   @default(false)
   // Bumped on password reset: invalidates every session issued before
   sessionVersion Int       @default(0)
   lastLoginAt    DateTime?
@@ -74,6 +76,14 @@ model Group {
   name        String
   description String?
   isArchived  Boolean  @default(false)
+  // Trial group: people who sign up on /register land here. In its courses only the first
+  // trialLessons lessons open, each after the previous one is submitted (no teacher review needed).
+  isTrial      Boolean   @default(false)
+  trialLessons Int       @default(3)
+  // The offer shown to trial students: next online group start, seats left, where to sign up
+  offerStart   DateTime?
+  offerSeats   Int?
+  offerLink    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

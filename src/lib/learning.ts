@@ -30,17 +30,36 @@ export function assignmentProgress(assignment: {
 
 const lessonOrder =[{ order: "asc" as const }, { createdAt: "asc" as const }];
 
+type CourseGroupLink = { openLessons: number; group: { isTrial: boolean; trialLessons: number } };
+
+/**
+ * How a course opens for one student, from the groups that link them to it. A student who reaches
+ * the course only through trial groups gets the free first lessons, each opening once the previous
+ * one is submitted; a real group lifts both limits.
+ */
+export function courseAccess(links: CourseGroupLink[]) {
+  const trialOnly = links.length > 0 && links.every((l) => l.group.isTrial);
+  return {
+    trialOnly,
+    /** Lessons with an index at or past this stay closed (Infinity = no limit) */
+    limit: trialOnly ? Math.max(...links.map((l) => l.group.trialLessons)) : Infinity,
+    openedByTeacher: Math.max(0, ...links.filter((l) => !l.group.isTrial).map((l) => l.openLessons)),
+  };
+}
+const linkSelect = (userId: string) =>
+  ({ where: { group: { members: { some: { userId } } } }, select: { openLessons: true, group: { select: { isTrial: true, trialLessons: true } } } }) as const;
+
 /**
  * Lessons a student may open. In each course the first lesson is open; the next one opens once the
  * teacher has accepted every task of the previous one (a lesson without tasks counts once it is
  * marked as done). The teacher can also open the first N lessons for a group ahead of time, or open
- * single lessons for one student.
+ * single lessons for one student. Trial students: see courseAccess.
  */
 export async function getOpenLessonIds(userId: string, courseId?: string): Promise<Set<string>> {
   const courses = await prisma.course.findMany({
     where: { ...studentCourseWhere(userId), ...(courseId && { id: courseId }) },
     select: {
-      groups: { where: { group: { members: { some: { userId } } } }, select: { openLessons: true } },
+      groups: linkSelect(userId),
       modules: {
         orderBy: lessonOrder,
         select: {
@@ -54,29 +73,32 @@ export async function getOpenLessonIds(userId: string, courseId?: string): Promi
     },
   });
   const lessons = courses.flatMap((c) => c.modules.flatMap((m) => m.lessons));
-  const [accepted, marked, granted] = await Promise.all([
+  const [submissions, marked, granted] = await Promise.all([
     // Only work the teacher accepted counts: a submitted or returned task keeps the next lesson closed
+    // (trial students: any submission that wasn't returned)
     prisma.submission.findMany({
-      where: { studentId: userId, status: "ACCEPTED", assignmentId: { in: lessons.flatMap((l) => l.assignments.map((a) => a.id)) } },
-      select: { assignmentId: true },
-      distinct: ["assignmentId"],
+      where: { studentId: userId, status: { not: "RETURNED" }, assignmentId: { in: lessons.flatMap((l) => l.assignments.map((a) => a.id)) } },
+      select: { assignmentId: true, status: true },
     }),
     prisma.lessonProgress.findMany({ where: { userId, lessonId: { in: lessons.map((l) => l.id) } }, select: { lessonId: true } }),
     prisma.studentLessonAccess.findMany({ where: { userId }, select: { lessonId: true } }),
   ]);
   const openedForStudent = new Set(granted.map((g) => g.lessonId));
-  const isAccepted = new Set(accepted.map((s) => s.assignmentId));
+  const isAccepted = new Set(submissions.filter((s) => s.status === "ACCEPTED").map((s) => s.assignmentId));
+  const isSubmitted = new Set(submissions.map((s) => s.assignmentId));
   const markedDone = new Set(marked.map((p) => p.lessonId));
-  const finished = (lesson: (typeof lessons)[number]) =>
-    lesson.assignments.length > 0 ? lesson.assignments.every((a) => isAccepted.has(a.id)) : markedDone.has(lesson.id);
 
   const open = new Set<string>();
   for (const course of courses) {
     const ordered = course.modules.flatMap((m) => m.lessons);
-    const openedByTeacher = Math.max(0, ...course.groups.map((g) => g.openLessons));
+    const { trialOnly, limit, openedByTeacher } = courseAccess(course.groups);
+    const done = trialOnly ? isSubmitted : isAccepted;
+    const finished = (lesson: (typeof lessons)[number]) =>
+      lesson.assignments.length > 0 ? lesson.assignments.every((a) => done.has(a.id)) : markedDone.has(lesson.id);
     let previousFinished = true;
     ordered.forEach((lesson, index) => {
-      if (previousFinished || index < openedByTeacher || openedForStudent.has(lesson.id)) open.add(lesson.id);
+      const inOrder = (previousFinished || index < openedByTeacher) && index < limit;
+      if (inOrder || openedForStudent.has(lesson.id)) open.add(lesson.id);
       previousFinished = open.has(lesson.id) && finished(lesson);
     });
   }
@@ -102,6 +124,7 @@ export async function getStudentCourses(userId: string, courseId?: string) {
       titleRu: true,
       descriptionUz: true,
       descriptionRu: true,
+      groups: linkSelect(userId),
       modules: {
         orderBy: lessonOrder,
         select: {
@@ -126,10 +149,13 @@ export async function getStudentCourses(userId: string, courseId?: string) {
   const completed = new Set(progress.map((p) => p.lessonId));
   const open = await getOpenLessonIds(userId, courseId);
 
-  return courses.map((course) => {
+  return courses.map(({ groups, ...course }) => {
     const lessons = course.modules.flatMap((m) => m.lessons);
+    const access = courseAccess(groups);
     return {
       ...course,
+      /** Trial students: lessons from this index on open only in a real group */
+      trialLimit: access.trialOnly ? access.limit : null,
       lessons,
       completed,
       open,
@@ -142,3 +168,14 @@ export async function getStudentCourses(userId: string, courseId?: string) {
 }
 
 export type StudentCourse = Awaited<ReturnType<typeof getStudentCourses>>[number];
+
+/** A student who is only in trial groups: their free-lesson count and the offer to join a real group. */
+export async function getTrialOffer(userId: string) {
+  const memberships = await prisma.groupMember.findMany({
+    where: { userId, group: { isArchived: false } },
+    select: { group: { select: { isTrial: true, trialLessons: true, offerStart: true, offerSeats: true, offerLink: true } } },
+  });
+  if (memberships.length === 0 || !memberships.every((m) => m.group.isTrial)) return null;
+  const g = memberships[0].group;
+  return { freeLessons: g.trialLessons, start: g.offerStart, seats: g.offerSeats, link: g.offerLink || "https://t.me/codov_admin" };
+}

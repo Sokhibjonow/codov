@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/admin/BackLink";
 import { AttachmentsList } from "@/components/attachments/AttachmentsList";
 import { AssignmentStatusBadge } from "@/components/learn/AssignmentStatusBadge";
+import { TrialOffer } from "@/components/learn/TrialOffer";
 import { attachmentOrder, attachmentSelect } from "@/lib/attachments";
 import { Markdown } from "@/components/markdown/Markdown";
 import { SubmitButton } from "@/components/ui/SubmitButton";
@@ -11,7 +12,7 @@ import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { assignmentProgress, getStudentCourses, pick, studentCourseWhere } from "@/lib/learning";
+import { assignmentProgress, getStudentCourses, getTrialOffer, pick, studentCourseWhere } from "@/lib/learning";
 import { setLessonCompleted } from "../actions";
 
 export default async function StudentLessonPage({ params }: { params: Promise<{ id: string }> }) {
@@ -51,6 +52,20 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
   const prev = course.lessons[index - 1];
   const next = course.lessons[index + 1];
   const done = course.completed.has(lesson.id);
+  // Trial students: lessons past the free part open only in a real group
+  const trialLimit = course.trialLimit;
+  const pastTrial = (i: number) => trialLimit != null && i >= trialLimit;
+  const offer = trialLimit != null && (pastTrial(index) || pastTrial(index + 1)) ? await getTrialOffer(user.id) : null;
+  const lockedShort = (i: number) => (trialLimit == null ? t.learn.lockedShort : pastTrial(i) ? t.trial.lockedShort : t.trial.lockedNextShort);
+
+  if (!course.open.has(lesson.id) && offer && pastTrial(index)) {
+    return (
+      <article className="mx-auto max-w-3xl">
+        <BackLink href={`/student/courses/${course.id}`} label={pick(locale, course.titleUz, course.titleRu)} />
+        <TrialOffer offer={offer} t={t.trial} locale={locale} locked />
+      </article>
+    );
+  }
 
   if (!course.open.has(lesson.id)) {
     return (
@@ -62,7 +77,7 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
           </span>
           <p className="text-xs font-extrabold uppercase tracking-wide text-primary">{format(t.learn.lesson, { n: index + 1 })}</p>
           <h1 className="text-2xl font-extrabold tracking-tight">{t.learn.lockedTitle}</h1>
-          <p className="max-w-md text-muted">{t.learn.lockedHint}</p>
+          <p className="max-w-md text-muted">{trialLimit == null ? t.learn.lockedHint : t.trial.lockedNextHint}</p>
           {prev && (
             <Link href={`/student/lessons/${prev.id}`} className="btn btn-primary mt-2">
               <ArrowLeft size={18} />
@@ -170,7 +185,7 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
         {next && !course.open.has(next.id) && (
           <div className="card flex items-center justify-end gap-2 p-4 text-right text-muted" aria-disabled="true">
             <span className="min-w-0">
-              <span className="block text-xs">{t.learn.lockedShort}</span>
+              <span className="block text-xs">{lockedShort(index + 1)}</span>
               <span className="block truncate font-bold">{pick(locale, next.titleUz, next.titleRu)}</span>
             </span>
             <Lock size={18} className="shrink-0" />
@@ -186,6 +201,13 @@ export default async function StudentLessonPage({ params }: { params: Promise<{ 
           </Link>
         )}
       </nav>
+
+      {/* The last free lesson of a trial: what comes next is the online group */}
+      {offer && next && pastTrial(index + 1) && (
+        <div className="mt-6">
+          <TrialOffer offer={offer} t={t.trial} locale={locale} />
+        </div>
+      )}
     </article>
   );
 }

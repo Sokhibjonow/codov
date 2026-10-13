@@ -1,16 +1,17 @@
 import { ArrowRight, BookOpen, ClipboardList, MessageCircle, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import { ProgressBar } from "@/components/learn/ProgressBar";
+import { TrialOffer } from "@/components/learn/TrialOffer";
 import { PageHeader } from "@/components/PageHeader";
 import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
-import { getStudentCourses, pick } from "@/lib/learning";
+import { getStudentCourses, getTrialOffer, pick } from "@/lib/learning";
 
 export default async function StudentDashboard() {
   const user = await requireUser("STUDENT");
   const { t, locale } = await getDictionary();
-  const courses = await getStudentCourses(user.id);
+  const [courses, offer] = await Promise.all([getStudentCourses(user.id), getTrialOffer(user.id)]);
 
   const current = courses.find((c) => c.nextLesson);
   const hasLessons = courses.some((c) => c.total > 0);
@@ -44,12 +45,24 @@ export default async function StudentDashboard() {
           </span>
         </Link>
       ) : (
-        hasLessons && (
+        hasLessons &&
+        !offer && (
           <p className="card mb-4 flex items-center gap-3 font-bold text-success">
             <PartyPopper size={22} />
             {t.learn.allDone}
           </p>
         )
+      )}
+
+      {offer && (
+        <>
+          {current && (
+            <p className="mb-4 text-sm font-semibold text-muted">
+              {format(t.trial.title, { count: offer.freeLessons })} · {t.trial.text}
+            </p>
+          )}
+          <TrialOffer offer={offer} t={t.trial} locale={locale} locked={!current && hasLessons} />
+        </>
       )}
 
       <div className="grid gap-3 sm:grid-cols-3 md:gap-4">

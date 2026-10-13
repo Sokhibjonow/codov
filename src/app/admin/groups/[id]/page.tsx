@@ -15,7 +15,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { pick } from "@/lib/learning";
 import { formatPhone, fullName } from "@/lib/users";
-import { addGroupMembers, deleteGroup, removeGroupMember, setGroupArchived, setGroupCourses, updateGroup } from "../actions";
+import { addGroupMembers, deleteGroup, removeGroupMember, setGroupArchived, setGroupCourses, setGroupTrial, updateGroup } from "../actions";
 
 export default async function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser("ADMIN");
@@ -29,6 +29,11 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
       name: true,
       description: true,
       isArchived: true,
+      isTrial: true,
+      trialLessons: true,
+      offerStart: true,
+      offerSeats: true,
+      offerLink: true,
       courses: { select: { courseId: true } },
       members: {
         orderBy: [{ user: { lastName: "asc" } }, { user: { firstName: "asc" } }],
@@ -58,6 +63,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
           <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold tracking-tight md:text-3xl">
             {group.name}
             {group.isArchived && <Badge tone="accent">{t.groups.archived}</Badge>}
+            {group.isTrial && <Badge tone="primary">{t.groups.trialBadge}</Badge>}
           </h1>
           <p className="mt-1 text-muted">{format(t.groups.studentsCount, { count: group.members.length })}</p>
         </div>
@@ -139,6 +145,26 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
             <ActionForm action={updateGroup.bind(null, group.id)} submitLabel={t.common.save}>
               <Field name="name" label={t.fields.groupName} defaultValue={group.name} maxLength={80} required />
               <TextArea name="description" label={t.fields.description} defaultValue={group.description ?? ""} maxLength={500} />
+            </ActionForm>
+          </section>
+
+          <section className="card">
+            <h2 className="text-lg font-extrabold">{t.groups.trialTitle}</h2>
+            <p className="mb-4 mt-1 text-xs text-muted">{t.groups.trialHint}</p>
+            <ActionForm action={setGroupTrial.bind(null, group.id)} submitLabel={t.common.save}>
+              <label className="flex cursor-pointer items-center gap-3">
+                <input type="checkbox" name="isTrial" defaultChecked={group.isTrial} className="size-4 accent-primary" />
+                <span className="text-sm font-bold">{t.groups.isTrial}</span>
+              </label>
+              <Field name="trialLessons" type="number" min={1} max={100} label={t.groups.trialLessons} defaultValue={group.trialLessons} required />
+              <Field
+                name="offerStart"
+                type="date"
+                label={t.groups.offerStart}
+                defaultValue={group.offerStart ? new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tashkent" }).format(group.offerStart) : ""}
+              />
+              <Field name="offerSeats" type="number" min={0} max={999} label={t.groups.offerSeats} defaultValue={group.offerSeats ?? ""} />
+              <Field name="offerLink" type="url" label={t.groups.offerLink} hint={t.groups.offerLinkHint} defaultValue={group.offerLink ?? ""} placeholder="https://t.me/codov_admin" />
             </ActionForm>
           </section>
 
