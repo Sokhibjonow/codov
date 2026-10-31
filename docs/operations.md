@@ -78,7 +78,7 @@ Course content is imported by scripts kept with the content, outside this reposi
 The videos promise a free PDF; viewers get it from the bot (`src/app/api/telegram/webhook/route.ts`).
 A deep link `t.me/<bot>?start=<video>` records which video brought the person (`BotUser.source`);
 `giftForSource` in `src/lib/gifts.ts` picks the PDF (`js…`/`viral…` → JavaScript cheat sheet, anything else →
-the 30-day plan). The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
+the 30-day plan; a bare /start — typed after a Short — gets both). The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
 
 1. @BotFather → /newbot → copy the token.
 2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` (a long random string),

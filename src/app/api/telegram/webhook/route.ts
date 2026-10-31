@@ -14,10 +14,12 @@ type Update = {
 
 const channelUrl = () => `https://t.me/${(process.env.TELEGRAM_CHANNEL || "@codovvv").replace(/^@/, "")}`;
 
-async function sendGift(chatId: number, gift: Gift, name: string) {
+/** Sends the gifts (a bare /start from a Short gets all of them), then the next steps. */
+async function sendGift(chatId: number, gifts: Gift[], name: string) {
+  const gift = gifts[0];
   await tg("sendMessage", { chat_id: chatId, text: `${name ? `${name}, ` : ""}mana videoda va’da qilingan sovg‘a:` });
-  await tg("sendDocument", { chat_id: chatId, document: `${SITE_URL}${gift.href}`, caption: `${gift.titleUz} — codov` });
-  const other = GIFTS.find((g) => g.key !== gift.key);
+  for (const g of gifts) await tg("sendDocument", { chat_id: chatId, document: `${SITE_URL}${g.href}`, caption: `${g.titleUz} — codov` });
+  const other = GIFTS.find((g) => !gifts.includes(g));
   await tg("sendMessage", {
     chat_id: chatId,
     text:
@@ -65,10 +67,10 @@ export async function POST(request: Request) {
         await remember(msg.from, source);
         const gift = giftForSource(source);
         if (await isSubscribed(msg.from.id)) {
-          await sendGift(msg.chat.id, gift, msg.from.first_name ?? "");
+          await sendGift(msg.chat.id, source ? [gift] : GIFTS, msg.from.first_name ?? "");
           await prisma.botUser.update({ where: { telegramId: String(msg.from.id) }, data: { giftSent: true } });
         } else {
-          await askToSubscribe(msg.chat.id, gift.key);
+          await askToSubscribe(msg.chat.id, source ? gift.key : "all");
         }
       } else {
         await tg("sendMessage", {
@@ -81,10 +83,11 @@ export async function POST(request: Request) {
 
     const cb = update.callback_query;
     if (cb?.data?.startsWith("gift:") && cb.message) {
-      const gift = GIFTS.find((g) => g.key === cb.data!.slice(5)) ?? GIFTS[0];
+      const key = cb.data.slice(5);
+      const gifts = key === "all" ? GIFTS : [GIFTS.find((g) => g.key === key) ?? GIFTS[0]];
       if (await isSubscribed(cb.from.id)) {
         await tg("answerCallbackQuery", { callback_query_id: cb.id, text: "Rahmat!" });
-        await sendGift(cb.message.chat.id, gift, cb.from.first_name ?? "");
+        await sendGift(cb.message.chat.id, gifts, cb.from.first_name ?? "");
         await prisma.botUser.updateMany({ where: { telegramId: String(cb.from.id) }, data: { giftSent: true, lastSeenAt: new Date() } });
       } else {
         await tg("answerCallbackQuery", { callback_query_id: cb.id, text: "Hali obuna bo‘lmagansiz. Avval kanalga obuna bo‘ling.", show_alert: true });
