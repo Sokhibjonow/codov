@@ -1,11 +1,13 @@
 import { ArrowRight, BookOpen, ClipboardList, MessageCircle, PartyPopper } from "lucide-react";
 import Link from "next/link";
 import { ProgressBar } from "@/components/learn/ProgressBar";
+import { GiftCard } from "@/components/learn/GiftCard";
 import { TrialOffer } from "@/components/learn/TrialOffer";
 import { PageHeader } from "@/components/PageHeader";
 import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
+import { giftsFor } from "@/lib/gifts";
 import { getStudentCourses, getTrialOffer, pick } from "@/lib/learning";
 
 export default async function StudentDashboard() {
@@ -15,6 +17,7 @@ export default async function StudentDashboard() {
 
   const current = courses.find((c) => c.nextLesson);
   const hasLessons = courses.some((c) => c.total > 0);
+  const gifts = giftsFor(courses.map((c) => c.titleUz));
 
   const links = [
     { href: "/student/courses", label: t.nav.courses, icon: BookOpen },
@@ -53,6 +56,10 @@ export default async function StudentDashboard() {
           </p>
         )
       )}
+
+      {gifts.map((gift) => (
+        <GiftCard key={gift.href} gift={gift} t={t.gift} locale={locale} />
+      ))}
 
       {offer && (
         <>

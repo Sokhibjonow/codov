@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/admin/BackLink";
 import { AttachmentsList } from "@/components/attachments/AttachmentsList";
 import { ProgressBar } from "@/components/learn/ProgressBar";
+import { GiftCard } from "@/components/learn/GiftCard";
 import { TrialOffer } from "@/components/learn/TrialOffer";
 import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { attachmentOrder, attachmentSelect } from "@/lib/attachments";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { giftsFor } from "@/lib/gifts";
 import { getStudentCourses, getTrialOffer, pick } from "@/lib/learning";
 
 export default async function StudentCoursePage({ params }: { params: Promise<{ id: string }> }) {
@@ -54,6 +56,10 @@ export default async function StudentCoursePage({ params }: { params: Promise<{ 
       </div>
 
       {offer && <TrialOffer offer={offer} t={t.trial} locale={locale} locked={!course.nextLesson && course.total > (trialLimit ?? 0)} />}
+
+      {giftsFor([course.titleUz]).map((gift) => (
+        <GiftCard key={gift.href} gift={gift} t={t.gift} locale={locale} />
+      ))}
 
       <AttachmentsList items={attachments} t={t} className="mb-4" />
 

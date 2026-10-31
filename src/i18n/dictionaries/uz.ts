@@ -110,6 +110,11 @@ export const uz: Dictionary = {
       tooMany: "Urinishlar juda ko‘p. Bir necha daqiqa kuting",
     },
   },
+  gift: {
+    badge: "Sovg‘a",
+    text: "Video darsda va’da qilingan bepul shpargalka: chop eting yoki telefonda saqlang.",
+    download: "Yuklab olish",
+  },
   aiFeedback: {
     title: "AI fikri",
     note: "Bu avtomatik maslahat. Yakuniy bahoni ustoz qo‘yadi.",
