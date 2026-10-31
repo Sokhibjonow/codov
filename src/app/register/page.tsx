@@ -20,8 +20,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RegisterPage() {
+/** Links from videos and posts pick the course: /register?kurs=js or ?kurs=start (a word of the course title). */
+function courseFromLink(kurs: string | string[] | undefined, courses: { id: string; titleUz: string; titleRu: string }[]) {
+  const word = (Array.isArray(kurs) ? kurs[0] : kurs)?.trim().toLowerCase();
+  if (!word) return undefined;
+  const wanted = word === "js" ? "javascript" : word;
+  return courses.find((c) => `${c.titleUz} ${c.titleRu}`.toLowerCase().includes(wanted))?.id;
+}
+
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ kurs?: string | string[] }> }) {
   const [{ locale, t }, theme, trialCourses] = await Promise.all([getDictionary(), getThemeMode(), getTrialCourses()]);
+  const preselected = courseFromLink((await searchParams).kurs, trialCourses);
   const courses = trialCourses.map((c) => ({
     id: c.id,
     title: pick(locale, c.titleUz, c.titleRu),
@@ -78,7 +87,7 @@ export default async function RegisterPage() {
           <h1 className="text-3xl font-extrabold tracking-tight">{t.register.title}</h1>
           <p className="mb-8 mt-2 text-muted">{t.register.subtitle}</p>
           {courses.length > 0 ? (
-            <RegisterForm t={t.register} courses={courses} />
+            <RegisterForm t={t.register} courses={courses} preselected={preselected} />
           ) : (
             <p className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">{t.register.errors.closed}</p>
           )}

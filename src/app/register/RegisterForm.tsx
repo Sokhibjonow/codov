@@ -8,7 +8,7 @@ import { register } from "./actions";
 
 export type RegisterCourse = { id: string; title: string; description: string; freeLessons: number };
 
-export function RegisterForm({ t, courses }: { t: Dictionary["register"]; courses: RegisterCourse[] }) {
+export function RegisterForm({ t, courses, preselected }: { t: Dictionary["register"]; courses: RegisterCourse[]; preselected?: string }) {
   const [state, formAction, pending] = useActionState(register, undefined);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -32,7 +32,7 @@ export function RegisterForm({ t, courses }: { t: Dictionary["register"]; course
                 type="radio"
                 name="courseId"
                 value={course.id}
-                defaultChecked={state?.courseId ? state.courseId === course.id : courses.length === 1}
+                defaultChecked={state?.courseId ? state.courseId === course.id : course.id === preselected || courses.length === 1}
                 required
                 className="peer sr-only"
               />
