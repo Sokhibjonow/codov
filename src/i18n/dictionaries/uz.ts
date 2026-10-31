@@ -78,6 +78,8 @@ export const uz: Dictionary = {
   register: {
     title: "Bepul sinab ko‘ring",
     subtitle: "Ro‘yxatdan o‘tishingiz bilan kursning birinchi darslari ochiladi. To‘lovsiz va kartasiz.",
+    course: "Qaysi kursni sinab ko‘rasiz?",
+    freeLessons: "{count} ta bepul dars",
     firstName: "Ism",
     lastName: "Familiya",
     optional: "(ixtiyoriy)",
@@ -100,6 +102,7 @@ export const uz: Dictionary = {
     ],
     errors: {
       required: "Ism, telefon va parolni kiriting",
+      course: "Kursni tanlang",
       phone: "O‘zbekiston raqamini kiriting: +998 va 9 ta raqam",
       password: "Parol kamida 6 ta belgidan iborat bo‘lsin",
       exists: "Bu raqam allaqachon ro‘yxatdan o‘tgan. Uni login sifatida kiritib, tizimga kiring",

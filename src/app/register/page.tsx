@@ -6,7 +6,9 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { getThemeMode } from "@/lib/theme-server";
 import { Logo } from "@/components/Logo";
 import { getDictionary } from "@/i18n/server";
+import { pick } from "@/lib/learning";
 import { SITE_TITLE } from "@/lib/site";
+import { getTrialCourses } from "@/lib/trial";
 import { RegisterForm } from "./RegisterForm";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,7 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RegisterPage() {
-  const [{ locale, t }, theme] = await Promise.all([getDictionary(), getThemeMode()]);
+  const [{ locale, t }, theme, trialCourses] = await Promise.all([getDictionary(), getThemeMode(), getTrialCourses()]);
+  const courses = trialCourses.map((c) => ({
+    id: c.id,
+    title: pick(locale, c.titleUz, c.titleRu),
+    description: pick(locale, c.descriptionUz, c.descriptionRu),
+    freeLessons: c.freeLessons,
+  }));
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -69,7 +77,11 @@ export default async function RegisterPage() {
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">
           <h1 className="text-3xl font-extrabold tracking-tight">{t.register.title}</h1>
           <p className="mb-8 mt-2 text-muted">{t.register.subtitle}</p>
-          <RegisterForm t={t.register} />
+          {courses.length > 0 ? (
+            <RegisterForm t={t.register} courses={courses} />
+          ) : (
+            <p className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">{t.register.errors.closed}</p>
+          )}
           <p className="mt-6 text-center text-sm text-muted">
             {t.register.haveAccount}{" "}
             <Link href="/login" className="font-bold text-primary hover:underline">

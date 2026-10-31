@@ -1,11 +1,14 @@
 "use client";
 
-import { Eye, EyeOff, Rocket } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Rocket } from "lucide-react";
 import { useActionState, useState } from "react";
+import { format } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
 import { register } from "./actions";
 
-export function RegisterForm({ t }: { t: Dictionary["register"] }) {
+export type RegisterCourse = { id: string; title: string; description: string; freeLessons: number };
+
+export function RegisterForm({ t, courses }: { t: Dictionary["register"]; courses: RegisterCourse[] }) {
   const [state, formAction, pending] = useActionState(register, undefined);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -16,6 +19,35 @@ export function RegisterForm({ t }: { t: Dictionary["register"] }) {
           {t.errors[state.error]}
         </p>
       )}
+
+      <fieldset>
+        <legend className="mb-1.5 text-sm font-bold">{t.course}</legend>
+        <div className="grid gap-2">
+          {courses.map((course) => (
+            <label
+              key={course.id}
+              className="group flex cursor-pointer items-start gap-3 rounded-xl border-2 border-border bg-surface p-3.5 transition has-[:checked]:border-primary has-[:checked]:bg-primary-soft/50"
+            >
+              <input
+                type="radio"
+                name="courseId"
+                value={course.id}
+                defaultChecked={state?.courseId ? state.courseId === course.id : courses.length === 1}
+                required
+                className="peer sr-only"
+              />
+              <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-border text-primary peer-checked:border-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+                <CheckCircle2 size={14} strokeWidth={3} className="hidden group-has-[:checked]:block" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-extrabold">{course.title}</span>
+                {course.description && <span className="mt-0.5 line-clamp-2 block text-sm text-muted">{course.description}</span>}
+                <span className="mt-1 block text-xs font-bold text-primary">{format(t.freeLessons, { count: course.freeLessons })}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">

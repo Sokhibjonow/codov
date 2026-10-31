@@ -9,12 +9,14 @@ import { prisma } from "@/lib/db";
 import { notify } from "@/lib/notifications";
 import { hashPassword } from "@/lib/password";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getTrialCourses } from "@/lib/trial";
 import { createSession } from "@/lib/session";
 import { normalizePhone } from "@/lib/users";
 
 export type RegisterState =
   | {
-      error: "required" | "phone" | "password" | "exists" | "closed" | "tooMany";
+      error: "required" | "course" | "phone" | "password" | "exists" | "closed" | "tooMany";
+      courseId: string;
       firstName: string;
       lastName: string;
       phone: string;
@@ -29,7 +31,7 @@ const schema = z.object({
 });
 
 /**
- * Free trial sign-up: the person becomes a student of the newest trial group,
+ * Free trial sign-up: the person picks a course and becomes a student of the newest trial group with it,
  * logs in with their phone number and lands on the first lessons right away.
  */
 export async function register(_prev: RegisterState, formData: FormData): Promise<RegisterState> {
@@ -39,10 +41,12 @@ export async function register(_prev: RegisterState, formData: FormData): Promis
     phone: String(formData.get("phone") ?? ""),
     password: String(formData.get("password") ?? ""),
   };
-  const back = { firstName: raw.firstName, lastName: raw.lastName, phone: raw.phone };
+  const courseId = String(formData.get("courseId") ?? "");
+  const back = { courseId, firstName: raw.firstName, lastName: raw.lastName, phone: raw.phone };
   const parsed = schema.safeParse(raw);
   // The hidden "website" field is only ever filled by bots
   if (!parsed.success || formData.get("website")) return { error: "required", ...back };
+  if (!courseId) return { error: "course", ...back };
 
   const phone = normalizePhone(parsed.data.phone);
   if (!phone || !/^\+998\d{9}$/.test(phone)) return { error: "phone", ...back };
@@ -51,12 +55,9 @@ export async function register(_prev: RegisterState, formData: FormData): Promis
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   if (!checkRateLimit(`register:${ip}`)) return { error: "tooMany", ...back };
 
-  const group = await prisma.group.findFirst({
-    where: { isTrial: true, isArchived: false },
-    orderBy: { createdAt: "desc" },
-    select: { id: true },
-  });
-  if (!group) return { error: "closed", ...back };
+  const trial = (await getTrialCourses()).find((c) => c.id === courseId);
+  if (!trial) return { error: "closed", ...back };
+  const group = { id: trial.groupId };
 
   const login = phone.slice(1);
   const name = [parsed.data.firstName, parsed.data.lastName].filter(Boolean).join(" ");
@@ -85,9 +86,11 @@ export async function register(_prev: RegisterState, formData: FormData): Promis
   }
 
   // The teacher sees the sign-up among the requests and gets a notification to call back
-  const lead = await prisma.lead.create({ data: { name, phone } });
+  // The chosen course goes with the name, so the teacher knows what to talk about when calling back
+  const leadName = `${name} · ${trial.titleUz}`;
+  const lead = await prisma.lead.create({ data: { name: leadName, phone } });
   const admins = await prisma.user.findMany({ where: { role: "ADMIN", isActive: true }, select: { id: true } });
-  await notify(admins.map((a) => a.id), "lead.new", { leadId: lead.id, name, phone });
+  await notify(admins.map((a) => a.id), "lead.new", { leadId: lead.id, name: leadName, phone });
 
   await createSession({ userId: user.id, role: user.role, sv: user.sessionVersion, remember: true });
   redirect("/student");

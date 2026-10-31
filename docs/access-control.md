@@ -56,9 +56,12 @@ by guessing its URL.
 ## Free trial (self sign-up)
 
 `/register` lets anyone create a student account (`User.selfRegistered`): login is the phone number
-without `+` (`998901234567`), the password is their own. The account joins the newest non-archived
-group with `Group.isTrial`; without one registration is closed. Each sign-up also creates a `Lead`
-and a `lead.new` notification so the teacher can call back. Registrations are rate limited to 10
+without `+` (`998901234567`), the password is their own. The visitor picks a course: the form lists every
+published course linked to an active trial group (`getTrialCourses` in `src/lib/trial.ts`), and the account
+joins the newest trial group with that course. Keep one trial group per course ("Sinov · START",
+"Sinov · JavaScript") so each has its own offer; with no trial group the page says registration is closed.
+Each sign-up also creates a `Lead` named "Name · Course" and a `lead.new` notification so the teacher
+can call back. Registrations are rate limited to 10
 per 15 minutes per IP, and a hidden `website` field catches form bots.
 
 A student whose every group linked to a course is a trial group (`courseAccess` in `learning.ts`):
