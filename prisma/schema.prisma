@@ -485,3 +485,19 @@ model Lead {
 
   @@index([status, createdAt])
 }
+
+// People who pressed Start in the Telegram bot (the gift from the videos). `source` is the deep-link
+// payload of their first /start: which video or post brought them.
+model BotUser {
+  id           String   @id @default(cuid())
+  telegramId   String   @unique
+  username     String?
+  firstName    String   @default("")
+  source       String   @default("")
+  startCount   Int      @default(1)
+  giftSent     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  lastSeenAt   DateTime @default(now())
+
+  @@index([createdAt])
+}

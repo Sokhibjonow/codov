@@ -20,6 +20,7 @@ Production is **www.codov.uz** on Vercel.
 | `DATABASE_URL` | Postgres connection (pooled on Vercel) |
 | `SESSION_SECRET` | signs the session cookie — rotating it logs everyone out |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | AI review of submissions |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL` | The gift bot (optional, see below) |
 | `BLOB_READ_WRITE_TOKEN`, `BLOB_STORE_ID` | Vercel Blob uploads |
 | `UPLOAD_DIR` | upload folder when not on Vercel |
 | `GOOGLE_SITE_VERIFICATION` | Search Console meta tag |
@@ -70,3 +71,18 @@ Course content is imported by scripts kept with the content, outside this reposi
 - Neon keeps point-in-time history; the VPS setup writes nightly dumps to `data/backups`.
 - The course sources (lesson texts, model solutions, handouts, layouts) live only on the teacher's
   machine — they are the one thing without an automatic copy.
+
+
+## Telegram gift bot
+
+The videos promise a free PDF; viewers get it from the bot (`src/app/api/telegram/webhook/route.ts`).
+A deep link `t.me/<bot>?start=<video>` records which video brought the person (`BotUser.source`);
+`giftForSource` in `src/lib/gifts.ts` picks the PDF (`js…`/`viral…` → JavaScript cheat sheet, anything else →
+the 30-day plan). The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
+
+1. @BotFather → /newbot → copy the token.
+2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` (a long random string),
+   optionally `TELEGRAM_CHANNEL=@codovvv` — then the gift waits until the person subscribes to the channel.
+   For that check the bot must be an **administrator** of the channel; otherwise the gift is sent without the check.
+3. Redeploy, then register the webhook once:
+   `curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://www.codov.uz/api/telegram/webhook&secret_token=<SECRET>"`

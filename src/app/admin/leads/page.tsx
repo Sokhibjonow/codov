@@ -1,4 +1,4 @@
-import { Check, Inbox, Phone, RotateCcw, Trash2 } from "lucide-react";
+import { Bot, Check, Inbox, Phone, RotateCcw, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { SubmitButton } from "@/components/ui/SubmitButton";
@@ -6,7 +6,7 @@ import { format } from "@/i18n/config";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { formatDateTime } from "@/lib/format";
+import { daysAgo, formatDateTime } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { deleteLead, setLeadContacted } from "./actions";
 
@@ -17,6 +17,13 @@ export default async function LeadsPage() {
 
   const leads = await prisma.lead.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: 500 });
   const newCount = leads.filter((lead) => lead.status === "NEW").length;
+  const dayStart = daysAgo(1);
+  const [botUsers, botTotal, botToday, bySource] = await Promise.all([
+    prisma.botUser.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
+    prisma.botUser.count(),
+    prisma.botUser.count({ where: { createdAt: { gte: dayStart } } }),
+    prisma.botUser.groupBy({ by: ["source"], _count: { _all: true }, orderBy: { _count: { source: "desc" } }, take: 12 }),
+  ]);
 
   return (
     <>
@@ -76,6 +83,51 @@ export default async function LeadsPage() {
           })}
         </ul>
       )}
+
+      <section className="card mt-6 p-0">
+        <header className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-4">
+          <Bot size={22} className="text-primary" />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-extrabold">{t.leads.botTitle}</h2>
+            <p className="text-xs text-muted">{t.leads.botHint}</p>
+          </div>
+          <Badge tone="primary">{format(t.leads.botTotal, { count: botTotal })}</Badge>
+          <Badge>{format(t.leads.botToday, { count: botToday })}</Badge>
+        </header>
+        {bySource.length > 0 && (
+          <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3">
+            {bySource.map((s) => (
+              <span key={s.source} className="rounded-full bg-background px-3 py-1 text-sm font-bold">
+                {s.source || "—"} · {s._count._all}
+              </span>
+            ))}
+          </div>
+        )}
+        {botUsers.length === 0 ? (
+          <p className="px-5 py-8 text-center text-muted">{t.leads.botEmpty}</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {botUsers.map((u) => (
+              <li key={u.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold">
+                    {u.firstName || "—"}{" "}
+                    {u.username && (
+                      <a href={`https://t.me/${u.username}`} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-primary hover:underline">
+                        @{u.username}
+                      </a>
+                    )}
+                  </p>
+                  <p className="text-sm text-muted">
+                    {t.leads.botSource}: {u.source || "—"} · {formatDateTime(u.createdAt, locale)}
+                  </p>
+                </div>
+                <Badge tone={u.giftSent ? "success" : "neutral"}>{u.giftSent ? t.leads.botGift : t.leads.botNoGift}</Badge>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </>
   );
 }
