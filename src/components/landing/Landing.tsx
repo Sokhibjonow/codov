@@ -24,10 +24,11 @@ import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { CookieNotice } from "@/components/CookieNotice";
 import { RevealOnScroll } from "./RevealOnScroll";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
-import { CONTACTS, SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
+import { CONTACTS, PRIVACY_PATH, SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
 import type { ThemeMode } from "@/lib/theme";
 
 type LandingProps = { t: Dictionary; locale: Locale; theme: ThemeMode | null };
@@ -516,10 +517,14 @@ export function Landing({ t, locale, theme }: LandingProps) {
               </a>
             )}
             <SocialLinks labels={l.contact} compact />
+            <Link href={PRIVACY_PATH} className="hover:text-foreground">
+              {t.legal.privacy}
+            </Link>
           </div>
           <p className="w-full sm:w-auto">© {new Date().getFullYear()} codov</p>
         </div>
       </footer>
+      <CookieNotice t={t.legal} />
     </div>
   );
 }

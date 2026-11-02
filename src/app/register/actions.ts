@@ -15,11 +15,12 @@ import { normalizePhone } from "@/lib/users";
 
 export type RegisterState =
   | {
-      error: "required" | "course" | "phone" | "password" | "exists" | "closed" | "tooMany";
+      error: "required" | "course" | "phone" | "password" | "consent" | "exists" | "closed" | "tooMany";
       courseId: string;
       firstName: string;
       lastName: string;
       phone: string;
+      consent: boolean;
     }
   | undefined;
 
@@ -42,7 +43,8 @@ export async function register(_prev: RegisterState, formData: FormData): Promis
     password: String(formData.get("password") ?? ""),
   };
   const courseId = String(formData.get("courseId") ?? "");
-  const back = { courseId, firstName: raw.firstName, lastName: raw.lastName, phone: raw.phone };
+  const consent = formData.get("consent") === "1";
+  const back = { courseId, firstName: raw.firstName, lastName: raw.lastName, phone: raw.phone, consent };
   const parsed = schema.safeParse(raw);
   // The hidden "website" field is only ever filled by bots
   if (!parsed.success || formData.get("website")) return { error: "required", ...back };
@@ -51,6 +53,7 @@ export async function register(_prev: RegisterState, formData: FormData): Promis
   const phone = normalizePhone(parsed.data.phone);
   if (!phone || !/^\+998\d{9}$/.test(phone)) return { error: "phone", ...back };
   if (parsed.data.password.length < 6) return { error: "password", ...back };
+  if (!consent) return { error: "consent", ...back };
 
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   if (!checkRateLimit(`register:${ip}`)) return { error: "tooMany", ...back };

@@ -1,14 +1,26 @@
 "use client";
 
 import { CheckCircle2, Eye, EyeOff, Rocket } from "lucide-react";
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { format } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/ru";
+import { PRIVACY_PATH } from "@/lib/site";
 import { register } from "./actions";
 
 export type RegisterCourse = { id: string; title: string; description: string; freeLessons: number };
 
-export function RegisterForm({ t, courses, preselected }: { t: Dictionary["register"]; courses: RegisterCourse[]; preselected?: string }) {
+export function RegisterForm({
+  t,
+  legal,
+  courses,
+  preselected,
+}: {
+  t: Dictionary["register"];
+  legal: Dictionary["legal"];
+  courses: RegisterCourse[];
+  preselected?: string;
+}) {
   const [state, formAction, pending] = useActionState(register, undefined);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -100,6 +112,18 @@ export function RegisterForm({ t, courses, preselected }: { t: Dictionary["regis
           </button>
         </span>
         <span className="mt-1 block text-xs text-muted">{t.passwordHint}</span>
+      </label>
+
+      {/* Consent to the processing of personal data (Law ZRU-547): the account is created only with it */}
+      <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+        <input type="checkbox" name="consent" value="1" required defaultChecked={state?.consent} className="mt-0.5 size-4 shrink-0 accent-primary" />
+        <span className="text-muted">
+          {legal.consentBefore}
+          <Link href={PRIVACY_PATH} target="_blank" className="font-bold text-primary hover:underline">
+            {legal.consentLink}
+          </Link>
+          {legal.consentAfter}
+        </span>
       </label>
 
       {/* Bots fill every field; people never see this one */}

@@ -6,6 +6,9 @@ export const SITE_DESCRIPTION =
   "va o‘z loyihangiz (AI, deploy). Oflayn, onlayn yoki mustaqil — har bir ishni o‘qituvchi tekshiradi. Alohida kurs: Word, Excel, PowerPoint. " +
   "Программирование с нуля за 3 этапа: основы, разработка и собственный проект. Офлайн, онлайн или самостоятельно — каждую работу проверяет преподаватель.";
 
+/** Privacy policy and cookie list */
+export const PRIVACY_PATH = "/maxfiylik";
+
 /** Contacts on the public page; empty values are hidden (fill in to show the buttons). */
 export const CONTACTS = {
   /** Telegram username without @ (sign-up and questions) */

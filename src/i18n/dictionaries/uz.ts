@@ -108,6 +108,7 @@ export const uz: Dictionary = {
       exists: "Bu raqam allaqachon ro‘yxatdan o‘tgan. Uni login sifatida kiritib, tizimga kiring",
       closed: "Ro‘yxatdan o‘tish hozir yopiq. Telegramda yozing: @codov_admin",
       tooMany: "Urinishlar juda ko‘p. Bir necha daqiqa kuting",
+      consent: "Shaxsga doir ma’lumotlarni qayta ishlashga roziligingizni tasdiqlang",
     },
   },
   gift: {
@@ -908,7 +909,7 @@ export const uz: Dictionary = {
         { q: "Kompyuter kerakmi?", a: "Kompyuter yoki noutbukda o‘qish qulayroq, lekin darslar va topshiriqlar telefondan ham ochiladi." },
         { q: "Darslar qaysi tilda?", a: "Platforma va darslar o‘zbek va rus tillarida, tilni istalgan payt almashtirish mumkin." },
         { q: "Topshiriqlar qanday tekshiriladi?", a: "Avval avtomatik testlar va sun’iy intellekt tezkor fikr beradi, keyin ishni o‘qituvchi tekshirib, baho qo‘yadi." },
-        { q: "Platformaga qanday kiraman?", a: "Kursga yozilgandan so‘ng o‘qituvchi login va parol beradi. Mustaqil ro‘yxatdan o‘tish yo‘q." },
+        { q: "Platformaga qanday kiraman?", a: "«Bepul sinab ko‘ring» sahifasida ro‘yxatdan o‘ting — birinchi darslar darhol ochiladi, login — telefon raqamingiz. Guruh o‘quvchilariga login va parolni o‘qituvchi beradi." },
       ],
     },
     lead: {
@@ -926,5 +927,15 @@ export const uz: Dictionary = {
       soon: "Yozilish uchun kontaktlar tez orada shu yerda bo‘ladi.",
     },
     footer: "Veb-dasturlashni o‘rganamiz",
+  },
+  legal: {
+    privacy: "Maxfiylik siyosati",
+    consentBefore: "Shaxsga doir ma’lumotlarimni ",
+    consentLink: "maxfiylik siyosatiga",
+    consentAfter: " muvofiq qayta ishlashga roziman. 18 yoshga to‘lmagan bo‘lsam — ota-onam roziligi bilan.",
+    cookieText: "Biz faqat zarur cookie’lardan foydalanamiz: kirish, til va ko‘rinishni eslab qolish uchun. Reklama va kuzatuv yo‘q.",
+    cookieMore: "Batafsil",
+    cookieOk: "Tushunarli",
+    home: "Bosh sahifa",
   },
 };

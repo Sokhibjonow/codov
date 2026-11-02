@@ -91,3 +91,16 @@ The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/
    Make the bot an **administrator** of the channel — without that Telegram won't tell it who is subscribed and
    the check lets everyone through (/admin/leads shows a red warning).
 3. Redeploy, then /admin/leads → «Botni ulash»: sets the webhook, the command menu and the bot's description.
+
+## Privacy policy and cookies
+
+The policy lives at `/maxfiylik` (Uzbek and Russian, text in `src/lib/privacy.ts`) and follows the Law
+"On Personal Data" (ZRU-547, as amended by ZRU-1125 of 26.03.2026: only biometric, genetic and telecom-subscriber
+data must stay in Uzbekistan; we store none of them, everything else is on EU servers of certified providers).
+
+- Sign-up on `/register` requires the consent checkbox; the server action checks it too.
+- Public pages show a one-time cookie notice (`CookieNotice`): the site only has necessary cookies
+  (`cubick_session`, `cubick_locale`, `cubick_theme`, `codov_cookies`), so it informs and does not ask for consent.
+- When you add a stored field, a cookie, an analytics script or an outside service (AI, storage, messaging),
+  add it to `src/lib/privacy.ts` and move the date there. Requests to see or delete data come to @codov_admin and
+  must be answered within 30 days.

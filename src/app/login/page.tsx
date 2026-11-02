@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CookieNotice } from "@/components/CookieNotice";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { getThemeMode } from "@/lib/theme-server";
 import { Logo } from "@/components/Logo";
 import { getDictionary } from "@/i18n/server";
-import { SITE_TITLE } from "@/lib/site";
+import { PRIVACY_PATH, SITE_TITLE } from "@/lib/site";
 import { LoginForm } from "./LoginForm";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -80,8 +81,14 @@ export default async function LoginPage() {
               {t.auth.tryFree}
             </Link>
           </p>
+          <p className="mt-3 text-center text-xs text-muted">
+            <Link href={PRIVACY_PATH} className="hover:text-primary hover:underline">
+              {t.legal.privacy}
+            </Link>
+          </p>
         </div>
       </main>
+      <CookieNotice t={t.legal} />
     </div>
   );
 }

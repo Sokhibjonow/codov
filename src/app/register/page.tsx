@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { CookieNotice } from "@/components/CookieNotice";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { getThemeMode } from "@/lib/theme-server";
@@ -87,7 +88,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           <h1 className="text-3xl font-extrabold tracking-tight">{t.register.title}</h1>
           <p className="mb-8 mt-2 text-muted">{t.register.subtitle}</p>
           {courses.length > 0 ? (
-            <RegisterForm t={t.register} courses={courses} preselected={preselected} />
+            <RegisterForm t={t.register} legal={t.legal} courses={courses} preselected={preselected} />
           ) : (
             <p className="rounded-xl bg-primary-soft px-4 py-3 font-semibold text-primary">{t.register.errors.closed}</p>
           )}
@@ -99,6 +100,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           </p>
         </div>
       </main>
+      <CookieNotice t={t.legal} />
     </div>
   );
 }
