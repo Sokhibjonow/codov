@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/db";
 import { GIFTS, giftForSource, type Gift } from "@/lib/gifts";
-import { SITE_URL } from "@/lib/site";
-import { isSubscribed, keyboard, telegramConfigured, tg, webhookSecret } from "@/lib/telegram";
+import { CONTACTS, SITE_URL } from "@/lib/site";
+import { CHANNEL, isSubscribed, keyboard, telegramConfigured, tg, webhookSecret } from "@/lib/telegram";
 
-// The gift bot — the first stop after a video: the viewer presses Start (t.me/<bot>?start=<video>),
-// gets the PDF promised in the video and, from the menu, the free lessons on the site, the channel and the
-// online group. Every Start is kept as a BotUser with the video that brought them.
+// The gift bot — the first stop after a video. It works only for followers: a subscription to the Telegram
+// channel (checked with Telegram) and a visit to our Instagram (following itself can't be checked, the visit
+// through /go/instagram can). Then: the PDF promised in the video and a menu with the free lessons on the
+// site, the online group and questions. Every Start is kept as a BotUser with the video that brought them.
 
 type TgUser = { id: number; first_name?: string; username?: string };
 type Update = {
@@ -13,7 +14,8 @@ type Update = {
   callback_query?: { id: string; from: TgUser; data?: string; message?: { chat: { id: number } } };
 };
 
-const channelUrl = () => `https://t.me/${(process.env.TELEGRAM_CHANNEL || "@codovvv").replace(/^@/, "")}`;
+const channelUrl = `https://t.me/${CHANNEL.replace(/^@/, "")}`;
+const instagramName = "@" + CONTACTS.instagram.replace(/\/+$/, "").split("/").pop();
 
 // The menu that stays under the input field
 const MENU = { gifts: "Sovg‘alar", lessons: "Bepul darslar", group: "Onlayn guruh", ask: "Savol berish" };
@@ -25,7 +27,31 @@ const menuKeyboard = {
 
 const send = (chatId: number, text: string, reply_markup?: unknown) => tg("sendMessage", { chat_id: chatId, text, ...(reply_markup ? { reply_markup } : {}) });
 
-/** The free lessons: pick a course, sign up on the site, the first lessons open at once. */
+// ── the gate ──
+type Gate = { telegram: boolean; instagram: boolean };
+async function gate(userId: number): Promise<Gate> {
+  const [telegram, user] = await Promise.all([
+    isSubscribed(userId),
+    prisma.botUser.findUnique({ where: { telegramId: String(userId) }, select: { instagramAt: true } }),
+  ]);
+  return { telegram, instagram: Boolean(user?.instagramAt) };
+}
+const passed = (g: Gate) => g.telegram && g.instagram;
+
+/** "Follow us first": both buttons and a check that remembers what the person came for. */
+async function askToFollow(chatId: number, userId: number, then: string) {
+  await send(
+    chatId,
+    `Botdan foydalanish uchun sahifalarimizga obuna bo‘ling:\n\n1. Telegram kanal — ${CHANNEL}\n2. Instagram — ${instagramName}\n\nIkkalasiga obuna bo‘lgach, «Tekshirish» tugmasini bosing.`,
+    keyboard([
+      [{ text: `1. Telegram kanal ${CHANNEL}`, url: channelUrl }],
+      [{ text: `2. Instagram ${instagramName}`, url: `${SITE_URL}/go/instagram?u=${userId}` }],
+      [{ text: "Tekshirish", callback_data: `check:${then}` }],
+    ]),
+  );
+}
+
+// ── what the bot gives ──
 async function sendLessons(chatId: number) {
   await send(
     chatId,
@@ -42,37 +68,38 @@ async function sendGroup(chatId: number) {
   await send(
     chatId,
     "Ustoz bilan onlayn guruh:\n• 6 kishigacha — ustoz har biriga vaqt ajratadi\n• o‘zbek va rus tilida\n• har bir ishingizni ustoz tekshiradi, ota-onalar natijani ko‘radi\n\nJoylar va boshlanish sanasini bilish uchun yozing:",
-    keyboard([[{ text: "Ustozga yozish", url: "https://t.me/codov_admin" }], [{ text: "Telegram kanal", url: channelUrl() }]]),
+    keyboard([[{ text: "Ustozga yozish", url: `https://t.me/${CONTACTS.telegram}` }]]),
   );
 }
 
-/** Sends the gifts (a bare /start from a Short gets all of them), then the way to the free lessons. */
-async function sendGifts(chatId: number, gifts: Gift[]) {
+/** The gifts (a bare /start from a Short gets all of them), then the way to the free lessons. */
+async function sendGifts(chatId: number, userId: number, gifts: Gift[]) {
   for (const g of gifts) await tg("sendDocument", { chat_id: chatId, document: `${SITE_URL}${g.href}`, caption: `${g.titleUz} — codov` });
-  const gift = gifts[0];
   await send(
     chatId,
     "Keyingi qadam — amaliyot: codov platformasida 3 ta dars bepul. Kodni brauzerda yozasiz, AI darhol tekshiradi.",
     keyboard([
-      [{ text: "3 ta bepul dars", url: `${SITE_URL}/register?kurs=${gift.kurs}` }],
-      ...GIFTS.filter((g) => !gifts.includes(g)).map((g) => [{ text: `Yana sovg‘a: ${g.titleUz}`, callback_data: `gift:${g.key}` }]),
+      [{ text: "3 ta bepul dars", url: `${SITE_URL}/register?kurs=${gifts[0].kurs}` }],
+      ...GIFTS.filter((g) => !gifts.includes(g)).map((g) => [{ text: `Yana sovg‘a: ${g.titleUz}`, callback_data: `do:gift-${g.key}` }]),
     ]),
   );
-}
-
-async function askToSubscribe(chatId: number, giftKey: string) {
-  await send(
-    chatId,
-    "Sovg‘ani olish uchun kanalimizga obuna bo‘ling — u yerda har hafta bepul darslar va foydali materiallar.\n\nObuna bo‘lgach, «Obuna bo‘ldim» tugmasini bosing.",
-    keyboard([[{ text: "Kanalga o‘tish", url: channelUrl() }], [{ text: "Obuna bo‘ldim", callback_data: `gift:${giftKey}` }]]),
-  );
-}
-
-/** Gifts behind the (optional) channel subscription. */
-async function giveGifts(chatId: number, userId: number, gifts: Gift[], key: string) {
-  if (!(await isSubscribed(userId))) return askToSubscribe(chatId, key);
-  await sendGifts(chatId, gifts);
   await prisma.botUser.updateMany({ where: { telegramId: String(userId) }, data: { giftSent: true, lastSeenAt: new Date() } });
+}
+
+/**
+ * What the person asked for, once they follow us. `what`: "start:<video>" (the gift of that video),
+ * "gifts", "gift-<key>", "lessons", "group".
+ */
+async function deliver(chatId: number, user: TgUser, what: string) {
+  if (what.startsWith("start:")) {
+    const source = what.slice(6);
+    await send(chatId, `Rahmat${user.first_name ? `, ${user.first_name}` : ""}! Mana videoda va’da qilingan sovg‘a. Pastdagi menyuda — bepul darslar va onlayn guruh.`, menuKeyboard);
+    return sendGifts(chatId, user.id, source ? [giftForSource(source)] : GIFTS);
+  }
+  if (what === "gifts") return sendGifts(chatId, user.id, GIFTS);
+  if (what.startsWith("gift-")) return sendGifts(chatId, user.id, [GIFTS.find((g) => g.key === what.slice(5)) ?? GIFTS[0]]);
+  if (what === "lessons") return sendLessons(chatId);
+  if (what === "group") return sendGroup(chatId);
 }
 
 async function remember(user: TgUser, source: string) {
@@ -96,36 +123,42 @@ export async function POST(request: Request) {
     if (msg?.from && msg.chat.type === "private") {
       const chat = msg.chat.id, user = msg.from;
       const text = (msg.text ?? "").trim();
+      let what: string | null = null;
       if (text.startsWith("/start")) {
         const source = text.slice(6).trim().replace(/[^\w-]/g, "");
         await remember(user, source);
-        const gift = giftForSource(source);
-        await send(
-          chat,
-          `Assalomu alaykum${user.first_name ? `, ${user.first_name}` : ""}! Bu — codov boti.\n\nBu yerda videolarda va’da qilingan bepul materiallarni olasiz va 3 ta darsni bepul sinab ko‘rasiz.`,
-          menuKeyboard,
-        );
-        await giveGifts(chat, user.id, source ? [gift] : GIFTS, source ? gift.key : "all");
-      } else if (text === MENU.gifts || text === "/sovgalar") {
-        await giveGifts(chat, user.id, GIFTS, "all");
-      } else if (text === MENU.lessons || text === "/darslar") {
-        await sendLessons(chat);
-      } else if (text === MENU.group || text === "/guruh") {
-        await sendGroup(chat);
+        await send(chat, `Assalomu alaykum${user.first_name ? `, ${user.first_name}` : ""}! Bu — codov boti: videolarda va’da qilingan bepul materiallar va 3 ta bepul dars.`);
+        what = `start:${source}`;
+      } else if (text === MENU.gifts || text === "/sovgalar") what = "gifts";
+      else if (text === MENU.lessons || text === "/darslar") what = "lessons";
+      else if (text === MENU.group || text === "/guruh") what = "group";
+
+      if (!what) {
+        await send(chat, `Savolingizni ustozga yozing: @${CONTACTS.telegram} — tez orada javob beradi.\n\nSovg‘alar va bepul darslar — pastdagi menyuda.`, menuKeyboard);
       } else {
-        await send(chat, "Savolingizni ustozga yozing: @codov_admin — tez orada javob beradi.\n\nSovg‘alar va bepul darslar — pastdagi menyuda.", menuKeyboard);
+        // nothing works without following us
+        const g = await gate(user.id);
+        if (passed(g)) await deliver(chat, user, what);
+        else await askToFollow(chat, user.id, what);
       }
     }
 
     const cb = update.callback_query;
-    if (cb?.data?.startsWith("gift:") && cb.message) {
-      const key = cb.data.slice(5);
-      const gifts = key === "all" ? GIFTS : [GIFTS.find((g) => g.key === key) ?? GIFTS[0]];
-      if (await isSubscribed(cb.from.id)) {
-        await tg("answerCallbackQuery", { callback_query_id: cb.id, text: "Rahmat!" });
-        await giveGifts(cb.message.chat.id, cb.from.id, gifts, key);
-      } else {
-        await tg("answerCallbackQuery", { callback_query_id: cb.id, text: "Hali obuna bo‘lmagansiz. Avval kanalga obuna bo‘ling.", show_alert: true });
+    if (cb?.data && cb.message) {
+      const chat = cb.message.chat.id;
+      if (cb.data.startsWith("check:") || cb.data.startsWith("do:")) {
+        const what = cb.data.replace(/^(check|do):/, "");
+        const g = await gate(cb.from.id);
+        if (!g.telegram) {
+          await tg("answerCallbackQuery", { callback_query_id: cb.id, text: `Telegram kanalimizga (${CHANNEL}) hali obuna bo‘lmagansiz.`, show_alert: true });
+          if (cb.data.startsWith("do:")) await askToFollow(chat, cb.from.id, what);
+        } else if (!g.instagram) {
+          await tg("answerCallbackQuery", { callback_query_id: cb.id, text: `Instagram sahifamizni (${instagramName}) oching va obuna bo‘ling — «2. Instagram» tugmasi.`, show_alert: true });
+          if (cb.data.startsWith("do:")) await askToFollow(chat, cb.from.id, what);
+        } else {
+          await tg("answerCallbackQuery", { callback_query_id: cb.id, text: "Rahmat! Obuna tasdiqlandi." });
+          await deliver(chat, cb.from, what);
+        }
       }
     }
   } catch (error) {

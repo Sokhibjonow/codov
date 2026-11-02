@@ -108,6 +108,11 @@ export default async function LeadsPage() {
               <p className="text-xs text-muted">{t.leads.botSetup}</p>
             </div>
           )}
+          {bot?.ok && (
+            <p className={`w-full text-xs font-bold ${bot.channelAdmin ? "text-success" : "text-danger"}`}>
+              {format(bot.channelAdmin ? t.leads.botAdminOk : t.leads.botNotAdmin, { channel: bot.channel })}
+            </p>
+          )}
           {bot?.ok && bot.lastError && <p className="w-full text-xs text-danger">{format(t.leads.botError, { error: bot.lastError })}</p>}
           <ActionForm action={connectTelegramBot} submitLabel={bot?.ok && bot.connected ? t.leads.botReconnect : t.leads.botConnect} className="ml-auto flex flex-wrap items-center gap-3">
             {null}
@@ -141,6 +146,7 @@ export default async function LeadsPage() {
                     {t.leads.botSource}: {u.source || "—"} · {formatDateTime(u.createdAt, locale)}
                   </p>
                 </div>
+                {u.instagramAt && <Badge>{t.leads.botInstagram}</Badge>}
                 <Badge tone={u.giftSent ? "success" : "neutral"}>{u.giftSent ? t.leads.botGift : t.leads.botNoGift}</Badge>
               </li>
             ))}

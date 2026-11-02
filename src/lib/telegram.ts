@@ -3,8 +3,8 @@ import { SITE_URL } from "./site";
 
 // Telegram Bot API: the bot that hands out the gifts from the videos and leads people to the free lessons.
 // Env: TELEGRAM_BOT_TOKEN (from @BotFather) is all that is required. Optional: TELEGRAM_WEBHOOK_SECRET
-// (otherwise derived from the token) and TELEGRAM_CHANNEL (e.g. "@codovvv": gifts wait for a subscription;
-// the bot must be an administrator of that channel to see its members).
+// (otherwise derived from the token) and TELEGRAM_CHANNEL (default "@codovvv"). The bot works only for
+// subscribers of that channel; to see its members the bot must be an administrator of the channel.
 
 export function telegramConfigured() {
   return Boolean(process.env.TELEGRAM_BOT_TOKEN);
@@ -39,10 +39,11 @@ export async function tg<T = unknown>(method: string, body: Record<string, unkno
 export type InlineButton = { text: string; url: string } | { text: string; callback_data: string };
 export const keyboard = (rows: InlineButton[][]) => ({ inline_keyboard: rows });
 
-/** Is the user subscribed to the channel? True when no channel is configured or the check is impossible. */
+export const CHANNEL = process.env.TELEGRAM_CHANNEL || "@codovvv";
+
+/** Is the user subscribed to the channel? True when the check is impossible (the bot is not a channel admin). */
 export async function isSubscribed(userId: number) {
-  const channel = process.env.TELEGRAM_CHANNEL;
-  if (!channel) return true;
+  const channel = CHANNEL;
   const member = await tg<{ status: string }>("getChatMember", { chat_id: channel, user_id: userId });
   // the bot is not an admin of the channel (or Telegram is down): never lock the gift away
   if (!member) return true;
@@ -53,11 +54,20 @@ export async function isSubscribed(userId: number) {
 export async function botStatus() {
   if (!telegramConfigured()) return null;
   const [me, hook] = await Promise.all([
-    tg<{ username: string; first_name: string }>("getMe"),
+    tg<{ id: number; username: string; first_name: string }>("getMe"),
     tg<{ url: string; pending_update_count: number; last_error_message?: string }>("getWebhookInfo"),
   ]);
   if (!me) return { ok: false as const };
-  return { ok: true as const, username: me.username, connected: hook?.url === WEBHOOK_URL, lastError: hook?.last_error_message };
+  // the subscription check only works when the bot is an administrator of the channel
+  const self = await tg<{ status: string }>("getChatMember", { chat_id: CHANNEL, user_id: me.id });
+  return {
+    ok: true as const,
+    username: me.username,
+    connected: hook?.url === WEBHOOK_URL,
+    lastError: hook?.last_error_message,
+    channel: CHANNEL,
+    channelAdmin: self?.status === "administrator" || self?.status === "creator",
+  };
 }
 
 /** One-click setup: webhook, command menu and the texts people see before pressing Start. */

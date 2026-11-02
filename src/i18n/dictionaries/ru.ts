@@ -497,6 +497,9 @@ export const ru = {
     botConnectFailed: "Telegram не принял подключение. Проверьте токен в Vercel.",
     botNoToken: "Нет TELEGRAM_BOT_TOKEN в настройках сайта (Vercel)",
     botError: "Последняя ошибка Telegram: {error}",
+    botNotAdmin: "Сделайте бота администратором канала {channel} — иначе он не может проверить подписку и пропускает всех.",
+    botAdminOk: "Проверка подписки на {channel} работает",
+    botInstagram: "Instagram открыт",
   },
   stats: {
     title: "Статистика",

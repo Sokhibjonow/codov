@@ -75,7 +75,10 @@ Course content is imported by scripts kept with the content, outside this reposi
 
 ## Telegram gift bot
 
-The first stop after a video: the viewer presses Start in the bot, gets the PDF promised in the video and,
+The first stop after a video. The bot works only for followers: a subscription to the Telegram channel
+(`TELEGRAM_CHANNEL`, default `@codovvv`, checked with getChatMember) and a visit to our Instagram — following
+there can't be checked by anyone, so the Instagram button goes through `/go/instagram?u=<id>`, which records
+`BotUser.instagramAt`. Then the viewer gets the PDF promised in the video and,
 from the menu under the input field («Sovg‘alar», «Bepul darslar», «Onlayn guruh», «Savol berish»),
 goes to the free lessons on the site (`/register?kurs=start|js`), the channel or the online group
 (`src/app/api/telegram/webhook/route.ts`). A deep link `t.me/<bot>?start=<video>` records which video brought
@@ -84,7 +87,8 @@ JavaScript cheat sheet, anything else → the 30-day plan; a bare /start — typ
 The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
 
 1. @BotFather → /newbot → copy the token.
-2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`. Optional: `TELEGRAM_CHANNEL=@codovvv` — gifts then wait until
-   the person subscribes (the bot must be an **administrator** of the channel, otherwise the check is skipped);
-   `TELEGRAM_WEBHOOK_SECRET` — otherwise derived from the token.
+2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`. Optional: `TELEGRAM_CHANNEL` (default `@codovvv`),
+   `TELEGRAM_WEBHOOK_SECRET` (otherwise derived from the token).
+   Make the bot an **administrator** of the channel — without that Telegram won't tell it who is subscribed and
+   the check lets everyone through (/admin/leads shows a red warning).
 3. Redeploy, then /admin/leads → «Botni ulash»: sets the webhook, the command menu and the bot's description.

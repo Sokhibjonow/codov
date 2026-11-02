@@ -496,6 +496,8 @@ model BotUser {
   source       String   @default("")
   startCount   Int      @default(1)
   giftSent     Boolean  @default(false)
+  // When they opened our Instagram from the bot (following itself can't be checked, the visit can)
+  instagramAt  DateTime?
   createdAt    DateTime @default(now())
   lastSeenAt   DateTime @default(now())
 
