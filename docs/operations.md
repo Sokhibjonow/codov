@@ -75,10 +75,9 @@ Course content is imported by scripts kept with the content, outside this reposi
 
 ## Telegram gift bot
 
-The first stop after a video. The bot works only for followers: a subscription to the Telegram channel
-(`TELEGRAM_CHANNEL`, default `@codovvv`, checked with getChatMember) and a visit to our Instagram — following
-there can't be checked by anyone, so the Instagram button goes through `/go/instagram?u=<id>`, which records
-`BotUser.instagramAt`. Then the viewer gets the PDF promised in the video and,
+The first stop after a video. The bot works only for subscribers of the Telegram channel
+(`TELEGRAM_CHANNEL`, default `@codovvv`, checked with getChatMember on every action).
+Then the viewer gets the PDF promised in the video and,
 from the menu under the input field («Sovg‘alar», «Bepul darslar», «Onlayn guruh», «Savol berish»),
 goes to the free lessons on the site (`/register?kurs=start|js`), the channel or the online group
 (`src/app/api/telegram/webhook/route.ts`). A deep link `t.me/<bot>?start=<video>` records which video brought
