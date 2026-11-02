@@ -81,10 +81,13 @@ export async function connectBot() {
   if (!hook) return false;
   await tg("setMyCommands", {
     commands: [
-      { command: "start", description: "Sovg‘alar va bepul darslar" },
-      { command: "sovgalar", description: "Bepul materiallar (PDF)" },
+      { command: "start", description: "Bosh menyu" },
+      { command: "materiallar", description: "Bepul materiallar (PDF)" },
       { command: "darslar", description: "3 ta bepul dars" },
+      { command: "kurslar", description: "Kurslarimiz haqida" },
+      { command: "video", description: "Video darslar" },
       { command: "guruh", description: "Ustoz bilan onlayn guruh" },
+      { command: "savol", description: "Ustozga savol" },
     ],
   });
   await tg("setMyDescription", {
