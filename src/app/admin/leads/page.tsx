@@ -1,4 +1,5 @@
 import { Bot, Check, Inbox, Phone, RotateCcw, Trash2 } from "lucide-react";
+import { ActionForm } from "@/components/admin/ActionForm";
 import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { SubmitButton } from "@/components/ui/SubmitButton";
@@ -8,7 +9,8 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { daysAgo, formatDateTime } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
-import { deleteLead, setLeadContacted } from "./actions";
+import { botStatus } from "@/lib/telegram";
+import { connectTelegramBot, deleteLead, setLeadContacted } from "./actions";
 
 /** Sign-up requests from the public page, newest and unanswered first. */
 export default async function LeadsPage() {
@@ -18,7 +20,8 @@ export default async function LeadsPage() {
   const leads = await prisma.lead.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }], take: 500 });
   const newCount = leads.filter((lead) => lead.status === "NEW").length;
   const dayStart = daysAgo(1);
-  const [botUsers, botTotal, botToday, bySource] = await Promise.all([
+  const [bot, botUsers, botTotal, botToday, bySource] = await Promise.all([
+    botStatus(),
     prisma.botUser.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),
     prisma.botUser.count(),
     prisma.botUser.count({ where: { createdAt: { gte: dayStart } } }),
@@ -94,6 +97,22 @@ export default async function LeadsPage() {
           <Badge tone="primary">{format(t.leads.botTotal, { count: botTotal })}</Badge>
           <Badge>{format(t.leads.botToday, { count: botToday })}</Badge>
         </header>
+        <div className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-3">
+          {bot?.ok && bot.connected ? (
+            <a href={`https://t.me/${bot.username}`} target="_blank" rel="noopener noreferrer" className="font-bold text-success hover:underline">
+              {format(t.leads.botOn, { name: bot.username })}
+            </a>
+          ) : (
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-danger">{t.leads.botOff}</p>
+              <p className="text-xs text-muted">{t.leads.botSetup}</p>
+            </div>
+          )}
+          {bot?.ok && bot.lastError && <p className="w-full text-xs text-danger">{format(t.leads.botError, { error: bot.lastError })}</p>}
+          <ActionForm action={connectTelegramBot} submitLabel={bot?.ok && bot.connected ? t.leads.botReconnect : t.leads.botConnect} className="ml-auto flex flex-wrap items-center gap-3">
+            {null}
+          </ActionForm>
+        </div>
         {bySource.length > 0 && (
           <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3">
             {bySource.map((s) => (

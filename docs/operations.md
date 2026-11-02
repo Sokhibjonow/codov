@@ -75,14 +75,16 @@ Course content is imported by scripts kept with the content, outside this reposi
 
 ## Telegram gift bot
 
-The videos promise a free PDF; viewers get it from the bot (`src/app/api/telegram/webhook/route.ts`).
-A deep link `t.me/<bot>?start=<video>` records which video brought the person (`BotUser.source`);
-`giftForSource` in `src/lib/gifts.ts` picks the PDF (`js…`/`viral…` → JavaScript cheat sheet, anything else →
-the 30-day plan; a bare /start — typed after a Short — gets both). The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
+The first stop after a video: the viewer presses Start in the bot, gets the PDF promised in the video and,
+from the menu under the input field («Sovg‘alar», «Bepul darslar», «Onlayn guruh», «Savol berish»),
+goes to the free lessons on the site (`/register?kurs=start|js`), the channel or the online group
+(`src/app/api/telegram/webhook/route.ts`). A deep link `t.me/<bot>?start=<video>` records which video brought
+the person (`BotUser.source`); `giftForSource` in `src/lib/gifts.ts` picks the PDF (`js…`/`viral…` →
+JavaScript cheat sheet, anything else → the 30-day plan; a bare /start — typed after a Short — gets both).
+The PDFs live in `public/sovga`. Everyone who pressed Start is listed on /admin/leads.
 
 1. @BotFather → /newbot → copy the token.
-2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` (a long random string),
-   optionally `TELEGRAM_CHANNEL=@codovvv` — then the gift waits until the person subscribes to the channel.
-   For that check the bot must be an **administrator** of the channel; otherwise the gift is sent without the check.
-3. Redeploy, then register the webhook once:
-   `curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://www.codov.uz/api/telegram/webhook&secret_token=<SECRET>"`
+2. Vercel env (Production): `TELEGRAM_BOT_TOKEN`. Optional: `TELEGRAM_CHANNEL=@codovvv` — gifts then wait until
+   the person subscribes (the bot must be an **administrator** of the channel, otherwise the check is skipped);
+   `TELEGRAM_WEBHOOK_SECRET` — otherwise derived from the token.
+3. Redeploy, then /admin/leads → «Botni ulash»: sets the webhook, the command menu and the bot's description.
