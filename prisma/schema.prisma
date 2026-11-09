@@ -41,10 +41,10 @@ model User {
   updatedAt      DateTime  @updatedAt
 
   groupMemberships    GroupMember[]
-  children            ParentChild[]      @relation("ParentLinks")
-  parents             ParentChild[]      @relation("ChildLinks")
-  submissions         Submission[]       @relation("StudentSubmissions")
-  reviewedSubmissions Submission[]       @relation("ReviewerSubmissions")
+  children            ParentChild[]             @relation("ParentLinks")
+  parents             ParentChild[]             @relation("ChildLinks")
+  submissions         Submission[]              @relation("StudentSubmissions")
+  reviewedSubmissions Submission[]              @relation("ReviewerSubmissions")
   drafts              CodeDraft[]
   lessonProgress      LessonProgress[]
   lessonAccess        StudentLessonAccess[]
@@ -72,10 +72,10 @@ model ParentChild {
 // ───────────── Groups ─────────────
 
 model Group {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  isArchived  Boolean  @default(false)
+  id           String    @id @default(cuid())
+  name         String
+  description  String?
+  isArchived   Boolean   @default(false)
   // Trial group: people who sign up on /register land here. In its courses only the first
   // trialLessons lessons open, each after the previous one is submitted (no teacher review needed).
   isTrial      Boolean   @default(false)
@@ -84,8 +84,8 @@ model Group {
   offerStart   DateTime?
   offerSeats   Int?
   offerLink    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   members    GroupMember[]
   courses    GroupCourse[]
@@ -149,12 +149,12 @@ model Course {
 }
 
 model GroupCourse {
-  groupId  String
-  courseId String
-  openedAt DateTime @default(now())
+  groupId     String
+  courseId    String
+  openedAt    DateTime @default(now())
   // Lessons open in order: the next one opens once the teacher accepted every task of the previous one.
   // The teacher can open the first N lessons for the group regardless of progress (0 = in order only).
-  openLessons Int @default(0)
+  openLessons Int      @default(0)
 
   group  Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -194,7 +194,7 @@ model Lesson {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module      Module                @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   assignments Assignment[]
   progress    LessonProgress[]
   attachments Attachment[]
@@ -241,35 +241,46 @@ model StudentAssignmentAccess {
   @@index([assignmentId])
 }
 
+// CODE: HTML/CSS/JS in the editor with autotests; TEXT: a written answer (AI course), checked against `criteria`
+enum AssignmentKind {
+  CODE
+  TEXT
+}
+
 model Assignment {
-  id              String   @id @default(cuid())
+  id              String         @id @default(cuid())
   lessonId        String
   // Stable key from the content folder (see Lesson.slug)
   key             String?
   titleUz         String
   titleRu         String
   // Markdown task description (ТЗ)
-  descriptionUz   String   @default("") @db.Text
-  descriptionRu   String   @default("") @db.Text
+  descriptionUz   String         @default("") @db.Text
+  descriptionRu   String         @default("") @db.Text
   // Lesson topic passed to the AI reviewer to judge what is "age-appropriate" code
-  topic           String   @default("")
-  starterHtml     String   @default("") @db.Text
-  starterCss      String   @default("") @db.Text
-  starterJs       String   @default("") @db.Text
+  topic           String         @default("")
+  kind            AssignmentKind @default(CODE)
+  // TEXT tasks: what the AI reviewer and the teacher check, and the answer outline the student starts from
+  criteria        String         @default("") @db.Text
+  templateUz      String         @default("") @db.Text
+  templateRu      String         @default("") @db.Text
+  starterHtml     String         @default("") @db.Text
+  starterCss      String         @default("") @db.Text
+  starterJs       String         @default("") @db.Text
   // Model answer: shown to the teacher only (editor and review page), never selected for students
-  solutionHtml    String   @default("") @db.Text
-  solutionCss     String   @default("") @db.Text
-  solutionJs      String   @default("") @db.Text
+  solutionHtml    String         @default("") @db.Text
+  solutionCss     String         @default("") @db.Text
+  solutionJs      String         @default("") @db.Text
   // Autotest rules, see src/lib/autotests
-  tests           Json     @default("[]")
-  maxScore        Int      @default(100)
-  aiReviewEnabled Boolean  @default(true)
-  order           Int      @default(0)
-  isPublished     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  tests           Json           @default("[]")
+  maxScore        Int            @default(100)
+  aiReviewEnabled Boolean        @default(true)
+  order           Int            @default(0)
+  isPublished     Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
-  lesson      Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson      Lesson                    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   submissions Submission[]
   drafts      CodeDraft[]
   deadlines   AssignmentDeadline[]
@@ -332,6 +343,8 @@ model CodeDraft {
   html         String   @default("") @db.Text
   css          String   @default("") @db.Text
   js           String   @default("") @db.Text
+  // Written answer of a TEXT task
+  answer       String   @default("") @db.Text
   // Integrity counters accumulated while editing (paste count, typed chars, active time…)
   integrity    Json?
   // Editing sessions since the last submission (see src/lib/integrity.ts)
@@ -367,6 +380,8 @@ model Submission {
   html         String           @db.Text
   css          String           @db.Text
   js           String           @db.Text
+  // Written answer of a TEXT task (the code fields stay empty)
+  answer       String           @default("") @db.Text
   status       SubmissionStatus @default(SUBMITTED)
   // Sent after the student's group deadline (snapshot at submit time)
   isLate       Boolean          @default(false)
@@ -489,17 +504,17 @@ model Lead {
 // People who pressed Start in the Telegram bot (the gift from the videos). `source` is the deep-link
 // payload of their first /start: which video or post brought them.
 model BotUser {
-  id           String   @id @default(cuid())
-  telegramId   String   @unique
-  username     String?
-  firstName    String   @default("")
-  source       String   @default("")
-  startCount   Int      @default(1)
-  giftSent     Boolean  @default(false)
+  id          String    @id @default(cuid())
+  telegramId  String    @unique
+  username    String?
+  firstName   String    @default("")
+  source      String    @default("")
+  startCount  Int       @default(1)
+  giftSent    Boolean   @default(false)
   // When they opened our Instagram from the bot (following itself can't be checked, the visit can)
-  instagramAt  DateTime?
-  createdAt    DateTime @default(now())
-  lastSeenAt   DateTime @default(now())
+  instagramAt DateTime?
+  createdAt   DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
 
   @@index([createdAt])
 }

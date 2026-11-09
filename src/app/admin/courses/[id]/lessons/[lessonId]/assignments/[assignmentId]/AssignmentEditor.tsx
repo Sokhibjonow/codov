@@ -29,6 +29,10 @@ type AssignmentEditorProps = {
     solutionCss: string;
     solutionJs: string;
     maxScore: number;
+    kind: "CODE" | "TEXT";
+    criteria: string;
+    templateUz: string;
+    templateRu: string;
     aiReviewEnabled: boolean;
     tests: AutotestRule[];
   };
@@ -52,6 +56,10 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
   const [maxScore, setMaxScore] = useState(String(assignment.maxScore));
   const [aiReview, setAiReview] = useState(assignment.aiReviewEnabled);
   const [tests, setTests] = useState(assignment.tests);
+  const [kind, setKind] = useState(assignment.kind);
+  const [criteria, setCriteria] = useState(assignment.criteria);
+  const [template, setTemplate] = useState({ uz: assignment.templateUz, ru: assignment.templateRu });
+  const ta = t.textAnswer;
   const [dirty, setDirty] = useState(false);
   const [result, setResult] = useState<ActionState>();
 
@@ -96,7 +104,42 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
         />
       </section>
 
-      <section className="space-y-3">
+      <input type="hidden" name="kind" value={kind} />
+      {kind === "TEXT" && (
+        <section className="card space-y-4">
+          <div>
+            <h2 className="text-lg font-extrabold">{ta.template}</h2>
+            <p className="text-sm text-muted">{ta.templateHint}</p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {(["uz", "ru"] as const).map((lang) => (
+              <label key={lang} className="block">
+                <span className="mb-1.5 block text-sm font-bold uppercase">{lang}</span>
+                <textarea
+                  name={lang === "uz" ? "templateUz" : "templateRu"}
+                  value={template[lang]}
+                  onChange={(e) => edit(setTemplate)({ ...template, [lang]: e.target.value })}
+                  className="input min-h-48 w-full resize-y"
+                />
+              </label>
+            ))}
+          </div>
+          <label className="block">
+            <span className="mb-1.5 block text-lg font-extrabold">{ta.criteria}</span>
+            <span className="mb-2 block text-sm text-muted">{ta.criteriaHint}</span>
+            <textarea name="criteria" value={criteria} onChange={(e) => edit(setCriteria)(e.target.value)} className="input min-h-32 w-full resize-y" />
+          </label>
+        </section>
+      )}
+      {kind === "CODE" && (
+        <>
+          <input type="hidden" name="templateUz" value={template.uz} />
+          <input type="hidden" name="templateRu" value={template.ru} />
+          <input type="hidden" name="criteria" value={criteria} />
+        </>
+      )}
+
+      <section className={kind === "TEXT" ? "hidden" : "space-y-3"}>
         <div>
           <h2 className="text-lg font-extrabold">{t.assignments.starterCode}</h2>
           <p className="text-sm text-muted">{t.assignments.starterHint}</p>
@@ -118,7 +161,7 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className={kind === "TEXT" ? "hidden" : "space-y-3"}>
         <div>
           <h2 className="flex items-center gap-2 text-lg font-extrabold">
             <LockKeyhole size={18} className="text-primary" />
@@ -143,7 +186,7 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
         </div>
       </section>
 
-      <section className="card space-y-3">
+      <section className={kind === "TEXT" ? "hidden" : "card space-y-3"}>
         <div>
           <h2 className="text-lg font-extrabold">{t.autotests.title}</h2>
           <p className="text-sm text-muted">{t.autotests.hint}</p>
@@ -154,6 +197,15 @@ export function AssignmentEditor({ t, assignment, saveAction }: AssignmentEditor
 
       <section className="card space-y-4">
         <h2 className="text-lg font-extrabold">{t.assignments.settings}</h2>
+        <fieldset className="flex flex-wrap gap-2">
+          <legend className="mb-1.5 text-sm font-bold">{ta.kind}</legend>
+          {(["CODE", "TEXT"] as const).map((k) => (
+            <label key={k} className="flex cursor-pointer items-center gap-2 rounded-xl border-2 border-border px-3 py-2 text-sm font-bold has-[:checked]:border-primary has-[:checked]:bg-primary-soft/50">
+              <input type="radio" checked={kind === k} onChange={() => edit(setKind)(k)} className="accent-primary" />
+              {k === "CODE" ? ta.kindCode : ta.kindText}
+            </label>
+          ))}
+        </fieldset>
         <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
           <Field
             name="topic"

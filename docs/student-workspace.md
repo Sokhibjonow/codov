@@ -82,3 +82,20 @@ own score is advisory and never becomes `Submission.score`.
 A task page, a draft save, a submit, the task list, the reports and the `/results` blocks all go
 through `studentOpenAssignmentWhere` — see [access control](access-control.md). A locked task cannot
 be reached by guessing its URL.
+
+## Written answers (TEXT tasks)
+
+`Assignment.kind` is `CODE` (everything above) or `TEXT` — the AI Foundation course, where the student works with
+an AI chat and hands in a written answer: their prompts, the AI's replies and their own conclusions.
+
+- The student page renders `TextWorkspace` instead of the editor: the task, then one text field that starts from
+  the task's answer outline (`templateUz` / `templateRu`) and autosaves into `CodeDraft.answer`.
+- `submitAnswer` stores the text in `Submission.answer` (the code fields stay empty) and queues the AI review.
+- The queue calls `reviewAnswer` for TEXT tasks: same report shape as for code, judged against `Assignment.criteria`
+  (Russian, written for the reviewer and the teacher). Pasted AI replies are expected; "Самостоятельность" there means
+  the student's own conclusions.
+- The teacher's review page shows the answer, the task and the criteria; there is no integrity recording.
+- The content importer reads `kind: "text"` and `criteria` from `tasks.mjs` and the outlines from
+  `<key>.template.uz.md` / `<key>.template.ru.md`.
+- `/admin/stats` lists, per group, every task someone has sent: how many sent it, how many were accepted, the average
+  teacher score and the average AI "task done" score.

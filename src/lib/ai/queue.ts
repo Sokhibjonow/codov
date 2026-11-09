@@ -3,7 +3,7 @@ import { parseRules, parseResults } from "../autotests";
 import { prisma } from "../db";
 import { readSummary } from "../integrity";
 import { GeminiError, geminiConfigured } from "./gemini";
-import { reviewSubmission } from "./review";
+import { reviewAnswer, reviewSubmission } from "./review";
 
 // One-at-a-time background queue for AI reviews, paced for the free Gemini tier.
 // Runs inside the web server; queued work survives restarts because the state lives in the database.
@@ -59,10 +59,13 @@ async function processQueue() {
         html: true,
         css: true,
         js: true,
+        answer: true,
         integrity: true,
         autotestResults: true,
         assignment: {
           select: {
+            kind: true,
+            criteria: true,
             topic: true,
             tests: true,
             descriptionUz: true,
@@ -81,16 +84,21 @@ async function processQueue() {
     if (claimed.count === 0) continue;
 
     const rules = parseRules(next.assignment.tests);
+    const lessonTitle = next.assignment.lesson.titleRu || next.assignment.lesson.titleUz;
+    const description = { uz: next.assignment.descriptionUz, ru: next.assignment.descriptionRu };
     try {
-      const report = await reviewSubmission({
-        topic: next.assignment.topic,
-        lessonTitle: next.assignment.lesson.titleRu || next.assignment.lesson.titleUz,
-        description: { uz: next.assignment.descriptionUz, ru: next.assignment.descriptionRu },
-        code: { html: next.html, css: next.css, js: next.js },
-        rules,
-        results: next.autotestResults ? parseResults(next.autotestResults, rules) : null,
-        integrity: readSummary(next.integrity),
-      });
+      const report =
+        next.assignment.kind === "TEXT"
+          ? await reviewAnswer({ lessonTitle, description, criteria: next.assignment.criteria, answer: next.answer })
+          : await reviewSubmission({
+              topic: next.assignment.topic,
+              lessonTitle,
+              description,
+              code: { html: next.html, css: next.css, js: next.js },
+              rules,
+              results: next.autotestResults ? parseResults(next.autotestResults, rules) : null,
+              integrity: readSummary(next.integrity),
+            });
       await prisma.submission.update({
         where: { id: next.id },
         data: { aiStatus: "DONE", aiReport: report as unknown as Prisma.InputJsonValue, aiError: null },

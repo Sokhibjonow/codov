@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
-import { saveDraft, submitWork } from "@/app/student/actions/drafts";
+import { saveAnswerDraft, saveDraft, submitAnswer, submitWork } from "@/app/student/actions/drafts";
 import { AttachmentsList } from "@/components/attachments/AttachmentsList";
 import { Markdown } from "@/components/markdown/Markdown";
 import { kickAiQueue } from "@/lib/ai/queue";
@@ -14,6 +14,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatDateTime, isPast } from "@/lib/format";
 import { pick, studentOpenAssignmentWhere } from "@/lib/learning";
+import { TextWorkspace } from "./TextWorkspace";
 import { Workspace } from "./Workspace";
 
 type Props = { params: Promise<{ id: string }> };
@@ -30,6 +31,9 @@ async function loadAssignment(userId: string, id: string) {
       starterHtml: true,
       starterCss: true,
       starterJs: true,
+      kind: true,
+      templateUz: true,
+      templateRu: true,
       maxScore: true,
       tests: true,
       lesson: { select: { id: true, titleUz: true, titleRu: true } },
@@ -45,7 +49,7 @@ async function loadAssignment(userId: string, id: string) {
         take: 1,
         select: { dueAt: true },
       },
-      drafts: { where: { userId }, select: { html: true, css: true, js: true } },
+      drafts: { where: { userId }, select: { html: true, css: true, js: true, answer: true } },
       attachments: { orderBy: attachmentOrder, select: attachmentSelect },
     },
   });
@@ -86,41 +90,55 @@ export default async function AssignmentWorkspacePage({ params }: Props) {
           ? ({ state: "done", ...(report.feedback[locale] ?? report.feedback.uz) } as const)
           : null;
 
+  const common = {
+    t,
+    title: pick(locale, assignment.titleUz, assignment.titleRu),
+    lessonTitle: pick(locale, assignment.lesson.titleUz, assignment.lesson.titleRu),
+    backHref: "/student/assignments",
+    due: dueAt
+      ? { label: isPast(dueAt) ? t.assignments.overdue : format(t.assignments.due, { date: formatDateTime(dueAt, locale) }), overdue: isPast(dueAt) }
+      : null,
+    maxScore: assignment.maxScore,
+    submission: lastSubmission
+      ? { status: lastSubmission.status, score: lastSubmission.score, comment: lastSubmission.teacherComment, ai: aiFeedback }
+      : null,
+    // Keyed: the workspace renders it among other children and it can reach the client as a lazy chunk
+    description: (
+      <div key="description" className="space-y-5">
+        {description.trim() && (
+          <Markdown
+            content={description}
+            resultLabel={t.lessons.result}
+            resultUrl={(i) => `/results/assignment/${assignment.id}/${descriptionLang}/${i}`}
+          />
+        )}
+        <AttachmentsList items={assignment.attachments} t={t} />
+      </div>
+    ),
+  };
+
+  if (assignment.kind === "TEXT") {
+    const template = pick(locale, assignment.templateUz, assignment.templateRu);
+    const draft = assignment.drafts[0]?.answer;
+    return (
+      <TextWorkspace
+        {...common}
+        template={template}
+        initialAnswer={draft || template}
+        saveDraft={saveAnswerDraft.bind(null, assignment.id)}
+        submitAnswer={submitAnswer.bind(null, assignment.id)}
+      />
+    );
+  }
+
   return (
     <Workspace
-      t={t}
-      title={pick(locale, assignment.titleUz, assignment.titleRu)}
-      lessonTitle={pick(locale, assignment.lesson.titleUz, assignment.lesson.titleRu)}
-      backHref="/student/assignments"
-      due={
-        dueAt
-          ? { label: isPast(dueAt) ? t.assignments.overdue : format(t.assignments.due, { date: formatDateTime(dueAt, locale) }), overdue: isPast(dueAt) }
-          : null
-      }
-      maxScore={assignment.maxScore}
+      {...common}
       starter={starter}
       initialCode={assignment.drafts[0] ?? starter}
-      submission={
-        lastSubmission
-          ? { status: lastSubmission.status, score: lastSubmission.score, comment: lastSubmission.teacherComment, ai: aiFeedback }
-          : null
-      }
       tests={parseRules(assignment.tests)}
       saveDraft={saveDraft.bind(null, assignment.id)}
       submitWork={submitWork.bind(null, assignment.id)}
-      // Keyed: Workspace renders it among other children and it can reach the client as a lazy chunk
-      description={
-        <div key="description" className="space-y-5">
-          {description.trim() && (
-            <Markdown
-              content={description}
-              resultLabel={t.lessons.result}
-              resultUrl={(i) => `/results/assignment/${assignment.id}/${descriptionLang}/${i}`}
-            />
-          )}
-          <AttachmentsList items={assignment.attachments} t={t} />
-        </div>
-      }
     />
   );
 }

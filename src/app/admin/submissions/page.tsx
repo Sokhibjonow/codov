@@ -34,6 +34,8 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
   const q = param(sp.q);
   const group = param(sp.group);
   const status = param(sp.status) || "NEEDS_REVIEW";
+  // From the task statistics: every work on one task
+  const assignment = param(sp.assignment);
 
   // Resume AI reviews left in the queue (no-op when there's nothing to do or no key)
   after(() => kickAiQueue());
@@ -45,6 +47,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
     ...(group && { groupMemberships: { some: { groupId: group } } }),
   };
   if (q || group) where.student = studentWhere;
+  if (assignment) where.assignmentId = assignment;
 
   const [submissions, groups] = await Promise.all([
     prisma.submission.findMany({

@@ -15,7 +15,7 @@ import type { ReplaySegment } from "@/lib/integrity";
 import type { CodeFiles } from "@/lib/preview";
 import { useIntegrityRecorder } from "./useIntegrityRecorder";
 
-type SaveStatus = "saved" | "unsaved" | "saving" | "error";
+export type SaveStatus = "saved" | "unsaved" | "saving" | "error";
 
 export type WorkspaceSubmission = {
   status: "SUBMITTED" | "NEEDS_REVIEW" | "ACCEPTED" | "RETURNED";
@@ -261,10 +261,21 @@ export function Workspace({
   );
 }
 
-function SubmissionBanner({ submission, maxScore, t }: { submission: WorkspaceSubmission; maxScore: number; t: Dictionary }) {
+/** `reviewText` replaces the waiting message (written answers are not code). */
+export function SubmissionBanner({
+  submission,
+  maxScore,
+  t,
+  reviewText = t.submissions.banner.review,
+}: {
+  submission: WorkspaceSubmission;
+  maxScore: number;
+  t: Dictionary;
+  reviewText?: string;
+}) {
   const view = {
-    SUBMITTED: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: t.submissions.banner.review },
-    NEEDS_REVIEW: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: t.submissions.banner.review },
+    SUBMITTED: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: reviewText },
+    NEEDS_REVIEW: { icon: Hourglass, className: "bg-accent/15 text-warning-strong", text: reviewText },
     ACCEPTED: {
       icon: CheckCircle2,
       className: "bg-success/10 text-success",
@@ -293,7 +304,7 @@ function SubmissionBanner({ submission, maxScore, t }: { submission: WorkspaceSu
 const AI_POLL_MS = 6_000;
 const AI_POLL_LIMIT = 30;
 
-function AiFeedback({ ai, t }: { ai: NonNullable<WorkspaceSubmission["ai"]>; t: Dictionary }) {
+export function AiFeedback({ ai, t }: { ai: NonNullable<WorkspaceSubmission["ai"]>; t: Dictionary }) {
   const router = useRouter();
   const pending = ai.state === "pending";
 
@@ -344,7 +355,7 @@ function AiFeedback({ ai, t }: { ai: NonNullable<WorkspaceSubmission["ai"]>; t: 
   );
 }
 
-function SaveIndicator({ status, t }: { status: SaveStatus; t: Dictionary }) {
+export function SaveIndicator({ status, t }: { status: SaveStatus; t: Dictionary }) {
   const content = {
     saved: { icon: <CheckCircle2 size={16} className="text-success" />, label: t.assignments.saved, className: "text-muted" },
     unsaved: { icon: <span className="size-2 rounded-full bg-accent" />, label: t.assignments.unsaved, className: "text-muted" },

@@ -1,6 +1,7 @@
 import { AlertTriangle, BookOpen, CalendarCheck, ClipboardCheck, GraduationCap, Send, Star } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { AssignmentStats } from "@/components/stats/AssignmentStats";
 import { getDictionary } from "@/i18n/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -208,6 +209,8 @@ export default async function AdminStatsPage({ searchParams }: Props) {
           </div>
         )}
       </section>
+
+      <AssignmentStats groupId={group.id} studentIds={studentIds} t={t} locale={locale} />
     </>
   );
 }

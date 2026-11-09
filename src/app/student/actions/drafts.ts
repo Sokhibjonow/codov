@@ -42,10 +42,99 @@ async function loadForStudent(userId: string, assignmentId: string) {
         take: 1,
         select: { dueAt: true },
       },
+      kind: true,
       submissions: { where: { studentId: userId }, orderBy: { attempt: "desc" }, take: 1, select: { attempt: true, status: true } },
       drafts: { where: { userId }, select: { replay: true } },
     },
   });
+}
+
+const MAX_ANSWER = 30_000;
+const cleanAnswer = (answer: unknown) => (typeof answer === "string" ? answer.slice(0, MAX_ANSWER) : "");
+
+/** Autosave of a written answer (TEXT tasks of the AI course). */
+export async function saveAnswerDraft(assignmentId: string, answer: string) {
+  const user = await requireUser("STUDENT");
+
+  const assignment = await loadForStudent(user.id, assignmentId);
+  if (!assignment || assignment.kind !== "TEXT") return { ok: false };
+  if (LOCKED_STATUSES.has(assignment.submissions[0]?.status ?? "")) return { ok: false, locked: true };
+
+  const text = cleanAnswer(answer);
+  await prisma.codeDraft.upsert({
+    where: { userId_assignmentId: { userId: user.id, assignmentId } },
+    create: { userId: user.id, assignmentId, answer: text },
+    update: { answer: text },
+  });
+  return { ok: true };
+}
+
+/** Sends a written answer: the teacher reviews it, the AI gives instant feedback by the lesson's criteria. */
+export async function submitAnswer(assignmentId: string, answer: string) {
+  const user = await requireUser("STUDENT");
+  const { t } = await getDictionary();
+
+  const assignment = await loadForStudent(user.id, assignmentId);
+  if (!assignment || assignment.kind !== "TEXT") return { ok: false, message: t.common.errors.notFound };
+
+  const last = assignment.submissions[0];
+  if (last && LOCKED_STATUSES.has(last.status)) return { ok: false, message: t.submissions.alreadySubmitted };
+
+  const text = cleanAnswer(answer);
+  if (!text.trim()) return { ok: false, message: t.submissions.emptyAnswer };
+
+  const dueAt = assignment.deadlines[0]?.dueAt;
+  const admins = await prisma.user.findMany({ where: { role: "ADMIN", isActive: true }, select: { id: true } });
+  const queueAi = assignment.aiReviewEnabled && geminiConfigured();
+
+  let submissionId: string;
+  try {
+    const [created] = await prisma.$transaction([
+      prisma.submission.create({
+        select: { id: true },
+        data: {
+          assignmentId,
+          studentId: user.id,
+          attempt: (last?.attempt ?? 0) + 1,
+          html: "",
+          css: "",
+          js: "",
+          answer: text,
+          status: "NEEDS_REVIEW",
+          isLate: !!dueAt && new Date() > dueAt,
+          aiStatus: queueAi ? "QUEUED" : "NONE",
+        },
+      }),
+      prisma.codeDraft.upsert({
+        where: { userId_assignmentId: { userId: user.id, assignmentId } },
+        create: { userId: user.id, assignmentId, answer: text },
+        update: { answer: text },
+      }),
+    ]);
+    submissionId = created.id;
+  } catch (error) {
+    // Unique (assignment, student, attempt): a double click already created this attempt
+    if (typeof error === "object" && error && (error as { code?: string }).code === "P2002") {
+      return { ok: false, message: t.submissions.alreadySubmitted };
+    }
+    throw error;
+  }
+
+  await notify(
+    admins.map((admin) => admin.id),
+    "submission.new",
+    {
+      submissionId,
+      assignmentId,
+      studentName: `${user.lastName} ${user.firstName}`.trim(),
+      titleUz: assignment.titleUz,
+      titleRu: assignment.titleRu,
+    },
+  );
+
+  revalidatePath("/", "layout");
+  if (queueAi) after(() => kickAiQueue());
+  return { ok: true, message: t.submissions.sent };
 }
 
 /** Autosave of the student's work in progress together with the current editing session. */
@@ -74,7 +163,7 @@ export async function submitWork(assignmentId: string, code: CodeFiles, segment:
   const { t } = await getDictionary();
 
   const assignment = await loadForStudent(user.id, assignmentId);
-  if (!assignment) return { ok: false, message: t.common.errors.notFound };
+  if (!assignment || assignment.kind !== "CODE") return { ok: false, message: t.common.errors.notFound };
 
   const last = assignment.submissions[0];
   if (last && LOCKED_STATUSES.has(last.status)) return { ok: false, message: t.submissions.alreadySubmitted };

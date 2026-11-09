@@ -48,6 +48,7 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
       html: true,
       css: true,
       js: true,
+      answer: true,
       integrity: true,
       replay: true,
       autotestResults: true,
@@ -66,6 +67,8 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
           descriptionUz: true,
           descriptionRu: true,
           maxScore: true,
+          kind: true,
+          criteria: true,
           tests: true,
           aiReviewEnabled: true,
           solutionHtml: true,
@@ -119,13 +122,36 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
       </div>
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <SubmissionViewer
-          t={t}
-          code={code}
-          segments={parseSegments(submission.replay)}
-          task={description.trim() ? <Markdown content={description} resultLabel={t.lessons.result} hiddenCodeNote={t.lessons.codeHidden} /> : null}
-          solution={{ html: submission.assignment.solutionHtml, css: submission.assignment.solutionCss, js: submission.assignment.solutionJs }}
-        />
+        {submission.assignment.kind === "TEXT" ? (
+          <div className="space-y-4">
+            <section className="card">
+              <h2 className="mb-3 text-lg font-extrabold">{t.textAnswer.studentAnswer}</h2>
+              <div className="whitespace-pre-wrap break-words rounded-xl bg-background p-4 leading-relaxed">{submission.answer || "—"}</div>
+            </section>
+            {description.trim() && (
+              <details className="card">
+                <summary className="cursor-pointer font-extrabold">{t.textAnswer.task}</summary>
+                <div className="mt-3">
+                  <Markdown content={description} resultLabel={t.lessons.result} hiddenCodeNote={t.lessons.codeHidden} />
+                </div>
+              </details>
+            )}
+            {submission.assignment.criteria.trim() && (
+              <section className="card">
+                <h2 className="mb-2 font-extrabold">{t.textAnswer.criteria}</h2>
+                <p className="whitespace-pre-wrap text-sm">{submission.assignment.criteria}</p>
+              </section>
+            )}
+          </div>
+        ) : (
+          <SubmissionViewer
+            t={t}
+            code={code}
+            segments={parseSegments(submission.replay)}
+            task={description.trim() ? <Markdown content={description} resultLabel={t.lessons.result} hiddenCodeNote={t.lessons.codeHidden} /> : null}
+            solution={{ html: submission.assignment.solutionHtml, css: submission.assignment.solutionCss, js: submission.assignment.solutionJs }}
+          />
+        )}
 
         <div className="space-y-4">
           <section className="card">
@@ -162,7 +188,7 @@ export default async function SubmissionReviewPage({ params }: { params: Promise
             requeue={requeueAiReview.bind(null, submission.id)}
           />
 
-          <IntegrityCard summary={readSummary(submission.integrity)} t={t} />
+          {submission.assignment.kind === "CODE" && <IntegrityCard summary={readSummary(submission.integrity)} t={t} />}
 
           {attempts.length > 1 && (
             <section className="card p-0">
